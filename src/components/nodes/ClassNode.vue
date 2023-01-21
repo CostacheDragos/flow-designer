@@ -1,8 +1,39 @@
 <template>
+  <NodeToolbar :is-visible="data.toolbarVisible" :position="data.toolbarPosition">
+    <div class="flex flex-col di">
+      <button class="bg-blue-500 text-white rounded py-2 px-4 block" @click="addProperty">
+        Add Property
+      </button>
+      <button class="bg-blue-500 text-white rounded py-2 px-4 block mt-1" @click="addMethod">
+        Add Method
+      </button>
+    </div>
+  </NodeToolbar>
+
   <div :class="{'border-sky-400 border-2': selected, 'border-black border-2': !selected}" class="vue-flow__node-default">
-    <h2>
-      {{ label }}
-    </h2>
+    <div class="flex">
+      <h2 class="grow">
+        {{ label }}
+      </h2>
+      <div class="my-auto rounded-full hover:bg-sky-400 px-1">
+        <font-awesome-icon v-show="!isExpanded" icon="fa-solid fa-angle-right" @click="toggleExpanded"/>
+        <font-awesome-icon v-show="isExpanded" icon="fa-solid fa-angle-down" @click="toggleExpanded"/>
+      </div>
+    </div>
+
+    <div v-show="isExpanded" class="divide-y-2 mt-2">
+      <ul>
+        <li v-for="property in data.classData.properties">
+          <p>{{ property }}</p>
+        </li>
+      </ul>
+      <ul>
+        <li v-for="method in data.classData.methods">
+          <p>{{ method }}()</p>
+        </li>
+      </ul>
+    </div>
+
     <Handle :position="Position.Top" type="target"/>
     <Handle :position="Position.Bottom" type="source"/>
   </div>
@@ -10,7 +41,26 @@
 
 <script setup>
 import {Handle, Position} from "@vue-flow/core";
+import {NodeToolbar} from "@vue-flow/node-toolbar";
+import {ref} from "vue";
 
-
+// Accepting props
 const props = defineProps(["label", "id", "data", "selected"]);
+
+
+// Called when adding properties & methods using the node toolbar
+function addProperty() {
+  props.data.classData.properties.push("NewProperty");
+}
+function addMethod() {
+  props.data.classData.methods.push("NewMethod");
+}
+
+
+// Expands and collapses the node content
+const isExpanded = ref(false);
+function toggleExpanded() {
+  isExpanded.value = !isExpanded.value;
+}
+
 </script>

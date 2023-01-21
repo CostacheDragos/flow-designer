@@ -4,7 +4,7 @@
      <VueFlow v-model="elements" @dragover="onDragOver" @drop="onDrop">
        <Background/>
        <template v-slot:node-class="props">
-         <class-node v-bind="props" />
+         <class-node :label="props.label" :data="props.data" :selected="props.selected" :id="props.id" />
        </template>
      </VueFlow>
     <SelectionMenu/>
@@ -15,7 +15,7 @@
 import {v4 as uuidv4} from "uuid";
 import {nextTick, provide, reactive, ref, watch} from "vue";
 
-import {VueFlow, useVueFlow, MarkerType} from "@vue-flow/core";
+import {VueFlow, useVueFlow, MarkerType, Position} from "@vue-flow/core";
 import {Background} from "@vue-flow/background";
 
 import Sidebar from "@/components/Sidebar.vue";
@@ -31,12 +31,28 @@ const elements = ref([
     label: "Class 1",
     type: "class",
     position: { x: 100, y: 100 },
+    data: {
+      toolbarPosition: Position.Right,
+      classData: {
+        name: "Class 1",
+        properties: [],
+        methods: [],
+      },
+    },
   },
   {
     id: uuidv4(),
     label: "Class 2",
     type: "class",
     position: { x: 200, y: 200 },
+    data: {
+      toolbarPosition: Position.Right,
+      classData: {
+        name: "Class 2",
+        properties: [],
+        methods: [],
+      },
+    },
   },
 ]);
 
@@ -67,13 +83,23 @@ function onDrop(event) {
     y: event.clientY - top
   });
 
+  const newNodeId = uuidv4();
   const newNode = {
-    id: uuidv4(),
+    id: newNodeId,
     label: `Class`,
     type: "class",
     position,
+    data: {
+      toolbarPosition: Position.Right,
+      classData: {
+        name: "Class",
+        properties: [],
+        methods: [],
+      },
+    },
   }
 
+  // Add the node to vue flow
   addNodes([newNode]);
 
   // align node position after drop, so it's centered to the mouse
