@@ -6,6 +6,9 @@
        <template v-slot:node-class="props">
          <class-node :label="props.label" :data="props.data" :selected="props.selected" :id="props.id" />
        </template>
+       <template v-slot:edge-inheritance="props">
+         <inheritance-edge v-bind="props"/>
+       </template>
      </VueFlow>
     <SelectionMenu/>
   </div>
@@ -21,6 +24,7 @@ import {Background} from "@vue-flow/background";
 import Sidebar from "@/components/Sidebar.vue";
 import SelectionMenu from "@/components/SelectionMenu.vue"
 import ClassNode from "@/components/nodes/ClassNode.vue";
+import InheritanceEdge from "@/components/edges/InheritanceEdge.vue";
 
 const { addNodes, addEdges, findNode, vueFlowRef, project, onConnect } = useVueFlow();
 
@@ -62,7 +66,7 @@ onConnect((params) => {
   addEdges([
     {
       ...params,
-      type: "step",
+      type: "inheritance",
       markerEnd: MarkerType.Arrow,
     },
   ]);
