@@ -24,12 +24,12 @@
     <div v-show="isExpanded" class="divide-y-2 mt-2">
       <ul>
         <li v-for="property in data.classData.properties">
-          <p>{{ property }}</p>
+          <p class="normal-case">{{ property }}</p>
         </li>
       </ul>
       <ul>
         <li v-for="method in data.classData.methods">
-          <p>{{ method }}()</p>
+          <p class="normal-case">{{ method }}()</p>
         </li>
       </ul>
     </div>
