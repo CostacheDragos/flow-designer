@@ -1,5 +1,5 @@
 <template>
-  <NodeToolbar :is-visible="data.toolbarVisible" :position="data.toolbarPosition">
+  <NodeToolbar :is-visible="isToolbarVisible" :position="data.toolbarPosition">
     <div class="flex flex-col di">
       <button class="bg-blue-500 text-white rounded py-2 px-4 block" @click="addProperty">
         Add Property
@@ -12,12 +12,16 @@
 
   <div :class="{'border-sky-400 border-2': selected, 'border-black border-2': !selected}" class="vue-flow__node-default">
     <div class="flex">
+      <div class="my-auto rounded-full hover:bg-sky-400 px-1" @click="toggleExpanded">
+        <font-awesome-icon v-show="!isExpanded" icon="fa-solid fa-angle-right"/>
+        <font-awesome-icon v-show="isExpanded" icon="fa-solid fa-angle-down"/>
+      </div>
       <h2 class="grow">
         {{ label }}
       </h2>
-      <div class="my-auto rounded-full hover:bg-sky-400 px-1">
-        <font-awesome-icon v-show="!isExpanded" icon="fa-solid fa-angle-right" @click="toggleExpanded"/>
-        <font-awesome-icon v-show="isExpanded" icon="fa-solid fa-angle-down" @click="toggleExpanded"/>
+      <div class="my-auto rounded-full hover:bg-sky-400 px-1" @click="toggleToolbarVisibility">
+        <font-awesome-icon v-show="!isToolbarVisible" icon="fa-plus fa-solid"/>
+        <font-awesome-icon v-show="isToolbarVisible" icon="fa-solid fa-minus"/>
       </div>
     </div>
 
@@ -62,5 +66,13 @@ const isExpanded = ref(false);
 function toggleExpanded() {
   isExpanded.value = !isExpanded.value;
 }
+
+
+// Determines toolbar visibility
+const isToolbarVisible = ref(false);
+function toggleToolbarVisibility() {
+  isToolbarVisible.value = !isToolbarVisible.value;
+}
+
 
 </script>

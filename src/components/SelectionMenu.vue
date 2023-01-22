@@ -1,10 +1,14 @@
 <template>
   <div class="bg-slate-600 border-l-4 border-gray-900 w-72 select-none">
     <template v-if="selectedNodeData">
-      <h1 class="text-white border-b-4 p-4 border-gray-900">
-        {{ selectedNodeData.classData.name }}
-      </h1>
-
+      <div class="flex border-b-4 p-4 border-gray-900">
+        <h1 class="text-white grow">
+          {{ selectedNodeData.classData.name }}
+        </h1>
+        <div class="cursor-pointer" @click="removeNodes([`${getSelectedNodes[0].id}`])">
+          <font-awesome-icon icon="fa-solid fa-trash" color="red"/>
+        </div>
+      </div>
       <!-- Properties controls -->
       <details class="bg-inherit duration-300 border-b-4 border-gray-900">
         <summary class="bg-inherit px-5 py-3 text-lg cursor-pointer text-white border-b border-gray-900">Properties</summary>
@@ -54,7 +58,7 @@ import { ref, watch } from "vue";
 
 import { useVueFlow } from "@vue-flow/core";
 
-const { getSelectedNodes } = useVueFlow();
+const { getSelectedNodes, removeNodes } = useVueFlow();
 
 // Listens for when the node selection changes and updates the selection menu accordingly
 const selectedNodeData = ref();

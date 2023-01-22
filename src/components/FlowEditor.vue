@@ -1,7 +1,7 @@
 <template>
   <div>
      <Sidebar class="horizontal-resize"/>
-     <VueFlow v-model="elements" @dragover="onDragOver" @drop="onDrop">
+     <VueFlow v-model="elements" @dragover="onDragOver" @drop="onDrop" @keyup.delete="onDeleteKeyup">
        <Background/>
        <template v-slot:node-class="props">
          <class-node :label="props.label" :data="props.data" :selected="props.selected" :id="props.id" />
@@ -26,7 +26,7 @@ import SelectionMenu from "@/components/SelectionMenu.vue"
 import ClassNode from "@/components/nodes/ClassNode.vue";
 import InheritanceEdge from "@/components/edges/InheritanceEdge.vue";
 
-const { addNodes, addEdges, findNode, vueFlowRef, project, onConnect } = useVueFlow();
+const { addNodes, addEdges, removeNodes, findNode, getSelectedNodes, vueFlowRef, project, onConnect } = useVueFlow();
 
 // Initial elements (for testing only)
 const elements = ref([
@@ -121,6 +121,13 @@ function onDrop(event) {
     )
   })
 }
+
+
+// Deletes the selected nodes when the 'delete' key is pressed
+function onDeleteKeyup() {
+  removeNodes(getSelectedNodes.value);
+}
+
 
 // We create a state which will enable us to easily transfer data between any child components
 const sharedState = reactive({});
