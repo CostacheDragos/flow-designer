@@ -10,7 +10,7 @@
          <inheritance-edge v-bind="props"/>
        </template>
      </VueFlow>
-    <SelectionMenu/>
+    <SelectionMenu class="h-screen"/>
   </div>
 </template>
 
@@ -40,7 +40,12 @@ const elements = ref([
       classData: {
         name: "Class 1",
         properties: [],
-        methods: [],
+        methods: [{
+          name: "defaultMethod",
+          returnType: "void",
+          parameters: [{name: "param1", type:"int"}],
+          selectedParameter: undefined, // used for UI purposes only
+        }],
       },
     },
   },
