@@ -128,11 +128,6 @@ function onDeleteKeyup() {
   removeNodes(getSelectedNodes.value);
 }
 
-
-// We create a state which will enable us to easily transfer data between any child components
-const sharedState = reactive({});
-provide("editorSharedState", sharedState);
-
 </script>
 
 <style scoped>

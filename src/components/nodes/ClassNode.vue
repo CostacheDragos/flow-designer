@@ -25,15 +25,15 @@
       </div>
     </div>
 
-    <div v-show="isExpanded" class="divide-y-2 mt-2">
-      <ul>
-        <li v-for="property in data.classData.properties">
-          <p class="normal-case">{{ property }}</p>
+    <div v-show="isExpanded" class="divide-y-2 divide-black mt-2">
+      <ul class="pb-2">
+        <li v-for="property in data.classData.properties" class="my-1 shadow border border-gray-500 rounded">
+          <p class="normal-case">{{ property.type }} {{ property.name }}</p>
         </li>
       </ul>
-      <ul>
-        <li v-for="method in data.classData.methods">
-          <p class="normal-case">{{ method }}()</p>
+      <ul class="pt-2">
+        <li v-for="method in data.classData.methods" class="my-1 shadow border border-gray-500 rounded">
+          <p class="normal-case">{{ method.returnType }} {{ method.name }}{{ method.parameters.length > 0 ? '(...)' : '()' }}</p>
         </li>
       </ul>
     </div>
@@ -44,6 +44,7 @@
 </template>
 
 <script setup>
+import {v4 as uuidv4} from "uuid";
 import {Handle, Position} from "@vue-flow/core";
 import {NodeToolbar} from "@vue-flow/node-toolbar";
 import {ref} from "vue";
@@ -54,10 +55,21 @@ const props = defineProps(["label", "id", "data", "selected"]);
 
 // Called when adding properties & methods using the node toolbar
 function addProperty() {
-  props.data.classData.properties.push("NewProperty");
+  const newProperty = {
+    id: uuidv4(),
+    name: "newProperty",
+    type: "Object",
+  };
+  props.data.classData.properties.push(newProperty);
 }
 function addMethod() {
-  props.data.classData.methods.push("NewMethod");
+  const newMethod = {
+    id: uuidv4(),
+    name: "newMethod",
+    returnType: "Object",
+    parameters: [],
+  }
+  props.data.classData.methods.push(newMethod);
 }
 
 
