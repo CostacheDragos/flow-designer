@@ -16,7 +16,7 @@
         <font-awesome-icon v-show="!isExpanded" icon="fa-solid fa-angle-right"/>
         <font-awesome-icon v-show="isExpanded" icon="fa-solid fa-angle-down"/>
       </div>
-      <h2 class="grow">
+      <h2 class="grow normal-case">
         {{ label }}
       </h2>
       <div class="my-auto rounded-full hover:bg-sky-400 px-1" @click="toggleToolbarVisibility">

@@ -6,7 +6,7 @@
       <div class="p-2">
         <ul>
           <li>
-            <div class="vue-flow__node-default mx-auto hover:cursor-pointer" :draggable="true" @dragstart="onDragStart($event, 'classNode')">
+            <div class="vue-flow__node-default mx-auto hover:cursor-pointer normal-case" :draggable="true" @dragstart="onDragStart($event, 'classNode')">
               Class
             </div>
           </li>

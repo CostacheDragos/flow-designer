@@ -10,14 +10,32 @@
     <!-- Information about the selected class node -->
     <template v-if="selectedNodeData">
       <!-- Name -->
-      <div class="flex border-b-4 p-4 border-gray-900">
-        <h1 class="text-white grow">
-          {{ selectedNodeData.classData.name }}
-        </h1>
-        <div class="cursor-pointer" @click="removeNodes([`${getSelectedNodes[0].id}`])">
-          <font-awesome-icon icon="fa-solid fa-trash" color="red"/>
+      <details class="duration-300 text-white border-b-4 p-4 border-gray-900">
+        <summary class="flex">
+          <font-awesome-icon icon="fa-solid fa-pen-to-square" color="white" class="my-auto cursor-pointer mx-2"/>
+          <div class="flex grow" @click.prevent>
+            <h1 class="grow my-auto normal-case">
+              {{ selectedNodeData.classData.name }}
+            </h1>
+            <font-awesome-icon icon="fa-solid fa-trash" color="red" class="cursor-pointer my-auto mx-2" @click="removeNodes([`${getSelectedNodes[0].id}`])"/>
+          </div>
+        </summary>
+        <div class="mx-2 hover:shadow-lg hover:shadow-gray-500 border border-slate-600 hover:border-gray-500">
+          <ul class="p-2 space-y-2">
+            <!-- Class name editing -->
+            <li class="flex">
+              <label class="normal-case text-left">Name:</label>
+              <input class="bg-gray-500 rounded ml-1 px-2 w-36
+                                    border border-gray-500
+                                    focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                     :value="selectedNodeData.classData.name"
+                     @keyup.enter="changeClassName($event.target)"
+                     @focusout="onClassNameInputLostFocus($event.target)"
+              />
+            </li>
+          </ul>
         </div>
-      </div>
+      </details>
 
       <!-- Properties controls -->
       <details class="bg-inherit duration-300 border-b-4 border-gray-900">
@@ -202,6 +220,34 @@ watch(getSelectedNodes, () => {
 
 const generalDataTypes = ["int", "long", "float", "double", "bool", "char", "string"];
 
+
+// ****** General class functions ******
+function changeClassName(inputElement) {
+  if(inputElement.value.length) {
+    selectedNodeData.value.classData.name = inputElement.value;
+    getSelectedNodes.value[0].label = inputElement.value;
+
+    // Remove the red border if there was any previous error
+    inputElement.classList.remove("focus:border-red-600");
+  }
+  else {
+    // Color the border red to let the user know that the value is not valid
+    inputElement.classList.add("focus:border-red-600");
+  }
+}
+function onClassNameInputLostFocus(inputElement) {
+  // Save changes
+  changeClassName(inputElement);
+
+  // If the input at the time of focus lost is not valid, we need to
+  // give the input value the value of the actual property
+  inputElement.value = selectedNodeData.value.classData.name;
+
+  // Remove the red border if there was any previous error
+  inputElement.classList.remove("focus:border-red-600");
+}
+
+
 // ****** Class properties functions ******
 function addProperty() {
   const newProperty = {
@@ -217,7 +263,7 @@ function removeProperty(propertyIndex) {
 
 // Called when the user presses enter in a property name input field signaling that he wishes to change
 // the property name
-// TODO IMPLEMENT MORE VALIDATIONS ON NAMES
+// TODO IMPLEMENT MORE VALIDATIONS ON NAMES (do this for methods as well)
 function changePropertyName(inputElement, property) {
   if(inputElement.value.length) {
     property.name = inputElement.value;
@@ -244,7 +290,7 @@ function onPropertyNameInputLostFocus(inputElement, property) {
   // Remove the red border if there was any previous error
   inputElement.classList.remove("focus:border-red-600");
 }
-// TODO IMPLEMENT MORE VALIDATIONS ON TYPES
+// TODO IMPLEMENT MORE VALIDATIONS ON TYPES (do this for methods as well)
 function changePropertyType(inputElement, property) {
   if(inputElement.value.length) {
     property.type = inputElement.value;

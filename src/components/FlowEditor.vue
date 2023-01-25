@@ -32,13 +32,13 @@ const { addNodes, addEdges, removeNodes, findNode, getSelectedNodes, vueFlowRef,
 const elements = ref([
   {
     id: uuidv4(),
-    label: "Class 1",
+    label: "Class1",
     type: "class",
     position: { x: 100, y: 100 },
     data: {
       toolbarPosition: Position.Right,
       classData: {
-        name: "Class 1",
+        name: "Class1",
         properties: [],
         methods: [{
           name: "defaultMethod",
@@ -51,13 +51,13 @@ const elements = ref([
   },
   {
     id: uuidv4(),
-    label: "Class 2",
+    label: "Class2",
     type: "class",
     position: { x: 200, y: 200 },
     data: {
       toolbarPosition: Position.Right,
       classData: {
-        name: "Class 2",
+        name: "Class2",
         properties: [],
         methods: [],
       },
