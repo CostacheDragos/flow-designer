@@ -137,8 +137,8 @@
                         </div>
                       </div>
 
-                      <div v-if="method.selectedParameter" class="ml-5">
-                        <ul class="p-2 space-y-2 list-disc">
+                      <div v-if="method.selectedParameter" class="ml-5 flex">
+                        <ul class="p-2 space-y-2 list-disc grow">
                           <!-- Parameter name editing -->
                           <li class="flex">
                             <label class="normal-case text-left">Name:</label>
@@ -168,6 +168,7 @@
                             </datalist>
                           </li>
                         </ul>
+                        <font-awesome-icon icon="fa-solid fa-trash" color="red" class="cursor-pointer my-auto ml-2" @click="removeSelectedParameter(method)"/>
                       </div>
                     </li>
                   </ul>
@@ -337,6 +338,13 @@ function addParameter(method) {
   method.parameters.push(newParameter);
   method.selectedParameter = newParameter;
 }
+function removeSelectedParameter(method) {
+  const parameterIndex = method.parameters.indexOf(method.selectedParameter);
+  if(parameterIndex !== -1) {
+    method.parameters.splice(parameterIndex, 1);
+    method.selectedParameter = undefined;
+  }
+}
 
 // Method parameter name editing
 function changeMethodParameterName(inputElement, method) {
@@ -387,5 +395,6 @@ function onMethodParameterTypeInputLostFocus(inputElement, method) {
   // Remove the red border if there was any previous error
   inputElement.classList.remove("focus:border-red-600");
 }
+
 
 </script>
