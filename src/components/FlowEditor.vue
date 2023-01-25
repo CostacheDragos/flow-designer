@@ -10,7 +10,7 @@
          <inheritance-edge v-bind="props"/>
        </template>
      </VueFlow>
-    <SelectionMenu class="h-screen"/>
+    <SelectionMenu/>
   </div>
 </template>
 

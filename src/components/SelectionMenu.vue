@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-slate-600 border-l-4 border-gray-900 w-80 select-none">
+  <div class="bg-slate-600 border-l-4 border-gray-900 w-96 select-none">
     <div v-if="!selectedNodeData" class="grid place-items-center h-full">
       <div>
         <font-awesome-icon icon="fa-solid fa-gears" color="white"  size="10x"/>
@@ -29,10 +29,12 @@
           <ul>
             <li v-for="(property, propertyIndex) in selectedNodeData.classData.properties" :key="property.id">
               <details class="duration-300 text-white" >
-                <summary class="flex hover:bg-gray-400 py-1">
-                  <p class="grow text-white normal-case"> {{ property.name }} </p>
-                  <div class="my-auto cursor-pointer px-2" @click.prevent="removeProperty(`${propertyIndex}`)">
-                    <font-awesome-icon icon="fa-solid fa-xmark" color="red" />
+                <summary class="flex my-1">
+                  <font-awesome-icon icon="fa-solid fa-pen-to-square" color="white" class="my-auto cursor-pointer mx-2"/>
+                  <div @click.prevent class="flex grow">
+                    <p class="grow text-white normal-case"> {{ property.name }} </p>
+                    <font-awesome-icon icon="fa-solid fa-xmark" color="red" class="my-auto cursor-pointer mx-2"
+                                       @click.prevent="removeProperty(`${propertyIndex}`)"/>
                   </div>
                 </summary>
                 <div class="mx-2 hover:shadow-lg hover:shadow-gray-500 border border-slate-600 hover:border-gray-500">
@@ -82,11 +84,13 @@
         <div class="py-2">
           <ul>
             <li v-for="(method, methodIndex) in selectedNodeData.classData.methods" :key="method.id">
-              <details class="duration-300 text-white" >
-                <summary class="flex hover:bg-gray-400 py-1">
-                  <p class="grow text-white normal-case"> {{ method.name }} </p>
-                  <div class="my-auto cursor-pointer px-2" @click.prevent="removeMethod(`${methodIndex}`)">
-                    <font-awesome-icon icon="fa-solid fa-xmark" color="red" />
+              <details class="duration-300 text-white">
+                <summary class="flex my-1">
+                  <font-awesome-icon icon="fa-solid fa-pen-to-square" color="white" class="my-auto cursor-pointer px-2"/>
+                  <div @click.prevent class="flex grow">
+                    <p class="grow text-white normal-case"> {{ method.name }} </p>
+                    <font-awesome-icon icon="fa-solid fa-xmark" color="red" class="my-auto cursor-pointer px-2"
+                                       @click.prevent="removeMethod(`${methodIndex}`)"/>
                   </div>
                 </summary>
                 <div class="mx-2 hover:shadow-lg hover:shadow-gray-500 border border-slate-600 hover:border-gray-500">
