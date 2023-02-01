@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-slate-600 border-l-4 border-gray-900 w-72 select-none">
+  <div class="bg-slate-600 border-l-4 border-gray-900 w-72 select-none overflow-y-auto">
     <div v-if="!selectedNodeData" class="grid place-items-center h-full">
       <div>
         <font-awesome-icon icon="fa-solid fa-gears" color="white"  size="10x"/>
