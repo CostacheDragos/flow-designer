@@ -1,15 +1,38 @@
 <template>
   <div>
-     <Sidebar class="horizontal-resize"/>
-     <VueFlow v-model="elements" @dragover="onDragOver" @drop="onDrop" @keyup.delete="onDeleteKeyup">
-       <Background/>
-       <template v-slot:node-class="props">
-         <class-node :label="props.label" :data="props.data" :selected="props.selected" :id="props.id" />
-       </template>
-       <template v-slot:edge-inheritance="props">
-         <inheritance-edge v-bind="props"/>
-       </template>
-     </VueFlow>
+     <Sidebar/>
+     <div class="flex-grow flex flex-col">
+       <nav class="bg-slate-600 h-6 flex select-none">
+         <ul class="ml-3">
+           <li>
+             <button data-dropdown-toggle="dropdownNavbar" id="dropdownButton" data-dropdown-offset-skidding="50" class="text-white rounded hover:bg-gray-500 px-1">Flow</button>
+             <!-- Dropdown menu -->
+             <div id="dropdownNavbar" class="z-10 hidden rounded bg-gray-600 divide-y divide-gray-100 shadow w-36">
+               <ul class="py-2" aria-labelledby="dropdownButton">
+                 <li class="hover:bg-gray-500 bg-gray-600 cursor-pointer px-3 py-1 flex" @click="downloadSaveFile">
+                   <p class="text-white normal-case">Download</p>
+                   <font-awesome-icon icon="fa-solid fa-download" class="ml-auto" color="white" />
+                 </li>
+                 <li class="hover:bg-gray-500 bg-gray-600 cursor-pointer px-3 py-1 flex" @click="$refs.fileInput.click()">
+                   <input type="file" ref="fileInput" @change="uploadSavedFlow" class="hidden">
+                   <p class="text-white normal-case">Upload</p>
+                   <font-awesome-icon icon="fa-solid fa-upload" class="ml-auto" color="white" />
+                 </li>
+               </ul>
+             </div>
+           </li>
+         </ul>
+       </nav>
+       <VueFlow v-model="elements" @dragover="onDragOver" @drop="onDrop" @keyup.delete="onDeleteKeyup" class="flex-grow">
+         <Background/>
+         <template v-slot:node-class="props">
+           <class-node :label="props.label" :data="props.data" :selected="props.selected" :id="props.id" />
+         </template>
+         <template v-slot:edge-inheritance="props">
+           <inheritance-edge v-bind="props"/>
+         </template>
+       </VueFlow>
+     </div>
     <SelectionMenu/>
   </div>
 </template>
@@ -20,13 +43,15 @@ import {nextTick, provide, reactive, ref, watch} from "vue";
 
 import {VueFlow, useVueFlow, MarkerType, Position} from "@vue-flow/core";
 import {Background} from "@vue-flow/background";
+import {Dropdown} from "flowbite";
 
 import Sidebar from "@/components/Sidebar.vue";
 import SelectionMenu from "@/components/SelectionMenu.vue"
 import ClassNode from "@/components/nodes/ClassNode.vue";
 import InheritanceEdge from "@/components/edges/InheritanceEdge.vue";
 
-const { addNodes, addEdges, removeNodes, findNode, getSelectedNodes, vueFlowRef, project, onConnect } = useVueFlow();
+const { addNodes, addEdges, removeNodes, findNode, getSelectedNodes, vueFlowRef, project, onConnect, toObject,
+        setNodes, setEdges, setTransform } = useVueFlow();
 
 // Initial elements (for testing only)
 const elements = ref([
@@ -37,6 +62,7 @@ const elements = ref([
     position: { x: 100, y: 100 },
     data: {
       toolbarPosition: Position.Right,
+      isExpanded: false,
       classData: {
         name: "Class1",
         properties: [],
@@ -56,6 +82,7 @@ const elements = ref([
     position: { x: 200, y: 200 },
     data: {
       toolbarPosition: Position.Right,
+      isExpanded: false,
       classData: {
         name: "Class2",
         properties: [],
@@ -100,6 +127,7 @@ function onDrop(event) {
     position,
     data: {
       toolbarPosition: Position.Right,
+      isExpanded: false,
       classData: {
         name: "Class",
         properties: [],
@@ -133,11 +161,38 @@ function onDeleteKeyup() {
   removeNodes(getSelectedNodes.value);
 }
 
-</script>
 
-<style scoped>
-.horizontal-resize {
-  resize: horizontal;
-  overflow: auto;
+// Download to device & upload from device
+function downloadSaveFile() {
+  const flowData = toObject();
+
+  const element = document.createElement('a');
+  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(JSON.stringify(flowData)));
+  element.setAttribute('download', 'flow.save');
+
+  element.style.display = 'none';
+  document.body.appendChild(element);
+
+  element.click();
+
+  document.body.removeChild(element);
 }
-</style>
+function uploadSavedFlow(event) {
+  const file = event.target.files[0];
+  event.target.value = null;
+  const reader = new FileReader();
+
+  // Called when the file reading ended
+  reader.addEventListener('load', () => {
+    const flowData = JSON.parse(reader.result.toString());
+
+    setNodes(flowData.nodes);
+    setEdges(flowData.edges);
+    const [x = 0, y = 0] = flowData.position;
+    setTransform({x, y, zoom: flowData.zoom || 0});
+  });
+
+  reader.readAsText(file);
+}
+
+</script>

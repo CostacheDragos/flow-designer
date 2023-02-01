@@ -17,6 +17,7 @@
     "@vue-flow/background": "^1.0.3",
     "@vue-flow/core": "^1.12.7",
     "@vue-flow/node-toolbar": "^1.0.4",
+    "flowbite": "^1.6.3",
     "uuid": "^9.0.0",
     "vue": "^3.2.45"
   },

@@ -13,8 +13,8 @@
   <div :class="{'border-sky-400 border-2': selected, 'border-black border-2': !selected}" class="vue-flow__node-default">
     <div class="flex">
       <div class="my-auto rounded-full hover:bg-sky-400 px-1" @click="toggleExpanded">
-        <font-awesome-icon v-show="!isExpanded" icon="fa-solid fa-angle-right"/>
-        <font-awesome-icon v-show="isExpanded" icon="fa-solid fa-angle-down"/>
+        <font-awesome-icon v-show="!props.data.isExpanded" icon="fa-solid fa-angle-right"/>
+        <font-awesome-icon v-show="props.data.isExpanded" icon="fa-solid fa-angle-down"/>
       </div>
       <h2 class="grow normal-case">
         {{ label }}
@@ -25,7 +25,7 @@
       </div>
     </div>
 
-    <div v-show="isExpanded" class="divide-y-2 divide-black mt-2">
+    <div v-show="props.data.isExpanded" class="divide-y-2 divide-black mt-2">
       <ul class="pb-2">
         <li v-for="property in data.classData.properties" class="my-1 shadow border border-gray-500 rounded">
           <p class="normal-case">{{ property.type }} {{ property.name }}</p>
@@ -74,9 +74,8 @@ function addMethod() {
 
 
 // Expands and collapses the node content
-const isExpanded = ref(false);
 function toggleExpanded() {
-  isExpanded.value = !isExpanded.value;
+  props.data.isExpanded = !props.data.isExpanded;
 }
 
 
