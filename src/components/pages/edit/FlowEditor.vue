@@ -57,8 +57,8 @@ import {VueFlow, useVueFlow, MarkerType, Position} from "@vue-flow/core";
 import {Background} from "@vue-flow/background";
 import {Dropdown} from "flowbite";
 
-import Sidebar from "@/components/Sidebar.vue";
-import SelectionMenu from "@/components/SelectionMenu.vue"
+import Sidebar from "@/components/pages/edit/Sidebar.vue";
+import SelectionMenu from "@/components/pages/edit/SelectionMenu.vue"
 import ClassNode from "@/components/nodes/ClassNode.vue";
 import InheritanceEdge from "@/components/edges/InheritanceEdge.vue";
 
