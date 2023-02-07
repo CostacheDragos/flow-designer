@@ -4,16 +4,16 @@
     <div class="flex-grow flex flex-col">
        <nav class="bg-slate-600 h-6 flex select-none">
          <ul class="ml-3 flex">
+           <!-- Flow dropdown menu -->
            <li>
-             <button data-dropdown-toggle="flowDropdownNavbar" id="flowDropdownButton" data-dropdown-offset-skidding="50" class="text-white rounded hover:bg-gray-500 px-2">Flow</button>
-             <!-- Dropdown menu -->
-             <div id="flowDropdownNavbar" class="z-10 hidden rounded bg-gray-600 divide-y divide-gray-100 shadow w-36">
-               <ul class="py-2" aria-labelledby="flowDropdownButton">
-                 <li class="hover:bg-gray-500 bg-gray-600 cursor-pointer px-3 py-1 flex" @click="downloadSaveFile">
+             <div class="dropdown">
+               <button class="text-white rounded hover:bg-gray-500 px-2 normal-case">Flow</button>
+               <ul tabindex="0" class="dropdown-content rounded py-2 bg-gray-600 w-40 mt-2">
+                 <li class="rounded hover:bg-gray-500 bg-gray-600 cursor-pointer px-3 py-1 mx-1 flex" @click="downloadSaveFile">
                    <p class="text-white normal-case">Download</p>
                    <font-awesome-icon icon="fa-solid fa-download" class="ml-auto" color="white" />
                  </li>
-                 <li class="hover:bg-gray-500 bg-gray-600 cursor-pointer px-3 py-1 flex" @click="$refs.fileInput.click()">
+                 <li class="rounded hover:bg-gray-500 bg-gray-600 cursor-pointer px-3 py-1 mx-1 flex" @click="$refs.fileInput.click()">
                    <input type="file" ref="fileInput" @change="uploadSavedFlow" class="hidden">
                    <p class="text-white normal-case">Upload</p>
                    <font-awesome-icon icon="fa-solid fa-upload" class="ml-auto" color="white" />
@@ -21,12 +21,12 @@
                </ul>
              </div>
            </li>
+           <!-- Tools dropdown menu -->
            <li>
-             <button data-dropdown-toggle="codeGenerationDropdownNavbar" id="codeGenerationDropdownButton" data-dropdown-offset-skidding="50" class="text-white rounded hover:bg-gray-500 px-1">Tools</button>
-             <!-- Dropdown menu -->
-             <div id="codeGenerationDropdownNavbar" class="z-10 hidden rounded bg-gray-600 divide-y divide-gray-100 shadow w-36">
-               <ul class="py-2" aria-labelledby="flowDropdownButton">
-                 <li class="hover:bg-gray-500 bg-gray-600 cursor-pointer px-3 py-1 flex" @click="downloadCodeGenerationData">
+             <div class="dropdown">
+               <button class="text-white rounded hover:bg-gray-500 px-2 normal-case">Tools</button>
+               <ul tabindex="0" class="dropdown-content rounded py-2 bg-gray-600 w-40 mt-2">
+                 <li class="rounded hover:bg-gray-500 bg-gray-600 cursor-pointer px-3 py-1 mx-1 flex" @click="downloadCodeGenerationData">
                    <p class="text-white normal-case">Code Gen.</p>
                    <font-awesome-icon icon="fa-solid fa-code" class="ml-auto my-auto" color="white" />
                  </li>
@@ -51,11 +51,10 @@
 
 <script setup>
 import {v4 as uuidv4} from "uuid";
-import {nextTick, reactive, ref, watch, onMounted} from "vue";
+import {nextTick, ref, watch, onMounted} from "vue";
 
 import {VueFlow, useVueFlow, MarkerType, Position} from "@vue-flow/core";
 import {Background} from "@vue-flow/background";
-import {Dropdown} from "flowbite";
 
 import Sidebar from "@/components/pages/edit/Sidebar.vue";
 import SelectionMenu from "@/components/pages/edit/SelectionMenu.vue"
@@ -240,7 +239,6 @@ console.log(flowData);
 // so that the selection menu is scrollable individually
 const flowEditorContainerRef = ref(null);
 onMounted(() => {
-  console.log(flowEditorContainerRef.value);
   flowEditorContainerRef.value.style.maxHeight = `${flowEditorContainerRef.value.offsetHeight}px`;
 });
 

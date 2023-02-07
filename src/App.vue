@@ -1,8 +1,8 @@
 <template>
   <div class="flex flex-col h-screen overflow-clip">
-    <nav v-if="isLoggedIn" class="flex flex-col text-center py-4 px-6 bg-gray-900 shadow items-baseline w-full">
+    <nav v-if="isLoggedIn" class="flex text-center py-4 px-6 bg-gray-900 shadow items-baseline w-full">
       <div class="my-auto">
-        <a href="#" class="text-2xl no-underline text-white hover:text-sky-400 normal-case">Home</a>
+        <router-link to="/home" class="text-2xl no-underline text-white hover:text-sky-400 normal-case">Home</router-link>
       </div>
     </nav>
     <router-view></router-view>
@@ -14,7 +14,7 @@
 <script setup>
 import {ref, provide} from "vue";
 
-const isLoggedIn = ref(false);
+const isLoggedIn = ref(true);
 
 provide("isLoggedIn", isLoggedIn);
 
