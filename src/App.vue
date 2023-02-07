@@ -6,18 +6,21 @@
 <!--      </div>-->
 <!--    </nav>-->
 <!--    <FlowEditor ref="flowEditor" class="flex flex-grow max-h-initial"/>-->
-    <Login></Login>
+<!--    <Login></Login>-->
+    <Register></Register>
   </div>
 </template>
 
 
 <script>
 import FlowEditor from "@/components/pages/edit/FlowEditor.vue";
-import Login from "@/components/pages/login/Login.vue";
+import Login from "@/components/pages/auth/Login.vue";
+import Register from "@/components/pages/auth/Register.vue";
 import {ref} from "vue";
 
 export default {
   components: {
+    Register,
     Login,
     FlowEditor,
   },
