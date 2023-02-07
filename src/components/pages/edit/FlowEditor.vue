@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div ref="flowEditorContainerRef" class="flex flex-grow">
     <Sidebar/>
     <div class="flex-grow flex flex-col">
        <nav class="bg-slate-600 h-6 flex select-none">
@@ -51,7 +51,7 @@
 
 <script setup>
 import {v4 as uuidv4} from "uuid";
-import {nextTick, provide, reactive, ref, watch} from "vue";
+import {nextTick, reactive, ref, watch, onMounted} from "vue";
 
 import {VueFlow, useVueFlow, MarkerType, Position} from "@vue-flow/core";
 import {Background} from "@vue-flow/background";
@@ -234,5 +234,14 @@ console.log(flowData);
 
   document.body.removeChild(element);
 }
+
+
+// Used to set the height of the whole editor to it's initial height
+// so that the selection menu is scrollable individually
+const flowEditorContainerRef = ref(null);
+onMounted(() => {
+  console.log(flowEditorContainerRef.value);
+  flowEditorContainerRef.value.style.maxHeight = `${flowEditorContainerRef.value.offsetHeight}px`;
+});
 
 </script>

@@ -4,7 +4,7 @@
       <h1 class="text-xl font-bold leading-tight tracking-tight text-white normal-case mb-5">
         Sign up
       </h1>
-      <form class="space-y-6" action="#">
+      <form class="space-y-6" action="#" @submit.prevent="onSubmit">
         <div>
           <label for="email" class="block mb-2 text-left text-sm font-medium text-white normal-case">Your email</label>
           <input type="email" name="email" id="email" class="border rounded-lg  block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500" placeholder="name@company.com" required="">
@@ -25,7 +25,8 @@
         </button>
 
         <p class="text-sm font-light text-gray-400 normal-case text-left">
-          Already have an account? <a href="#" class="font-medium hover:underline text-blue-500">Sign in</a>
+          Already have an account?
+          <router-link to="/login" class="font-medium hover:underline text-blue-500">Sign in</router-link>
         </p>
       </form>
     </div>
@@ -33,4 +34,14 @@
 </template>
 
 <script setup>
+import {inject} from "vue";
+import router from "@/router/index.js";
+
+// Inject the global isLoggedIn variable
+const isLoggedIn = inject("isLoggedIn");
+function onSubmit() {
+  console.log("yas");
+  isLoggedIn.value = true;
+  router.push("/edit");
+}
 </script>
