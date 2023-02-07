@@ -1,4 +1,5 @@
 import { createApp } from 'vue';
+import { createPinia } from "pinia";
 import './style.css';
 import App from './App.vue';
 
@@ -14,7 +15,11 @@ import router from "@/router/index.js";
 library.add(faAngleRight, faAngleDown, faPlus, faMinus, faXmark, faCircleXmark, faTrash, faGears, faPenToSquare, faDownload, faUpload,
     faCode)
 
+const pinia = createPinia();
 createApp(App)
     .use(router)
+    .use(pinia)
     .component('font-awesome-icon', FontAwesomeIcon)
     .mount('#app');
+
+

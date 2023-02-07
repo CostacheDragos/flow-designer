@@ -10,13 +10,13 @@
                <button class="text-white rounded hover:bg-gray-500 px-2 normal-case">Flow</button>
                <ul tabindex="0" class="dropdown-content rounded py-2 bg-gray-600 w-40 mt-2">
                  <li class="rounded hover:bg-gray-500 bg-gray-600 cursor-pointer px-3 py-1 mx-1 flex" @click="downloadSaveFile">
-                   <p class="text-white normal-case">Download</p>
-                   <font-awesome-icon icon="fa-solid fa-download" class="ml-auto" color="white" />
+                   <font-awesome-icon icon="fa-solid fa-download" color="white" />
+                   <p class="text-white normal-case ml-3 mr-auto">Download</p>
                  </li>
                  <li class="rounded hover:bg-gray-500 bg-gray-600 cursor-pointer px-3 py-1 mx-1 flex" @click="$refs.fileInput.click()">
                    <input type="file" ref="fileInput" @change="uploadSavedFlow" class="hidden">
-                   <p class="text-white normal-case">Upload</p>
-                   <font-awesome-icon icon="fa-solid fa-upload" class="ml-auto" color="white" />
+                   <font-awesome-icon icon="fa-solid fa-upload" color="white" />
+                   <p class="text-white normal-case ml-3 mr-auto">Upload</p>
                  </li>
                </ul>
              </div>
@@ -27,8 +27,8 @@
                <button class="text-white rounded hover:bg-gray-500 px-2 normal-case">Tools</button>
                <ul tabindex="0" class="dropdown-content rounded py-2 bg-gray-600 w-40 mt-2">
                  <li class="rounded hover:bg-gray-500 bg-gray-600 cursor-pointer px-3 py-1 mx-1 flex" @click="downloadCodeGenerationData">
-                   <p class="text-white normal-case">Code Gen.</p>
-                   <font-awesome-icon icon="fa-solid fa-code" class="ml-auto my-auto" color="white" />
+                   <font-awesome-icon icon="fa-solid fa-code" class="my-auto" color="white" />
+                   <p class="text-white normal-case ml-3 mr-auto">Code Gen.</p>
                  </li>
                </ul>
              </div>

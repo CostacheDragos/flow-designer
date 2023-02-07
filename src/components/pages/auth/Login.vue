@@ -30,13 +30,13 @@
 </template>
 
 <script setup>
-import {inject} from "vue";
+import {useUserStore} from "@/stores/user.js";
 import router from "@/router/index.js";
+import { storeToRefs } from "pinia";
 
 // Inject the global isLoggedIn variable
-const isLoggedIn = inject("isLoggedIn");
+const {isLoggedIn} = storeToRefs(useUserStore());
 function onSubmit() {
-  console.log("yas");
   isLoggedIn.value = true;
   router.push("/edit");
 }
