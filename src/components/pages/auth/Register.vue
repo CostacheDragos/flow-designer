@@ -1,9 +1,16 @@
 <template>
   <div class="bg-gray-900 w-screen h-screen flex">
     <div class="mx-auto my-auto border border-gray-500 rounded-xl p-5 w-96 bg-gray-800 shadow">
-      <h1 class="text-xl font-bold leading-tight tracking-tight text-white normal-case mb-5">
-        Sign up
-      </h1>
+      <div class="flex mb-5 h-14">
+        <h1 class="flex flex-grow text-xl font-bold leading-tight tracking-tight text-white normal-case">
+          <span class="mx-auto my-auto"> Sign up </span>
+        </h1>
+        <Transition>
+          <div v-if="errorBox.display" class="bg-rose-600 rounded-lg w-fit h-fit mx-auto my-auto p-2 text-white">
+              <span>{{ errorBox.text }}</span>
+          </div>
+        </Transition>
+      </div>
       <form class="space-y-6" action="#" @submit.prevent="onSubmit">
         <div>
           <label for="email" class="block mb-2 text-left text-sm font-medium text-white normal-case">Your email</label>
@@ -44,7 +51,7 @@
 
 <script setup>
 import {useUserStore} from "@/stores/user.js";
-import {reactive} from "vue";
+import {reactive, ref} from "vue";
 
 const { registerWithEmailAndPassword, loginWithGoogle } = useUserStore();
 
@@ -62,9 +69,18 @@ const credentials = reactive({
     displayError: false,
   },
 });
+const errorBox = reactive({
+  text: "Invalid credentials",
+  display: false,
+})
 
-function onSubmit() {
-  registerWithEmailAndPassword(credentials.email, credentials.password);
+async function onSubmit() {
+  const result = await registerWithEmailAndPassword(credentials.email.value, credentials.password.value);
+
+  if(result === "Invalid credentials") {
+    errorBox.display = true;
+    setTimeout(() => errorBox.display = false, 2000);
+  }
 }
 
 // When the input changes, we check the contents in order
@@ -79,9 +95,23 @@ function onConfirmPasswordInput(event) {
   credentials.confirmPassword.displayError = credentials.password.value !== credentials.confirmPassword.value;
 
   //The password confirmation input is invalid only if empty or not matching the password
-  if(credentials.confirmPassword.value === "")
-    event.target.setCustomValidity("");
-  else
+  if(credentials.password.value !== credentials.confirmPassword.value)
     event.target.setCustomValidity("Must match the password.");
+  else
+    event.target.setCustomValidity("");
 }
 </script>
+
+<style scoped>
+
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+}
+
+</style>

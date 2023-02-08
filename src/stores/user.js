@@ -25,13 +25,23 @@ export const useUserStore = defineStore('user', () => {
     });
 
     async function registerWithEmailAndPassword(email, password) {
-        const userCred = await createUserWithEmailAndPassword(auth, email, password);
+        try {
+            const userCred = await createUserWithEmailAndPassword(auth, email, password);
+        }catch (e) {
+            console.log(e);
+            return "Invalid credentials";
+        }
 
         await router.push("/edit");
     }
 
     async function loginWithEmailAndPassword(email, password) {
-        const userCred = await signInWithEmailAndPassword(auth, email, password);
+        try {
+            const userCred = await signInWithEmailAndPassword(auth, email, password);
+        } catch (e) {
+            console.log(e);
+            return "Invalid credentials";
+        }
 
         await router.push("/edit");
     }
