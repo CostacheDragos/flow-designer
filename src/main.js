@@ -10,16 +10,26 @@ import { faAngleRight, faAngleDown, faPlus, faMinus, faXmark, faCircleXmark, faT
 
 import router from "@/router/index.js";
 
+import {onAuthStateChanged} from "firebase/auth";
+import {auth} from "@/includes/firebase.js";
+
 
 /* add icons to the library */
 library.add(faAngleRight, faAngleDown, faPlus, faMinus, faXmark, faCircleXmark, faTrash, faGears, faPenToSquare, faDownload, faUpload,
     faCode)
 
-const pinia = createPinia();
-createApp(App)
-    .use(pinia)
-    .use(router)
-    .component('font-awesome-icon', FontAwesomeIcon)
-    .mount('#app');
+let app;
+onAuthStateChanged(auth, () => {
+        if(!app) {
+           const pinia = createPinia();
+           app = createApp(App)
+            .use(pinia)
+            .use(router)
+            .component('font-awesome-icon', FontAwesomeIcon)
+            .mount('#app');
+        }
+});
+
+
 
 

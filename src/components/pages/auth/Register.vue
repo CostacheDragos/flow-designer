@@ -19,7 +19,7 @@
         </div>
         <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 rounded text-white py-2">Sign up</button>
 
-        <button type="button" class="rounded-lg text-gray-400 p-2 border border-gray-500 hover:bg-gray-600 flex">
+        <button type="button" class="rounded-lg text-gray-400 p-2 border border-gray-500 hover:bg-gray-600 flex" @click="loginWithGoogle">
           <img src="src/assets/Google__G__Logo.svg" class="mr-2">
           Sign in with Google
         </button>
@@ -35,13 +35,9 @@
 
 <script setup>
 import {useUserStore} from "@/stores/user.js";
-import router from "@/router/index.js";
-import {storeToRefs} from "pinia";
 
-// Inject the global isLoggedIn variable
-const {isLoggedIn} = storeToRefs(useUserStore());
+const { registerWithEmailAndPassword, loginWithGoogle } = useUserStore();
 function onSubmit() {
-  isLoggedIn.value = true;
-  router.push("/edit");
+  registerWithEmailAndPassword("dcostache01@yahoo.com", "password");
 }
 </script>
