@@ -42,15 +42,15 @@
            <p class="text-white text-sm normal-case my-auto">Save status:</p>
 
            <!-- Icon for when the flow is up to date in the database -->
-           <div v-show="flowId" class="dropdown dropdown-hover dropdown-bottom dropdown-end my-auto mx-2 h-fit">
+           <div v-show="isSaved && !showSaving" class="dropdown dropdown-hover dropdown-bottom dropdown-end my-auto mx-2 h-fit">
               <i class="bi bi-cloud-check-fill text-green-500 text-sm align-bottom"></i>
               <p class="dropdown-content bg-gray-600 text-white text-sm normal-case p-1 rounded-lg">Saved</p>
            </div>
 
           <!-- Icon for when the flow has not been uploaded -->
-           <div v-show="!flowId && !showSaving" class="dropdown dropdown-hover dropdown-bottom dropdown-end my-auto mx-2 h-fit">
+           <div v-show="!isSaved && !showSaving" class="dropdown dropdown-hover dropdown-bottom dropdown-end my-auto mx-2 h-fit">
              <i class="bi bi-cloud-slash-fill text-rose-600 text-sm align-bottom"></i>
-             <p class="dropdown-content bg-gray-600 text-white text-sm normal-case p-1 rounded-lg">Unsaved</p>
+             <p class="dropdown-content bg-gray-600 text-white text-sm normal-case p-1 rounded-lg w-36">Unsaved changes</p>
            </div>
 
            <!-- Icon for when the flow is being saved -->
@@ -62,7 +62,7 @@
          </div>
        </nav>
        <VueFlow v-model="elements" @dragover="onDragOver" @drop="onDrop" @keyup.delete="onDeleteKeyup" class="flex-grow">
-         <MiniMap id="minimap" class="border border-4 border-gray-900"/>
+         <MiniMap id="minimap" class="border border-4 border-gray-900" :mask-color="minimapMaskColor"/>
          <Background/>
          <template v-slot:node-class="props">
            <class-node :label="props.label" :data="props.data" :selected="props.selected" :id="props.id" />
@@ -78,7 +78,7 @@
 
 <script setup>
 import {v4 as uuidv4} from "uuid";
-import {nextTick, ref, watch, onMounted} from "vue";
+import {nextTick, ref, watch, onMounted, reactive} from "vue";
 
 import {VueFlow, useVueFlow, MarkerType, Position} from "@vue-flow/core";
 import {Background} from "@vue-flow/background";
@@ -89,8 +89,10 @@ import SelectionMenu from "@/components/pages/edit/SelectionMenu.vue"
 import ClassNode from "@/components/nodes/ClassNode.vue";
 import InheritanceEdge from "@/components/edges/InheritanceEdge.vue";
 
-import { collection, addDoc } from "firebase/firestore";
-import { db, auth } from "@/includes/firebase.js";
+import { doc, setDoc } from "firebase/firestore";
+import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
+import { db, auth, storage } from "@/includes/firebase.js";
+import html2canvas from "html2canvas";
 
 const { addNodes, addEdges, removeNodes, findNode, getSelectedNodes, vueFlowRef, project, onConnect, toObject,
         setNodes, setEdges, setTransform } = useVueFlow();
@@ -205,32 +207,56 @@ function onDeleteKeyup() {
 }
 
 
-
 // Flow Dropdown menu functionalities
 
 // DB save
-const flowId = ref(null); // Changes if the flow has an existing save in the database
+const flowMetadata = reactive({
+  flowId: uuidv4(),
+  userId: auth.currentUser.uid,
+  imageURL: "",
+});
+const isSaved = ref(false);
 const showSaving = ref(false);
-async function saveFlow() {
+const minimapMaskColor = ref("rgb(240, 242, 243, 0.7)");
+function saveFlow() {
   // Unfocus the dropdown in order to close it
   loseFocus();
+
+  // Display loading icon
   showSaving.value = true;
 
   try {
-    const flowData = toObject();
-    const docRef = await addDoc(collection(db, "flows"), {
-      userId: auth.currentUser.uid,
-      flowData,
+
+    // Make the minimap mask invisible for a better view of the flow in the saved picture
+    const tmp = minimapMaskColor.value;
+    minimapMaskColor.value = "rgb(255, 255, 255, 0)";
+
+    nextTick(async () => {
+      // After the minimap has been redrawn, create a picture out of the minimap and assign the mask its initial color
+      minimapMaskColor.value = tmp;
+
+      // Create a reference to the storage location
+      const fileRef = storageRef(storage, `${flowMetadata.flowId}.png`);
+      const imageData = await createFlowImage();
+      await uploadBytes(fileRef, imageData);
+      flowMetadata.imageURL = await getDownloadURL(fileRef);
+
+      // Add the contents of the flow to the database
+      const flowData = toObject();
+      // Don't change the order, metadata has to be uploaded first
+      await setDoc(doc(db, "flowsMetadata", flowMetadata.flowId), flowMetadata);
+      await setDoc(doc(db, "flowsContent", flowMetadata.flowId), flowData);
+
+      isSaved.value = true;
+      showSaving.value = false;
     });
 
-    flowId.value = docRef.id;
-    console.log("Document written with ID: ", docRef.id);
   } catch (e) {
-    console.error("Error adding document: ", e);
+    console.error("Error adding flow document: ", e);
   }
-
-  showSaving.value = false;
 }
+
+
 // Download to device & upload from device
 function downloadSaveFile() {
   // Unfocus the dropdown in order to close it
@@ -241,13 +267,7 @@ function downloadSaveFile() {
   const element = document.createElement('a');
   element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(JSON.stringify(flowData)));
   element.setAttribute('download', 'flow.save');
-
-  element.style.display = 'none';
-  document.body.appendChild(element);
-
   element.click();
-
-  document.body.removeChild(element);
 }
 function uploadSavedFlow(event) {
   const file = event.target.files[0];
@@ -312,4 +332,26 @@ function loseFocus() {
   tmp.focus();
   document.body.removeChild(tmp);
 }
+
+// Convert dataURL to Blob
+function dataURItoBlob(dataURL) {
+  const binary = window.atob(dataURL.split(",")[1]);
+  const array = [];
+  for (let i = 0; i < binary.length; i++) {
+    array.push(binary.charCodeAt(i));
+  }
+  return new Blob([new Uint8Array(array)], {type: "image/png"});
+}
+
+// Create flow minimap image
+async function createFlowImage() {
+  // Get the canvas element
+  const result = await html2canvas(document.querySelector("#minimap"));
+
+  // Convert the canvas to an image file
+  const dataURL = result.toDataURL();
+
+  return dataURItoBlob(dataURL);
+}
+
 </script>
