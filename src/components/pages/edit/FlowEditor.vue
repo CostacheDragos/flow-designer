@@ -47,15 +47,22 @@
               <p class="dropdown-content bg-gray-600 text-white text-sm normal-case p-1 rounded-lg">Saved</p>
            </div>
 
-           <!-- Icon for when the flow has not been uploaded -->
-           <div v-show="!flowId" class="dropdown dropdown-hover dropdown-bottom dropdown-end my-auto mx-2 h-fit">
+          <!-- Icon for when the flow has not been uploaded -->
+           <div v-show="!flowId && !showSaving" class="dropdown dropdown-hover dropdown-bottom dropdown-end my-auto mx-2 h-fit">
              <i class="bi bi-cloud-slash-fill text-rose-600 text-sm align-bottom"></i>
              <p class="dropdown-content bg-gray-600 text-white text-sm normal-case p-1 rounded-lg">Unsaved</p>
+           </div>
+
+           <!-- Icon for when the flow is being saved -->
+           <div v-show="showSaving" class="dropdown dropdown-hover dropdown-bottom dropdown-end my-auto mx-2 h-fit">
+             <i class="bi bi-arrow-repeat text-white text-sm align-bottom"></i>
+             <p class="dropdown-content bg-gray-600 text-white text-sm normal-case p-1 rounded-lg">Saving..</p>
            </div>
 
          </div>
        </nav>
        <VueFlow v-model="elements" @dragover="onDragOver" @drop="onDrop" @keyup.delete="onDeleteKeyup" class="flex-grow">
+         <MiniMap id="minimap" class="border border-4 border-gray-900"/>
          <Background/>
          <template v-slot:node-class="props">
            <class-node :label="props.label" :data="props.data" :selected="props.selected" :id="props.id" />
@@ -75,6 +82,7 @@ import {nextTick, ref, watch, onMounted} from "vue";
 
 import {VueFlow, useVueFlow, MarkerType, Position} from "@vue-flow/core";
 import {Background} from "@vue-flow/background";
+import {MiniMap} from "@vue-flow/minimap";
 
 import Sidebar from "@/components/pages/edit/Sidebar.vue";
 import SelectionMenu from "@/components/pages/edit/SelectionMenu.vue"
@@ -202,9 +210,11 @@ function onDeleteKeyup() {
 
 // DB save
 const flowId = ref(null); // Changes if the flow has an existing save in the database
+const showSaving = ref(false);
 async function saveFlow() {
   // Unfocus the dropdown in order to close it
   loseFocus();
+  showSaving.value = true;
 
   try {
     const flowData = toObject();
@@ -218,6 +228,8 @@ async function saveFlow() {
   } catch (e) {
     console.error("Error adding document: ", e);
   }
+
+  showSaving.value = false;
 }
 // Download to device & upload from device
 function downloadSaveFile() {

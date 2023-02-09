@@ -16,6 +16,7 @@
     "@fortawesome/vue-fontawesome": "^3.0.2",
     "@vue-flow/background": "^1.0.3",
     "@vue-flow/core": "^1.12.7",
+    "@vue-flow/minimap": "^1.0.2",
     "@vue-flow/node-toolbar": "^1.0.4",
     "bootstrap-icons": "^1.10.3",
     "daisyui": "^2.50.0",
