@@ -26,7 +26,7 @@ export const useUserStore = defineStore('user', () => {
 
     async function registerWithEmailAndPassword(email, password) {
         try {
-            const userCred = await createUserWithEmailAndPassword(auth, email, password);
+            await createUserWithEmailAndPassword(auth, email, password);
         }catch (e) {
             console.log(e);
             return "Invalid credentials";
@@ -37,7 +37,7 @@ export const useUserStore = defineStore('user', () => {
 
     async function loginWithEmailAndPassword(email, password) {
         try {
-            const userCred = await signInWithEmailAndPassword(auth, email, password);
+            await signInWithEmailAndPassword(auth, email, password);
         } catch (e) {
             console.log(e);
             return "Invalid credentials";

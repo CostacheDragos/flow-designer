@@ -64,7 +64,7 @@ const errorBox = reactive({
 })
 
 async function onSubmit() {
-  const result = await loginWithEmailAndPassword(credentials.email.value, credentials.password);
+  const result = await loginWithEmailAndPassword(credentials.email.value, credentials.password.value);
 
   if(result === "Invalid credentials") {
     errorBox.display = true;

@@ -9,6 +9,10 @@
              <div class="dropdown">
                <button class="text-white rounded hover:bg-gray-500 px-2 normal-case">Flow</button>
                <ul tabindex="0" class="dropdown-content rounded py-2 bg-gray-600 w-40 mt-2">
+                 <li class="rounded hover:bg-gray-500 bg-gray-600 cursor-pointer px-3 py-1 mx-1 flex" @click="saveFlow">
+                   <font-awesome-icon icon="fa-solid fa-cloud-arrow-up" color="white"/>
+                   <p class="text-white normal-case ml-3 mr-auto">Save</p>
+                 </li>
                  <li class="rounded hover:bg-gray-500 bg-gray-600 cursor-pointer px-3 py-1 mx-1 flex" @click="downloadSaveFile">
                    <font-awesome-icon icon="fa-solid fa-download" color="white" />
                    <p class="text-white normal-case ml-3 mr-auto">Download</p>
@@ -34,6 +38,22 @@
              </div>
            </li>
          </ul>
+         <div class="ml-auto flex">
+           <p class="text-white text-sm normal-case my-auto">Save status:</p>
+
+           <!-- Icon for when the flow is up to date in the database -->
+           <div v-show="flowId" class="dropdown dropdown-hover dropdown-bottom dropdown-end my-auto mx-2 h-fit">
+              <i class="bi bi-cloud-check-fill text-green-500 text-sm align-bottom"></i>
+              <p class="dropdown-content bg-gray-600 text-white text-sm normal-case p-1 rounded-lg">Saved</p>
+           </div>
+
+           <!-- Icon for when the flow has not been uploaded -->
+           <div v-show="!flowId" class="dropdown dropdown-hover dropdown-bottom dropdown-end my-auto mx-2 h-fit">
+             <i class="bi bi-cloud-slash-fill text-rose-600 text-sm align-bottom"></i>
+             <p class="dropdown-content bg-gray-600 text-white text-sm normal-case p-1 rounded-lg">Unsaved</p>
+           </div>
+
+         </div>
        </nav>
        <VueFlow v-model="elements" @dragover="onDragOver" @drop="onDrop" @keyup.delete="onDeleteKeyup" class="flex-grow">
          <Background/>
@@ -60,6 +80,9 @@ import Sidebar from "@/components/pages/edit/Sidebar.vue";
 import SelectionMenu from "@/components/pages/edit/SelectionMenu.vue"
 import ClassNode from "@/components/nodes/ClassNode.vue";
 import InheritanceEdge from "@/components/edges/InheritanceEdge.vue";
+
+import { collection, addDoc } from "firebase/firestore";
+import { db, auth } from "@/includes/firebase.js";
 
 const { addNodes, addEdges, removeNodes, findNode, getSelectedNodes, vueFlowRef, project, onConnect, toObject,
         setNodes, setEdges, setTransform } = useVueFlow();
@@ -174,8 +197,33 @@ function onDeleteKeyup() {
 }
 
 
+
+// Flow Dropdown menu functionalities
+
+// DB save
+const flowId = ref(null); // Changes if the flow has an existing save in the database
+async function saveFlow() {
+  // Unfocus the dropdown in order to close it
+  loseFocus();
+
+  try {
+    const flowData = toObject();
+    const docRef = await addDoc(collection(db, "flows"), {
+      userId: auth.currentUser.uid,
+      flowData,
+    });
+
+    flowId.value = docRef.id;
+    console.log("Document written with ID: ", docRef.id);
+  } catch (e) {
+    console.error("Error adding document: ", e);
+  }
+}
 // Download to device & upload from device
 function downloadSaveFile() {
+  // Unfocus the dropdown in order to close it
+  loseFocus();
+
   const flowData = toObject();
 
   const element = document.createElement('a');
@@ -206,6 +254,7 @@ function uploadSavedFlow(event) {
 
   reader.readAsText(file);
 }
+
 
 
 // Download file with code generation specific data
@@ -242,4 +291,13 @@ onMounted(() => {
   flowEditorContainerRef.value.style.maxHeight = `${flowEditorContainerRef.value.offsetHeight}px`;
 });
 
+
+// Auxiliary
+// Focuses on a temporary element, useful to unfocus any currently focused element
+function loseFocus() {
+  const tmp = document.createElement("input");
+  document.body.appendChild(tmp);
+  tmp.focus();
+  document.body.removeChild(tmp);
+}
 </script>
