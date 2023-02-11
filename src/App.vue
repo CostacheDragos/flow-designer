@@ -5,7 +5,7 @@
         <router-link to="/home" class="text-2xl no-underline text-white hover:text-sky-400 normal-case">Home</router-link>
       </div>
       <div class="ml-auto">
-        <router-link to="/login" class="text-2xl no-underline text-white hover:text-sky-400 normal-case" @click="logout">Logout</router-link>
+        <a class="text-2xl no-underline text-white hover:text-sky-400 normal-case cursor-pointer" @click="logout">Logout</a>
       </div>
     </nav>
     <router-view></router-view>

@@ -6,6 +6,7 @@ import FlowEditor from "@/components/pages/edit/FlowEditor.vue";
 import Home from "@/components/pages/dashboard/Home.vue";
 
 import { useUserStore } from "@/stores/user.js";
+import { useFlowStore } from "@/stores/flow.js";
 
 // Define the routes
 const routes = [
@@ -55,6 +56,12 @@ router.beforeEach((to, from) => {
     // If the user tries to access other pages and is not logged in, redirect to login
     else if(!isLoggedIn) {
         return {name: "Login"};
+    }
+
+    if(from.name === "Editor") {
+        // When navigating away from the editor, clear all data regarding current opened flow
+        const flowStore = useFlowStore();
+        flowStore.resetState();
     }
 });
 

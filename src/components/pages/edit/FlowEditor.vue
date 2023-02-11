@@ -42,13 +42,13 @@
            <p class="text-white text-sm normal-case my-auto">Save status:</p>
 
            <!-- Icon for when the flow is up to date in the database -->
-           <div v-show="isSaved && !showSaving" class="dropdown dropdown-hover dropdown-bottom dropdown-end my-auto mx-2 h-fit">
+           <div v-show="flowStore.isSaved && !showSaving" class="dropdown dropdown-hover dropdown-bottom dropdown-end my-auto mx-2 h-fit">
               <i class="bi bi-cloud-check-fill text-green-500 text-sm align-bottom"></i>
               <p class="dropdown-content bg-gray-600 text-white text-sm normal-case p-1 rounded-lg">Saved</p>
            </div>
 
           <!-- Icon for when the flow has not been uploaded -->
-           <div v-show="!isSaved && !showSaving" class="dropdown dropdown-hover dropdown-bottom dropdown-end my-auto mx-2 h-fit">
+           <div v-show="!flowStore.isSaved && !showSaving" class="dropdown dropdown-hover dropdown-bottom dropdown-end my-auto mx-2 h-fit">
              <i class="bi bi-cloud-slash-fill text-rose-600 text-sm align-bottom"></i>
              <p class="dropdown-content bg-gray-600 text-white text-sm normal-case p-1 rounded-lg w-36">Unsaved changes</p>
            </div>
@@ -62,7 +62,7 @@
          </div>
        </nav>
        <VueFlow v-model="elements" @dragover="onDragOver" @drop="onDrop" @keyup.delete="onDeleteKeyup" class="flex-grow">
-         <MiniMap id="minimap" class="border border-4 border-gray-900" :mask-color="minimapMaskColor"/>
+         <MiniMap id="minimap" class="border border-4 border-gray-900 rounded-lg" :mask-color="minimapMaskColor"/>
          <Background/>
          <template v-slot:node-class="props">
            <class-node :label="props.label" :data="props.data" :selected="props.selected" :id="props.id" />
@@ -78,7 +78,7 @@
 
 <script setup>
 import {v4 as uuidv4} from "uuid";
-import {nextTick, ref, watch, onMounted, reactive} from "vue";
+import {nextTick, ref, watch, onMounted, toRefs} from "vue";
 
 import {VueFlow, useVueFlow, MarkerType, Position} from "@vue-flow/core";
 import {Background} from "@vue-flow/background";
@@ -89,13 +89,17 @@ import SelectionMenu from "@/components/pages/edit/SelectionMenu.vue"
 import ClassNode from "@/components/nodes/ClassNode.vue";
 import InheritanceEdge from "@/components/edges/InheritanceEdge.vue";
 
-import { doc, setDoc } from "firebase/firestore";
+import {doc, getDoc, setDoc} from "firebase/firestore";
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, auth, storage } from "@/includes/firebase.js";
+
 import html2canvas from "html2canvas";
+
+import { useFlowStore } from "@/stores/flow.js";
 
 const { addNodes, addEdges, removeNodes, findNode, getSelectedNodes, vueFlowRef, project, onConnect, toObject,
         setNodes, setEdges, setTransform } = useVueFlow();
+
 
 // Initial elements (for testing only)
 const elements = ref([
@@ -136,10 +140,8 @@ const elements = ref([
   },
 ]);
 
-
 // Called when 2 nodes are connected
 onConnect((params) => {
-  console.log(toObject());
   addEdges([
     {
       ...params,
@@ -210,12 +212,29 @@ function onDeleteKeyup() {
 // Flow Dropdown menu functionalities
 
 // DB save
-const flowMetadata = reactive({
-  flowId: uuidv4(),
-  userId: auth.currentUser.uid,
-  imageURL: "",
+const flowStore = useFlowStore();
+
+onMounted(async () => {
+  // Check if the opened flow is new or not
+  if(flowStore.isSaved) {
+    // If it's not new, load the data from the database
+    const flowContent = (await getDoc(doc(db, "flowsContent", flowStore.currentFlowMetadata.flowId))).data();
+
+    setNodes(flowContent.nodes);
+    setEdges(flowContent.edges);
+    const [x = 0, y = 0] = flowContent.position;
+    setTransform({x, y, zoom: flowContent.zoom || 0});
+  } else {
+    // If the flow is new, populate the metadata
+    flowStore.setCurrentFlowMetadata({
+      flowId: uuidv4(),
+      userId: auth.currentUser.uid,
+      imageURL: "",
+    });
+  }
+
 });
-const isSaved = ref(false);
+
 const showSaving = ref(false);
 const minimapMaskColor = ref("rgb(240, 242, 243, 0.7)");
 function saveFlow() {
@@ -236,18 +255,18 @@ function saveFlow() {
       minimapMaskColor.value = tmp;
 
       // Create a reference to the storage location
-      const fileRef = storageRef(storage, `${flowMetadata.flowId}.png`);
+      const fileRef = storageRef(storage, `${flowStore.currentFlowMetadata.flowId}.png`);
       const imageData = await createFlowImage();
-      await uploadBytes(fileRef, imageData);
-      flowMetadata.imageURL = await getDownloadURL(fileRef);
+      await uploadBytes(fileRef, imageData, {customMetadata: {userId: flowStore.currentFlowMetadata.userId}});
+      flowStore.currentFlowMetadata.imageURL = await getDownloadURL(fileRef);
 
       // Add the contents of the flow to the database
       const flowData = toObject();
-      // Don't change the order, metadata has to be uploaded first
-      await setDoc(doc(db, "flowsMetadata", flowMetadata.flowId), flowMetadata);
-      await setDoc(doc(db, "flowsContent", flowMetadata.flowId), flowData);
+      // !!! Don't change the order, metadata has to be uploaded first !!!
+      await setDoc(doc(db, "flowsMetadata", flowStore.currentFlowMetadata.flowId), flowStore.currentFlowMetadata);
+      await setDoc(doc(db, "flowsContent", flowStore.currentFlowMetadata.flowId), flowData);
 
-      isSaved.value = true;
+      flowStore.isSaved = true;
       showSaving.value = false;
     });
 
@@ -294,7 +313,7 @@ function uploadSavedFlow(event) {
 function downloadCodeGenerationData() {
   // Get the entire flow data
   const flowData = toObject();
-console.log(flowData);
+
   // Create data object that contains only code generation specific data (data about the classes to be generated)
   const generationData = flowData.nodes.map(node => {
     return {
