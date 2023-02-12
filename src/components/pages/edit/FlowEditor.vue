@@ -55,7 +55,7 @@
 
            <!-- Icon for when the flow is being saved -->
            <div v-show="showSaving" class="dropdown dropdown-hover dropdown-bottom dropdown-end my-auto mx-2 h-fit">
-             <i class="bi bi-arrow-repeat text-white text-sm align-bottom"></i>
+             <font-awesome-icon class="animate-spin text-white align-bottom" icon="fa-solid fa-spinner" size="xs" />
              <p class="dropdown-content bg-gray-600 text-white text-sm normal-case p-1 rounded-lg">Saving..</p>
            </div>
 
@@ -73,6 +73,16 @@
        </VueFlow>
      </div>
     <SelectionMenu/>
+  </div>
+
+
+  <!-- Modal will be on screen while the flow loads -->
+  <input type="checkbox" id="my-modal-3" class="modal-toggle" />
+  <div class="modal" :class="!finishedLoading ? 'modal-open' : ''">
+    <div class="modal-box relative w-48 bg-gray-500 text-white">
+      <h3 class="text-lg font-bold normal-case">Loading...</h3>
+      <font-awesome-icon class="animate-spin mt-3" icon="fa-solid fa-spinner" size="2x" />
+    </div>
   </div>
 </template>
 
@@ -204,6 +214,14 @@ onPaneReady(async (vueFlowInstance) => {
     // If it's not new, load the data from the database
     const flowContent = (await getDoc(doc(db, "flowsContent", flowStore.currentFlowMetadata.flowId))).data();
 
+    // If the nodes list is empty, mark the flow as finished loading
+    if(flowContent.nodes.length === 0) {
+      finishedLoading.value = true;
+      return;
+    }
+
+    // If the list is not empty, the loading will finish when the fist onNodesChange
+    // is called
     setNodes(flowContent.nodes);
     setEdges(flowContent.edges);
     vueFlowInstance.fitView();
@@ -214,6 +232,8 @@ onPaneReady(async (vueFlowInstance) => {
       userId: auth.currentUser.uid,
       imageURL: "",
     });
+
+    finishedLoading.value = true;
   }
 });
 

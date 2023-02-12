@@ -6,7 +6,7 @@ import App from './App.vue';
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faAngleRight, faAngleDown, faPlus, faMinus, faXmark, faCircleXmark, faTrash, faGears, faPenToSquare, faDownload, faUpload,
-        faCode, faCloudArrowUp } from '@fortawesome/free-solid-svg-icons';
+        faCode, faCloudArrowUp, faSpinner } from '@fortawesome/free-solid-svg-icons';
 
 import 'bootstrap-icons/font/bootstrap-icons.css'
 
@@ -18,7 +18,7 @@ import {auth} from "@/includes/firebase.js";
 
 /* add icons to the library */
 library.add(faAngleRight, faAngleDown, faPlus, faMinus, faXmark, faCircleXmark, faTrash, faGears, faPenToSquare, faDownload, faUpload,
-    faCode, faCloudArrowUp)
+    faCode, faCloudArrowUp, faSpinner)
 
 let app;
 onAuthStateChanged(auth, () => {

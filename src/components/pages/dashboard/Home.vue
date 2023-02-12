@@ -35,15 +35,14 @@
 </template>
 
 <script setup>
-import { collection, doc, query, where, getDocs, getDoc, deleteDoc} from "firebase/firestore";
+import { collection, doc, query, where, getDocs, deleteDoc} from "firebase/firestore";
 import { auth, db, storage } from "@/includes/firebase.js";
 import { ref as storageRef, deleteObject } from "firebase/storage";
 
 import router from "@/router/index.js";
 import { useFlowStore } from "@/stores/flow.js";
 
-import {onMounted, reactive, ref, toRaw} from "vue";
-import {v4 as uuidv4} from "uuid";
+import {onMounted, reactive, ref} from "vue";
 
 
 
