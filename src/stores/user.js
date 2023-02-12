@@ -32,7 +32,7 @@ export const useUserStore = defineStore('user', () => {
             return "Invalid credentials";
         }
 
-        await router.push("/edit");
+        await router.push("/home");
     }
 
     async function loginWithEmailAndPassword(email, password) {
@@ -43,14 +43,14 @@ export const useUserStore = defineStore('user', () => {
             return "Invalid credentials";
         }
 
-        await router.push("/edit");
+        await router.push("/home");
     }
 
     async function loginWithGoogle() {
         const provider = new GoogleAuthProvider();
         await signInWithPopup(auth, provider);
 
-        await router.push("/edit");
+        await router.push("/home");
     }
 
     async function logout() {

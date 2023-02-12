@@ -78,7 +78,7 @@
 
 <script setup>
 import {v4 as uuidv4} from "uuid";
-import {nextTick, ref, watch, onMounted, toRefs} from "vue";
+import {nextTick, ref, watch, onMounted } from "vue";
 
 import {VueFlow, useVueFlow, MarkerType, Position} from "@vue-flow/core";
 import {Background} from "@vue-flow/background";
@@ -98,48 +98,13 @@ import html2canvas from "html2canvas";
 import { useFlowStore } from "@/stores/flow.js";
 
 const { addNodes, addEdges, removeNodes, findNode, getSelectedNodes, vueFlowRef, project, onConnect, toObject,
-        setNodes, setEdges, setTransform } = useVueFlow();
+        setNodes, setEdges, setTransform, onNodesChange, onEdgesChange, onPaneReady } = useVueFlow();
 
 
 // Initial elements (for testing only)
-const elements = ref([
-  {
-    id: uuidv4(),
-    label: "Class1",
-    type: "class",
-    position: { x: 100, y: 100 },
-    data: {
-      toolbarPosition: Position.Right,
-      isExpanded: false,
-      classData: {
-        name: "Class1",
-        properties: [],
-        methods: [{
-          name: "defaultMethod",
-          returnType: "void",
-          parameters: [{name: "param1", type:"int"}],
-          selectedParameter: undefined, // used for UI purposes only
-        }],
-      },
-    },
-  },
-  {
-    id: uuidv4(),
-    label: "Class2",
-    type: "class",
-    position: { x: 200, y: 200 },
-    data: {
-      toolbarPosition: Position.Right,
-      isExpanded: false,
-      classData: {
-        name: "Class2",
-        properties: [],
-        methods: [],
-      },
-    },
-  },
-]);
+const elements = ref([]);
 
+// Vue Flow Events
 // Called when 2 nodes are connected
 onConnect((params) => {
   addEdges([
@@ -149,6 +114,24 @@ onConnect((params) => {
       markerEnd: MarkerType.Arrow,
     },
   ]);
+});
+
+// Called when there was a change regarding nodes
+onNodesChange(() => {
+  // If this event is triggered without the finishedLoading variable
+  // being set to false, it means that the flow is not new and this is the first call
+  // of this event, we need to set the finishedLoading to true
+  if(!finishedLoading.value)
+    finishedLoading.value = true;
+  // If the isSaved value indicates that the flow is saved, change the value to false as this method
+  // is called when the flow changes
+  else
+    flowStore.setIsSaved(false);
+});
+
+onEdgesChange(() => {
+  if(finishedLoading.value)
+    flowStore.setIsSaved(false);
 });
 
 
@@ -213,8 +196,9 @@ function onDeleteKeyup() {
 
 // DB save
 const flowStore = useFlowStore();
+const finishedLoading = ref(false);
 
-onMounted(async () => {
+onPaneReady(async (vueFlowInstance) => {
   // Check if the opened flow is new or not
   if(flowStore.isSaved) {
     // If it's not new, load the data from the database
@@ -222,8 +206,7 @@ onMounted(async () => {
 
     setNodes(flowContent.nodes);
     setEdges(flowContent.edges);
-    const [x = 0, y = 0] = flowContent.position;
-    setTransform({x, y, zoom: flowContent.zoom || 0});
+    vueFlowInstance.fitView();
   } else {
     // If the flow is new, populate the metadata
     flowStore.setCurrentFlowMetadata({
@@ -232,7 +215,6 @@ onMounted(async () => {
       imageURL: "",
     });
   }
-
 });
 
 const showSaving = ref(false);
