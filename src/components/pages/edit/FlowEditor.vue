@@ -42,21 +42,18 @@
            <p class="text-white text-sm normal-case my-auto">Save status:</p>
 
            <!-- Icon for when the flow is up to date in the database -->
-           <div v-show="flowStore.isSaved && !showSaving" class="dropdown dropdown-hover dropdown-bottom dropdown-end my-auto mx-2 h-fit">
+           <div v-show="flowStore.isSaved && !showSaving" class="tooltip tooltip-bottom my-auto mx-2 h-fit normal-case" data-tip="Saved">
               <i class="bi bi-cloud-check-fill text-green-500 text-sm align-bottom"></i>
-              <p class="dropdown-content bg-gray-600 text-white text-sm normal-case p-1 rounded-lg">Saved</p>
            </div>
 
           <!-- Icon for when the flow has not been uploaded -->
-           <div v-show="!flowStore.isSaved && !showSaving" class="dropdown dropdown-hover dropdown-bottom dropdown-end my-auto mx-2 h-fit">
+           <div v-show="!flowStore.isSaved && !showSaving" class="tooltip tooltip-bottom my-auto mx-2 h-fit normal-case" data-tip="Unsaved changes">
              <i class="bi bi-cloud-slash-fill text-rose-600 text-sm align-bottom"></i>
-             <p class="dropdown-content bg-gray-600 text-white text-sm normal-case p-1 rounded-lg w-36">Unsaved changes</p>
            </div>
 
            <!-- Icon for when the flow is being saved -->
-           <div v-show="showSaving" class="dropdown dropdown-hover dropdown-bottom dropdown-end my-auto mx-2 h-fit">
+           <div v-show="showSaving" class="tooltip tooltip-bottom my-auto mx-2 h-fit normal-case" data-tip="Saving">
              <font-awesome-icon class="animate-spin text-white align-bottom" icon="fa-solid fa-spinner" size="xs" />
-             <p class="dropdown-content bg-gray-600 text-white text-sm normal-case p-1 rounded-lg">Saving..</p>
            </div>
 
          </div>

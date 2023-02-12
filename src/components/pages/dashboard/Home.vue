@@ -12,21 +12,27 @@
       </div>
 
       <!-- Saved flows cards -->
-      <div v-for="(flow, flowIdx) in savedFlows" :key="flow.flowId" v-show="finishedLoading"
-          class="card w-96 h-96 bg-gray-300 shadow-xl m-3 normal-case select-none transition hover:shadow-2xl hover:bg-gray-200 hover:scale-105">
-        <figure class="mt-2">
-          <img :src="flow.imageURL"
-                     alt="Minimap" class="rounded-lg h-full" />
-        </figure>
-        <div class="card-body">
-          <h2 class="card-title">{{ flow.flowId }}</h2>
-          <p class="h-20 overflow-y-auto p-2">Dummy flow description: If a dog chews shoes whose shoes does he choose? Dummy flow description: If a dog chews shoes whose shoes does he choose?</p>
-          <div class="card-actions mt-2">
-            <button class="btn btn-primary normal-case w-28" @click="openFlow(flow)">Open</button>
-            <button class="btn bg-rose-600 border-none normal-case ml-auto w-28 hover:bg-rose-700" @click="deleteFlow(flow, flowIdx)">
-              <font-awesome-icon icon="fa-solid fa-trash" class="mr-2"/>
-              Delete
-            </button>
+      <div v-for="(flow, flowIdx) in savedFlows" :key="flow.metadata.flowId" v-show="finishedLoading" class="relative w-96 h-96 m-3">
+        <div v-if="flow.deleting" class="card bg-black bg-opacity-60 w-96 h-96 absolute z-10">
+          <div class="mx-auto my-auto text-white">
+            <h3 class="text-3xl font-bold normal-case mb-4">Deleting</h3>
+            <font-awesome-icon class="animate-spin m-3" icon="fa-solid fa-spinner" size="5x" />
+          </div>
+        </div>
+        <div class="card w-96 h-96 bg-gray-300 shadow-xl normal-case select-none transition hover:shadow-2xl hover:bg-gray-200 hover:scale-105 absolute">
+          <figure class="mt-2">
+            <img :src="flow.metadata.imageURL" alt="Minimap" class="rounded-lg h-full" />
+          </figure>
+          <div class="card-body">
+            <h2 class="card-title">{{ flow.metadata.flowId }}</h2>
+            <p class="h-20 overflow-y-auto p-2">Dummy flow description: If a dog chews shoes whose shoes does he choose? Dummy flow description: If a dog chews shoes whose shoes does he choose?</p>
+            <div class="card-actions mt-2">
+              <button class="btn btn-primary normal-case w-28" @click="openFlow(flow)">Open</button>
+              <button class="btn bg-rose-600 border-none normal-case ml-auto w-28 hover:bg-rose-700" @click="deleteFlow(flow, flowIdx)">
+                <font-awesome-icon icon="fa-solid fa-trash" class="mr-2"/>
+                Delete
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -57,7 +63,10 @@ onMounted(async () => {
 
   const querySnapshot = await getDocs(q);
   querySnapshot.forEach((doc) => {
-    savedFlows.push(doc.data());
+    savedFlows.push({
+      metadata: doc.data(),
+      deleting: false,
+    });
   });
 
   finishedLoading.value = true
@@ -66,7 +75,7 @@ onMounted(async () => {
 // Called when the open button is pressed on one of the cards
 async function openFlow(flow) {
   // Set the values in the store to the loaded data
-  flowStore.setCurrentFlowMetadata(flow);
+  flowStore.setCurrentFlowMetadata(flow.metadata);
   flowStore.setIsSaved(true);
 
   // Redirect to edit
@@ -84,22 +93,24 @@ function createNewFlow() {
 
 // Called when the delete button is pressed on one of the cards
 async function deleteFlow(flowToBeDeleted, flowToBeDeletedIdx) {
+  flowToBeDeleted.deleting = true;
+
   try {
     // Delete the flow data
-    await deleteDoc(doc(db, "flowsContent", flowToBeDeleted.flowId));
+    await deleteDoc(doc(db, "flowsContent", flowToBeDeleted.metadata.flowId));
 
     // Delete the image of the minimap
-    const imageRef = storageRef(storage, flowToBeDeleted.imageURL);
+    const imageRef = storageRef(storage, flowToBeDeleted.metadata.imageURL);
     await deleteObject(imageRef);
 
     // Delete the flow metadata
-    await deleteDoc(doc(db, "flowsMetadata", flowToBeDeleted.flowId));
+    await deleteDoc(doc(db, "flowsMetadata", flowToBeDeleted.metadata.flowId));
 
 
     // After all remote deletions are completed, remove the flow from the local list
     savedFlows.splice(flowToBeDeletedIdx, 1);
 
-    console.log("Successfully deleted the flow with id: ", flowToBeDeleted.flowId);
+    console.log("Successfully deleted the flow with id: ", flowToBeDeleted.metadata.flowId);
   } catch (e) {
     console.log("Error while deleting flow: ", e);
   }
