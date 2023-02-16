@@ -30,7 +30,7 @@
              <div class="dropdown">
                <button class="text-white rounded hover:bg-gray-500 px-2 normal-case">Tools</button>
                <ul tabindex="0" class="dropdown-content rounded py-2 bg-gray-600 w-40 mt-2">
-                 <li class="rounded hover:bg-gray-500 bg-gray-600 cursor-pointer px-3 py-1 mx-1 flex" @click="downloadCodeGenerationData">
+                 <li class="rounded hover:bg-gray-500 bg-gray-600 cursor-pointer px-3 py-1 mx-1 flex" @click="requestCodeGeneration">
                    <font-awesome-icon icon="fa-solid fa-code" class="my-auto" color="white" />
                    <p class="text-white normal-case ml-3 mr-auto">Code Gen.</p>
                  </li>
@@ -306,31 +306,47 @@ function uploadSavedFlow(event) {
 }
 
 
+// Makes API call, providing flow data, the server will
+// return the generated code
+async function requestCodeGeneration() {
+  loseFocus();
 
-// Download file with code generation specific data
-// TODO Remove this when connecting to generation api
-function downloadCodeGenerationData() {
-  // Get the entire flow data
-  const flowData = toObject();
+  try {
+    // Get the entire flow data
+    const flowData = toObject();
 
-  // Create data object that contains only code generation specific data (data about the classes to be generated)
-  const generationData = flowData.nodes.map(node => {
-    return {
-      id: node.id,
-      classData: node.data.classData,
-    }
-  })
+    // Create data object that contains only code generation specific data (data about the classes to be generated)
+    const generationData = flowData.nodes.map(node => {
+      return {
+        id: node.id,
+        classData: node.data.classData,
+      }
+    });
 
-  const element = document.createElement('a');
-  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(JSON.stringify(generationData)));
-  element.setAttribute('download', 'codeGeneration.data');
+    const resultText = await (await fetch("https://localhost:7024/api/CodeGenerator", {
+      method: "POST",
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(generationData),
+    })).text();
 
-  element.style.display = 'none';
-  document.body.appendChild(element);
+    console.log(JSON.parse(resultText));
 
-  element.click();
 
-  document.body.removeChild(element);
+    // Download the generated file
+    const element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(JSON.parse(resultText)));
+    element.setAttribute('download', 'result.txt');
+
+    element.style.display = 'none';
+    element.click();
+
+
+  } catch (e) {
+    console.log("Error while trying to reach API: ", e);
+  }
 }
 
 

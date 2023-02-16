@@ -59,7 +59,7 @@
                   <ul class="p-2 space-y-2">
                     <!-- Property name editing -->
                     <li class="flex">
-                      <label class="normal-case text-left">Name:</label>
+                      <label class="normal-case text-left w-16">Name:</label>
                       <input class="bg-gray-500 rounded ml-1 px-2 w-36
                                     border border-gray-500
                                     focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
@@ -68,9 +68,20 @@
                              @focusout="onPropertyNameInputLostFocus($event.target, property)"
                       />
                     </li>
+                    <!-- Property access editing -->
+                    <li class="flex">
+                      <label class="normal-case text-left w-16">Access:</label>
+                      <select class="bg-gray-500 rounded ml-1 px-2 w-36
+                                    border border-gray-500
+                                    focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                             v-model="property.accessModifier">
+                        <option value="private">private</option>
+                        <option value="public">public</option>
+                      </select>
+                    </li>
                     <!-- Property type editing -->
                     <li class="flex">
-                      <label class="normal-case text-left">Type:</label>
+                      <label class="normal-case text-left w-16">Type:</label>
                       <input type="text" list="property-data-types"
                               class="bg-gray-500 rounded ml-1 px-2 w-36
                                     border border-gray-500
@@ -84,6 +95,22 @@
                           {{ dataType }}
                         </option>
                       </datalist>
+                    </li>
+                    <!-- Property setter & getter editing -->
+                    <li class="flex">
+                      <label class="normal-case text-left w-16">Setter:</label>
+                      <input type="checkbox"
+                             class="bg-gray-500 rounded ml-1 my-auto px-2 h-5 w-5
+                                    border border-gray-500
+                                    focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                              v-model="property.generateSetter">
+
+                      <label class="normal-case text-left w-16 ml-auto">Getter:</label>
+                      <input type="checkbox"
+                             class="bg-gray-500 rounded ml-1 my-auto px-2 h-5 w-5
+                                    border border-gray-500
+                                    focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                             v-model="property.generateGetter">
                     </li>
                   </ul>
                 </div>
@@ -123,6 +150,17 @@
                              @keyup.enter="changeMethodName($event.target, method)"
                              @focusout="onMethodNameInputLostFocus($event.target, method)"
                       />
+                    </li>
+                    <!-- Method access editing -->
+                    <li class="flex">
+                      <label class="normal-case text-left w-16">Access:</label>
+                      <select class="bg-gray-500 rounded ml-1 px-2 w-36
+                                    border border-gray-500
+                                    focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                              v-model="method.accessModifier">
+                        <option value="private">private</option>
+                        <option value="public">public</option>
+                      </select>
                     </li>
                     <!-- Method return type editing -->
                     <li class="flex">
@@ -261,7 +299,10 @@ function addProperty() {
   const newProperty = {
     id: uuidv4(),
     name: "newProperty",
+    accessModifier: "private",
     type: "Object",
+    generateSetter: false,
+    generateGetter: false,
   };
   selectedNodeData.value.classData.properties.push(newProperty);
   flowStore.setIsSaved(false);
@@ -333,6 +374,7 @@ function addMethod() {
   const newMethod = {
     id: uuidv4(),
     name: "newMethod",
+    accessModifier: "private",
     returnType: "Object",
     parameters: [],
   }
