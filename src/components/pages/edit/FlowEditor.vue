@@ -104,7 +104,7 @@ import html2canvas from "html2canvas";
 
 import { useFlowStore } from "@/stores/flow.js";
 
-const { addNodes, addEdges, removeNodes, findNode, getSelectedNodes, vueFlowRef, project, onConnect, toObject,
+const { addNodes, addEdges, removeNodes, findNode, findEdge, getSelectedNodes, vueFlowRef, project, onConnect, toObject,
         setNodes, setEdges, setTransform, onNodesChange, onEdgesChange, onPaneReady } = useVueFlow();
 
 
@@ -121,6 +121,11 @@ onConnect((params) => {
       markerEnd: MarkerType.Arrow,
     },
   ]);
+
+  // After adding the edge to the flow, add the corresponding data
+  // to the target node (mark that the class inherits another class)
+  const targetNode = findNode(params.target);
+  targetNode.data.classData.parentClassId = params.source;
 });
 
 // Called when there was a change regarding nodes
@@ -136,7 +141,25 @@ onNodesChange(() => {
     flowStore.setIsSaved(false);
 });
 
-onEdgesChange(() => {
+// Called when edges are added, removed or selected
+onEdgesChange((edgeEvents) => {
+
+  // If the event type is remove, then we need to
+  // update the data on the nodes that the edge was linking
+  // for example class inheritance
+  edgeEvents.forEach(edgeEvent => {
+    if(edgeEvent.type === "remove") {
+      const edge = findEdge(edgeEvent.id);
+      if(edge.type === "inheritance") {
+        const targetNode = findNode(edge.target);
+        // Check that the target node was not deleted (node deletion also triggers
+        // the deletion of all edges linked to it)
+        if(targetNode)
+          targetNode.data.classData.parentClassId = "";
+      }
+    }
+  })
+
   if(finishedLoading.value)
     flowStore.setIsSaved(false);
 });
@@ -169,6 +192,7 @@ function onDrop(event) {
         name: "Class",
         properties: [],
         methods: [],
+        parentClassId: "",
       },
     },
   }
