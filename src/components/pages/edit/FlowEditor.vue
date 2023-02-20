@@ -85,7 +85,7 @@
 
 <script setup>
 import {v4 as uuidv4} from "uuid";
-import {nextTick, ref, watch, onMounted } from "vue";
+import {nextTick, ref, watch, onMounted, onUnmounted} from "vue";
 
 import {VueFlow, useVueFlow, MarkerType, Position} from "@vue-flow/core";
 import {Background} from "@vue-flow/background";
@@ -114,6 +114,13 @@ const elements = ref([]);
 // Vue Flow Events
 // Called when 2 nodes are connected
 onConnect((params) => {
+
+  // Check if adding this edge will create an inheritance cycle
+  if(checkInheritanceCycle(params.source, params.target)) {
+    console.log("Adding this edge will create a cycle!!");
+    return;
+  }
+
   addEdges([
     {
       ...params,
@@ -125,7 +132,7 @@ onConnect((params) => {
   // After adding the edge to the flow, add the corresponding data
   // to the target node (mark that the class inherits another class)
   const targetNode = findNode(params.target);
-  targetNode.data.classData.parentClassId = params.source;
+  targetNode.data.classData.parentClassesIds.push(params.source);
 });
 
 // Called when there was a change regarding nodes
@@ -154,8 +161,10 @@ onEdgesChange((edgeEvents) => {
         const targetNode = findNode(edge.target);
         // Check that the target node was not deleted (node deletion also triggers
         // the deletion of all edges linked to it)
-        if(targetNode)
-          targetNode.data.classData.parentClassId = "";
+        if(targetNode) {
+          const deletedParentIdx = targetNode.data.classData.parentClassesIds.indexOf(edge.source);
+          targetNode.data.classData.parentClassesIds.splice(deletedParentIdx, 1);
+        }
       }
     }
   })
@@ -192,7 +201,7 @@ function onDrop(event) {
         name: "Class",
         properties: [],
         methods: [],
-        parentClassId: "",
+        parentClassesIds: [],
       },
     },
   }
@@ -346,7 +355,7 @@ async function requestCodeGeneration() {
         classData: node.data.classData,
       }
     });
-
+    console.log(flowData);
     const resultText = await (await fetch("https://localhost:7024/api/CodeGenerator", {
       method: "POST",
       headers: {
@@ -374,11 +383,20 @@ async function requestCodeGeneration() {
 }
 
 
-// Used to set the height of the whole editor to it's initial height
-// so that the selection menu is scrollable individually
+// Used to set the max height of the whole editor based on window height
+// and main nav height
 const flowEditorContainerRef = ref(null);
+const handleResize = () => {
+  // The height of the editor should take up all the remaining height of the window
+  const mainNavHeight = document.getElementById("main-nav").offsetHeight;
+  flowEditorContainerRef.value.style.maxHeight = `${window.innerHeight - mainNavHeight}px`;
+};
 onMounted(() => {
-  flowEditorContainerRef.value.style.maxHeight = `${flowEditorContainerRef.value.offsetHeight}px`;
+  handleResize();
+  window.addEventListener("resize", handleResize);
+});
+onUnmounted(() => {
+  window.removeEventListener("resize", handleResize);
 });
 
 
@@ -412,4 +430,26 @@ async function createFlowImage() {
   return dataURItoBlob(dataURL);
 }
 
+// Performs a BFS search in order to determine if the edge that the user intends to add
+// will create an inheritance cycle
+// The BFS will begin from the edge source node and go up its ancestors tree
+// Returns true if a cycle was discovered and false otherwise
+function checkInheritanceCycle(sourceNodeId, targetNodeId) {
+  const nodeIdsQueue = [sourceNodeId];
+
+  while (nodeIdsQueue.length) {
+    // Get the first node id and pop it
+    const currentNode = findNode(nodeIdsQueue.shift());
+
+    // Check if the current node's parents contain the searched node id
+    // if yes, there is a cycle
+    if(currentNode.data.classData.parentClassesIds.includes(targetNodeId))
+      return true;
+
+    // Add the current node's parents to the queue
+    nodeIdsQueue.push(...currentNode.data.classData.parentClassesIds);
+  }
+
+  return false;
+}
 </script>
