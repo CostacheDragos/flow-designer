@@ -74,11 +74,23 @@
 
 
   <!-- Modal will be on screen while the flow loads -->
-  <input type="checkbox" id="my-modal-3" class="modal-toggle" />
+  <input type="checkbox" id="loading-modal" class="modal-toggle" />
   <div class="modal" :class="!finishedLoading ? 'modal-open' : ''">
     <div class="modal-box relative w-48 bg-gray-500 text-white">
       <h3 class="text-lg font-bold normal-case">Loading...</h3>
       <font-awesome-icon class="animate-spin mt-3" icon="fa-solid fa-spinner" size="2x" />
+    </div>
+  </div>
+
+  <!--  This Modal will be displayed when the user tries to add an edge that will create an inheritance cycle -->
+  <input type="checkbox" id="cycle-warning-modal" class="modal-toggle" />
+  <div class="modal">
+    <div class="modal-box normal-case bg-gray-500 text-white">
+      <h3 class="font-bold text-lg bg-rose-600 mx-auto rounded-lg w-fit p-3">Warning!</h3>
+      <p class="py-4">The edge you are trying to add will create an inheritance cycle in you class hierarchy.</p>
+      <div class="modal-action">
+        <label for="cycle-warning-modal" class="btn">Close</label>
+      </div>
     </div>
   </div>
 </template>
@@ -117,7 +129,12 @@ onConnect((params) => {
 
   // Check if adding this edge will create an inheritance cycle
   if(checkInheritanceCycle(params.source, params.target)) {
-    console.log("Adding this edge will create a cycle!!");
+    console.log("Adding this edge will create a cycle!");
+
+    // Display warning to user
+    const modalToggle = document.getElementById("cycle-warning-modal");
+    modalToggle.checked = true;
+
     return;
   }
 
@@ -355,7 +372,7 @@ async function requestCodeGeneration() {
         classData: node.data.classData,
       }
     });
-    console.log(flowData);
+
     const resultText = await (await fetch("https://localhost:7024/api/CodeGenerator", {
       method: "POST",
       headers: {

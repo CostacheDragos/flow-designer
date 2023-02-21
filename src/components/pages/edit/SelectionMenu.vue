@@ -102,6 +102,7 @@
                       <input type="checkbox"
                              class="bg-gray-500 rounded ml-1 my-auto px-2 h-5 w-5
                                     border border-gray-500
+                                    cursor-pointer
                                     focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
                               v-model="property.generateSetter">
 
@@ -109,6 +110,7 @@
                       <input type="checkbox"
                              class="bg-gray-500 rounded ml-1 my-auto px-2 h-5 w-5
                                     border border-gray-500
+                                    cursor-pointer
                                     focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
                              v-model="property.generateGetter">
                     </li>
