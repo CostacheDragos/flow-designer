@@ -1,5 +1,7 @@
 <template>
-  <div class="bg-slate-600 border-l-4 border-gray-900 w-72 select-none overflow-y-auto">
+  <div class="h-full w-1.5 bg-gray-900 cursor-col-resize" @mousedown="resizeStart"/>
+
+  <div class="bg-slate-600 w-72 select-none overflow-y-auto overflow-x-hidden" id="selection-menu-container">
     <div v-if="!selectedNodeData" class="grid place-items-center h-full">
       <div>
         <font-awesome-icon icon="fa-solid fa-gears" color="white"  size="10x"/>
@@ -242,7 +244,7 @@
 
 <script setup>
 import {v4 as uuidv4} from "uuid";
-import {ref, watch} from "vue";
+import {onMounted, onUnmounted, ref, watch} from "vue";
 
 import { useVueFlow } from "@vue-flow/core";
 
@@ -510,4 +512,37 @@ function onMethodParameterTypeInputLostFocus(inputElement, method) {
 }
 
 
+
+// Resize bar functions
+let isBeingResized = false;
+function resizeStart(event) {
+  event.preventDefault();
+
+  isBeingResized = true;
+
+  document.addEventListener("mouseup", resizeStop);
+  document.addEventListener("mousemove", resizing);
+  document.body.style.cursor = "col-resize";
+}
+function resizeStop(event) {
+  event.preventDefault();
+
+  if(!isBeingResized)
+    return;
+
+  isBeingResized = false;
+
+  document.removeEventListener("mouseup", resizeStop);
+  document.removeEventListener("mousemove", resizing);
+  document.body.style.cursor = "";
+}
+function resizing(event) {
+  event.preventDefault();
+
+  if(!isBeingResized)
+    return;
+
+  const selectionMenuContainer = document.getElementById("selection-menu-container");
+  selectionMenuContainer.style.width =  `${window.innerWidth - event.clientX}px`;
+}
 </script>

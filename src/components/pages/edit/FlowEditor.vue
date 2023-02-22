@@ -149,7 +149,7 @@ onConnect((params) => {
   // After adding the edge to the flow, add the corresponding data
   // to the target node (mark that the class inherits another class)
   const targetNode = findNode(params.target);
-  targetNode.data.classData.parentClassesIds.push(params.source);
+  targetNode.data.parentClassNodesIds.push(params.source);
 });
 
 // Called when there was a change regarding nodes
@@ -179,8 +179,8 @@ onEdgesChange((edgeEvents) => {
         // Check that the target node was not deleted (node deletion also triggers
         // the deletion of all edges linked to it)
         if(targetNode) {
-          const deletedParentIdx = targetNode.data.classData.parentClassesIds.indexOf(edge.source);
-          targetNode.data.classData.parentClassesIds.splice(deletedParentIdx, 1);
+          const deletedParentIdx = targetNode.data.parentClassNodesIds.indexOf(edge.source);
+          targetNode.data.parentClassNodesIds.splice(deletedParentIdx, 1);
         }
       }
     }
@@ -214,11 +214,11 @@ function onDrop(event) {
     data: {
       toolbarPosition: Position.Right,
       isExpanded: false,
+      parentClassNodesIds: [],
       classData: {
         name: "Class",
         properties: [],
         methods: [],
-        parentClassesIds: [],
       },
     },
   }
@@ -369,11 +369,12 @@ async function requestCodeGeneration() {
     const generationData = flowData.nodes.map(node => {
       return {
         id: node.id,
+        parentClassNodesIds: node.data.parentClassNodesIds,
         classData: node.data.classData,
       }
     });
 
-    const resultText = await (await fetch("https://localhost:7024/api/CodeGenerator", {
+    const responseText = await (await fetch("https://localhost:7024/api/CodeGenerator", {
       method: "POST",
       headers: {
         'Accept': 'application/json',
@@ -382,18 +383,10 @@ async function requestCodeGeneration() {
       body: JSON.stringify(generationData),
     })).text();
 
-    console.log(JSON.parse(resultText));
+    const generatedClasses = JSON.parse(responseText);
 
-
-    // Download the generated file
-    const element = document.createElement('a');
-    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(JSON.parse(resultText)));
-    element.setAttribute('download', 'result.txt');
-
-    element.style.display = 'none';
-    element.click();
-
-
+    for(const classId in generatedClasses)
+      console.log(generatedClasses[classId]);
   } catch (e) {
     console.log("Error while trying to reach API: ", e);
   }
@@ -460,11 +453,11 @@ function checkInheritanceCycle(sourceNodeId, targetNodeId) {
 
     // Check if the current node's parents contain the searched node id
     // if yes, there is a cycle
-    if(currentNode.data.classData.parentClassesIds.includes(targetNodeId))
+    if(currentNode.data.parentClassNodesIds.includes(targetNodeId))
       return true;
 
     // Add the current node's parents to the queue
-    nodeIdsQueue.push(...currentNode.data.classData.parentClassesIds);
+    nodeIdsQueue.push(...currentNode.data.parentClassNodesIds);
   }
 
   return false;

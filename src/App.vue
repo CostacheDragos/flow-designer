@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col h-screen overflow-clip">
-    <nav v-if="isLoggedIn" class="flex text-center py-4 px-6 bg-gray-900 shadow items-baseline w-full" id="main-nav">
+    <nav v-if="isLoggedIn" class="flex text-center py-4 px-6 bg-gray-900 shadow items-baseline w-full select-none" id="main-nav">
       <div class="my-auto">
         <router-link to="/home" class="text-2xl no-underline text-white hover:text-sky-400 normal-case">Home</router-link>
       </div>
