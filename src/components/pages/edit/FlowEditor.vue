@@ -2,74 +2,76 @@
   <div ref="flowEditorContainerRef" class="flex flex-grow">
     <Sidebar/>
     <div class="flex-grow flex flex-col">
-       <nav class="bg-slate-600 h-6 flex select-none">
-         <ul class="ml-3 flex">
-           <!-- Flow dropdown menu -->
-           <li>
-             <div class="dropdown">
-               <button class="text-white rounded hover:bg-gray-500 px-2 normal-case">Flow</button>
-               <ul tabindex="0" class="dropdown-content rounded py-2 bg-gray-600 w-40 mt-2">
-                 <li class="rounded hover:bg-gray-500 bg-gray-600 cursor-pointer px-3 py-1 mx-1 flex" @click="saveFlow">
-                   <font-awesome-icon icon="fa-solid fa-cloud-arrow-up" color="white"/>
-                   <p class="text-white normal-case ml-3 mr-auto">Save</p>
-                 </li>
-                 <li class="rounded hover:bg-gray-500 bg-gray-600 cursor-pointer px-3 py-1 mx-1 flex" @click="downloadSaveFile">
-                   <font-awesome-icon icon="fa-solid fa-download" color="white" />
-                   <p class="text-white normal-case ml-3 mr-auto">Download</p>
-                 </li>
-                 <li class="rounded hover:bg-gray-500 bg-gray-600 cursor-pointer px-3 py-1 mx-1 flex" @click="$refs.fileInput.click()">
-                   <input type="file" ref="fileInput" @change="uploadSavedFlow" class="hidden">
-                   <font-awesome-icon icon="fa-solid fa-upload" color="white" />
-                   <p class="text-white normal-case ml-3 mr-auto">Upload</p>
-                 </li>
-               </ul>
+      <div class="flex-grow flex flex-col">
+         <nav class="bg-slate-600 h-6 flex select-none">
+           <ul class="ml-3 flex">
+             <!-- Flow dropdown menu -->
+             <li>
+               <div class="dropdown">
+                 <button class="text-white rounded hover:bg-gray-500 px-2 normal-case">Flow</button>
+                 <ul tabindex="0" class="dropdown-content rounded py-2 bg-gray-600 w-40 mt-2">
+                   <li class="rounded hover:bg-gray-500 bg-gray-600 cursor-pointer px-3 py-1 mx-1 flex" @click="saveFlow">
+                     <font-awesome-icon icon="fa-solid fa-cloud-arrow-up" color="white"/>
+                     <p class="text-white normal-case ml-3 mr-auto">Save</p>
+                   </li>
+                   <li class="rounded hover:bg-gray-500 bg-gray-600 cursor-pointer px-3 py-1 mx-1 flex" @click="downloadSaveFile">
+                     <font-awesome-icon icon="fa-solid fa-download" color="white" />
+                     <p class="text-white normal-case ml-3 mr-auto">Download</p>
+                   </li>
+                   <li class="rounded hover:bg-gray-500 bg-gray-600 cursor-pointer px-3 py-1 mx-1 flex" @click="$refs.fileInput.click()">
+                     <input type="file" ref="fileInput" @change="uploadSavedFlow" class="hidden">
+                     <font-awesome-icon icon="fa-solid fa-upload" color="white" />
+                     <p class="text-white normal-case ml-3 mr-auto">Upload</p>
+                   </li>
+                 </ul>
+               </div>
+             </li>
+             <!-- Tools dropdown menu -->
+             <li>
+               <div class="dropdown">
+                 <button class="text-white rounded hover:bg-gray-500 px-2 normal-case">Tools</button>
+                 <ul tabindex="0" class="dropdown-content rounded py-2 bg-gray-600 w-40 mt-2">
+                   <li class="rounded hover:bg-gray-500 bg-gray-600 cursor-pointer px-3 py-1 mx-1 flex" @click="requestCodeGeneration">
+                     <font-awesome-icon icon="fa-solid fa-code" class="my-auto" color="white" />
+                     <p class="text-white normal-case ml-3 mr-auto">Code Gen.</p>
+                   </li>
+                 </ul>
+               </div>
+             </li>
+           </ul>
+           <div class="ml-auto flex">
+             <p class="text-white text-sm normal-case my-auto">Save status:</p>
+
+             <!-- Icon for when the flow is up to date in the database -->
+             <div v-show="flowStore.isSaved && !showSaving" class="tooltip tooltip-bottom my-auto mx-2 h-fit normal-case" data-tip="Saved">
+                <i class="bi bi-cloud-check-fill text-green-500 text-sm align-bottom"></i>
              </div>
-           </li>
-           <!-- Tools dropdown menu -->
-           <li>
-             <div class="dropdown">
-               <button class="text-white rounded hover:bg-gray-500 px-2 normal-case">Tools</button>
-               <ul tabindex="0" class="dropdown-content rounded py-2 bg-gray-600 w-40 mt-2">
-                 <li class="rounded hover:bg-gray-500 bg-gray-600 cursor-pointer px-3 py-1 mx-1 flex" @click="requestCodeGeneration">
-                   <font-awesome-icon icon="fa-solid fa-code" class="my-auto" color="white" />
-                   <p class="text-white normal-case ml-3 mr-auto">Code Gen.</p>
-                 </li>
-               </ul>
+
+            <!-- Icon for when the flow has not been uploaded -->
+             <div v-show="!flowStore.isSaved && !showSaving" class="tooltip tooltip-bottom my-auto mx-2 h-fit normal-case" data-tip="Unsaved changes">
+               <i class="bi bi-cloud-slash-fill text-rose-600 text-sm align-bottom"></i>
              </div>
-           </li>
-         </ul>
-         <div class="ml-auto flex">
-           <p class="text-white text-sm normal-case my-auto">Save status:</p>
 
-           <!-- Icon for when the flow is up to date in the database -->
-           <div v-show="flowStore.isSaved && !showSaving" class="tooltip tooltip-bottom my-auto mx-2 h-fit normal-case" data-tip="Saved">
-              <i class="bi bi-cloud-check-fill text-green-500 text-sm align-bottom"></i>
+             <!-- Icon for when the flow is being saved -->
+             <div v-show="showSaving" class="tooltip tooltip-bottom my-auto mx-2 h-fit normal-case" data-tip="Saving">
+               <font-awesome-icon class="animate-spin text-white align-bottom" icon="fa-solid fa-spinner" size="xs" />
+             </div>
+
            </div>
-
-          <!-- Icon for when the flow has not been uploaded -->
-           <div v-show="!flowStore.isSaved && !showSaving" class="tooltip tooltip-bottom my-auto mx-2 h-fit normal-case" data-tip="Unsaved changes">
-             <i class="bi bi-cloud-slash-fill text-rose-600 text-sm align-bottom"></i>
-           </div>
-
-           <!-- Icon for when the flow is being saved -->
-           <div v-show="showSaving" class="tooltip tooltip-bottom my-auto mx-2 h-fit normal-case" data-tip="Saving">
-             <font-awesome-icon class="animate-spin text-white align-bottom" icon="fa-solid fa-spinner" size="xs" />
-           </div>
-
-         </div>
-       </nav>
-       <VueFlow v-model="elements" @dragover="onDragOver" @drop="onDrop" @keyup.delete="onDeleteKeyup" class="flex-grow">
-         <MiniMap id="minimap" class="border border-4 border-gray-900 rounded-lg" :mask-color="minimapMaskColor"/>
-         <Background/>
-         <template v-slot:node-class="props">
-           <class-node :label="props.label" :data="props.data" :selected="props.selected" :id="props.id" />
-         </template>
-         <template v-slot:edge-inheritance="props">
-           <inheritance-edge v-bind="props"/>
-         </template>
-       </VueFlow>
-       <CodeEditorWithTabs></CodeEditorWithTabs>
-     </div>
+         </nav>
+         <VueFlow v-model="elements" @dragover="onDragOver" @drop="onDrop" @keyup.delete="onDeleteKeyup" class="flex-grow">
+           <MiniMap id="minimap" class="border border-4 border-gray-900 rounded-lg" :mask-color="minimapMaskColor"/>
+           <Background/>
+           <template v-slot:node-class="props">
+             <class-node :label="props.label" :data="props.data" :selected="props.selected" :id="props.id" />
+           </template>
+           <template v-slot:edge-inheritance="props">
+             <inheritance-edge v-bind="props"/>
+           </template>
+         </VueFlow>
+      </div>
+      <CodeEditorWithTabs :generated-classes="generatedClasses"/>
+    </div>
     <SelectionMenu/>
   </div>
 
@@ -98,7 +100,7 @@
 
 <script setup>
 import {v4 as uuidv4} from "uuid";
-import {nextTick, ref, watch, onMounted, onUnmounted} from "vue";
+import {nextTick, ref, watch, onMounted, onUnmounted, reactive} from "vue";
 
 import {VueFlow, useVueFlow, MarkerType, Position} from "@vue-flow/core";
 import {Background} from "@vue-flow/background";
@@ -273,7 +275,10 @@ onPaneReady(async (vueFlowInstance) => {
     // is called
     setNodes(flowContent.nodes);
     setEdges(flowContent.edges);
-    vueFlowInstance.fitView();
+    // vueFlowInstance.fitView();
+
+    const [x = 0, y = 0] = flowContent.position;
+    setTransform({x, y, zoom: flowContent.zoom || 0});
   } else {
     // If the flow is new, populate the metadata
     flowStore.setCurrentFlowMetadata({
@@ -360,6 +365,7 @@ function uploadSavedFlow(event) {
 
 // Makes API call, providing flow data, the server will
 // return the generated code
+const generatedClasses = reactive([]);
 async function requestCodeGeneration() {
   loseFocus();
 
@@ -385,10 +391,25 @@ async function requestCodeGeneration() {
       body: JSON.stringify(generationData),
     })).text();
 
-    const generatedClasses = JSON.parse(responseText);
 
-    for(const classId in generatedClasses)
-      console.log(generatedClasses[classId]);
+    // Create a list from the generated code
+    // The API will return a dictionary in which
+    // the key is the id of the class/node and the value is the generated code
+    const formatedResponse = JSON.parse(responseText);
+    Object.assign(generatedClasses, []);
+
+    for(const classId in formatedResponse) {
+      generatedClasses.push({
+            className: findNode(classId).data.classData.name,
+            code: formatedResponse[classId],
+            isTabOpen: false,
+          }
+      );
+    }
+    generatedClasses[0].isTabOpen = true;
+
+    console.log(formatedResponse);
+    console.log(generatedClasses);
   } catch (e) {
     console.log("Error while trying to reach API: ", e);
   }

@@ -2,37 +2,40 @@
 
   <div class="w-full h-2 bg-gray-900 cursor-row-resize flex-shrink-0" @mousedown="resizeStart"/>
 
-  <div class="bg-rose-600 h-1/2 normal-case" id="code-editor-container">
-    <CodeEditor v-model="code" width="100%" height="100%" border_radius="0px" :language_selector="true" :languages="[['csharp', 'C#']]"/>
+  <div class="bg-gray-600 h-60 normal-case" id="code-editor-container">
+    <div class="flex mx-2">
+      <button v-for="(classData, idx) in props.generatedClasses"
+              class="bg-gray-500 px-3 mt-1 rounded-t text-gray-300 hover:text-black hover:bg-gray-200"
+              :class="classData.isTabOpen ? 'bg-white text-black mx-1 shadow-lg shadow-white' : ''"
+              @click="changeTab(idx)">
+        {{ classData.className }}
+      </button>
+    </div>
+    <CodeEditor v-for="classData in props.generatedClasses" v-show="classData.isTabOpen"
+                v-model="classData.code" height="100%" width="100%" border_radius="0px"
+                class="pb-6"
+                :language_selector="true" :languages="[['csharp', 'C#']]"/>
   </div>
 
 </template>
 
 <script setup>
-// import hljs from "highlight.js";
+import hljs from "highlight.js";
 import  CodeEditor  from 'simple-code-editor';
 
 import {ref} from "vue";
 
+const props = defineProps(["generatedClasses"])
 
-const code =  ref(`
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+const openTabIdx = ref(0);
+function changeTab(newTabIdx) {
+  console.log(props.generatedClasses[newTabIdx])
+  props.generatedClasses[openTabIdx.value].isTabOpen = false;
 
-namespace ConsoleCodeGenerator1.Models.Class
-{
-    public class ClassModel
-    {
-        public string Name { get; set; } = string.Empty;
-        public List<PropertyModel> Properties { get; set; } = new();
-        public List<MethodModel> Methods { get; set; } = new();
-        public List<string>? InheritedClassesNames { get; set; }
-    }
+  openTabIdx.value = newTabIdx;
+  props.generatedClasses[newTabIdx].isTabOpen = true;
 }
-`);
+
 
 // Resize bar functions
 let isBeingResized = false;
@@ -66,6 +69,5 @@ function resizing(event) {
   const codeEditorContainer = document.getElementById("code-editor-container");
   codeEditorContainer.style.height = `${window.innerHeight - event.clientY}px`;
 }
-
 </script>
 
