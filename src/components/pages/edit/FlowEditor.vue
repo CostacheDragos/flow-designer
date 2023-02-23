@@ -68,6 +68,7 @@
            <inheritance-edge v-bind="props"/>
          </template>
        </VueFlow>
+       <CodeEditorWithTabs></CodeEditorWithTabs>
      </div>
     <SelectionMenu/>
   </div>
@@ -107,6 +108,7 @@ import Sidebar from "@/components/pages/edit/Sidebar.vue";
 import SelectionMenu from "@/components/pages/edit/SelectionMenu.vue"
 import ClassNode from "@/components/nodes/ClassNode.vue";
 import InheritanceEdge from "@/components/edges/InheritanceEdge.vue";
+import CodeEditorWithTabs from "@/components/pages/edit/CodeEditorWithTabs.vue";
 
 import {doc, getDoc, setDoc} from "firebase/firestore";
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
