@@ -1,7 +1,7 @@
 <template>
   <div class="h-full w-1.5 bg-gray-900 cursor-col-resize flex-shrink-0" @mousedown="resizeStart"/>
 
-  <div class="bg-slate-600 w-72 select-none overflow-y-auto overflow-x-hidden max-w-2xl min-w-fit" id="selection-menu-container">
+  <div class="bg-slate-600 w-72 select-none overflow-y-auto overflow-x-hidden max-w-lg min-w-fit" id="selection-menu-container">
     <div v-if="!selectedNodeData" class="grid place-items-center h-full">
       <div>
         <font-awesome-icon icon="fa-solid fa-gears" color="white"  size="10x"/>
@@ -185,7 +185,7 @@
                       </datalist>
                     </li>
                     <!-- Method parameters editing -->
-                    <li class="flex flex-wrap">
+                    <li>
                       <div class="flex">
                         <label class="normal-case w-16 text-left">Param:</label>
                         <select class="bg-gray-500 focus:bg-white focus:text-black rounded ml-1 px-2 w-36 border border-gray-500"

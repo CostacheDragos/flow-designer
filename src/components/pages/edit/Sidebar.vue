@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-slate-600 w-60 min-w-fit max-w-2xl select-none" id="sidebar-menu-container">
+  <div class="bg-slate-600 w-60 min-w-fit max-w-lg select-none" id="sidebar-menu-container">
     <details class="bg-inherit duration-300 border-b-4 border-gray-900">
       <summary class="bg-inherit px-5 py-3 text-lg cursor-pointer text-white border-b border-gray-900">Nodes</summary>
       <p class="text-white normal-case text-xs">Drag & Drop to place nodes</p>
