@@ -38,6 +38,19 @@
                  </ul>
                </div>
              </li>
+             <!-- View dropdown menu -->
+             <li>
+               <div class="dropdown">
+                 <button class="text-white rounded hover:bg-gray-500 px-2 normal-case">View</button>
+                 <ul tabindex="0" class="dropdown-content rounded py-2 bg-gray-600 w-48 mt-2">
+                   <li class="rounded hover:bg-gray-500 bg-gray-600 cursor-pointer px-3 py-1 mx-1 flex" @click="toggleCodeEditorVisibility">
+                     <font-awesome-icon icon="fa-solid fa-file-code" class="my-auto" color="white"/>
+                     <p class="text-white normal-case ml-3 mr-auto">Code editor</p>
+                     <input type="checkbox" checked="checked" class="checkbox checkbox-sm ml-2 my-auto border-white bg-white" v-model="showCodeEditor"/>
+                   </li>
+                 </ul>
+               </div>
+             </li>
            </ul>
            <div class="ml-auto flex">
              <p class="text-white text-sm normal-case my-auto">Save status:</p>
@@ -70,7 +83,7 @@
            </template>
          </VueFlow>
       </div>
-      <CodeEditorWithTabs :generated-classes="generatedClasses"/>
+      <CodeEditorWithTabs v-if="showCodeEditor" :generated-classes="generatedClasses" @close_editor="toggleCodeEditorVisibility"/>
     </div>
     <SelectionMenu/>
   </div>
@@ -363,6 +376,8 @@ function uploadSavedFlow(event) {
 }
 
 
+// Tools dropdown functionalities
+
 // Makes API call, providing flow data, the server will
 // return the generated code
 const generatedClasses = reactive([]);
@@ -396,10 +411,11 @@ async function requestCodeGeneration() {
     // The API will return a dictionary in which
     // the key is the id of the class/node and the value is the generated code
     const formatedResponse = JSON.parse(responseText);
-    Object.assign(generatedClasses, []);
+    generatedClasses.splice(0, generatedClasses.length);
 
     for(const classId in formatedResponse) {
       generatedClasses.push({
+            id: classId,
             className: findNode(classId).data.classData.name,
             code: formatedResponse[classId],
             isTabOpen: false,
@@ -408,11 +424,19 @@ async function requestCodeGeneration() {
     }
     generatedClasses[0].isTabOpen = true;
 
-    console.log(formatedResponse);
-    console.log(generatedClasses);
+    // If closed, open the code editor
+    if(showCodeEditor.value === false)
+      showCodeEditor.value = true;
   } catch (e) {
     console.log("Error while trying to reach API: ", e);
   }
+}
+
+
+// View dropdown functionalities
+const showCodeEditor = ref(false);
+function toggleCodeEditorVisibility() {
+  showCodeEditor.value = !showCodeEditor.value;
 }
 
 
