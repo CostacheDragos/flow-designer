@@ -31,7 +31,7 @@
                <div class="dropdown">
                  <button class="text-white rounded hover:bg-gray-500 px-2 normal-case">Tools</button>
                  <ul tabindex="0" class="dropdown-content rounded py-2 bg-gray-600 w-40 mt-2">
-                   <li class="rounded hover:bg-gray-500 bg-gray-600 cursor-pointer px-3 py-1 mx-1 flex" @click="requestCodeGeneration">
+                   <li class="rounded hover:bg-gray-500 bg-gray-600 cursor-pointer px-3 py-1 mx-1 flex" @click="codeGenerationClicked">
                      <font-awesome-icon icon="fa-solid fa-code" class="my-auto" color="white" />
                      <p class="text-white normal-case ml-3 mr-auto">Code Gen.</p>
                    </li>
@@ -94,6 +94,15 @@
   <div class="modal" :class="!finishedLoading ? 'modal-open' : ''">
     <div class="modal-box relative w-48 bg-gray-500 text-white">
       <h3 class="text-lg font-bold normal-case">Loading...</h3>
+      <font-awesome-icon class="animate-spin mt-3" icon="fa-solid fa-spinner" size="2x" />
+    </div>
+  </div>
+
+  <!-- Modal will be on screen while the code is being generated -->
+  <input type="checkbox" id="generating-modal" class="modal-toggle" />
+  <div class="modal" :class="displayGeneratingModal ? 'modal-open' : ''">
+    <div class="modal-box relative w-48 bg-gray-500 text-white">
+      <h3 class="text-lg font-bold normal-case">Generating...</h3>
       <font-awesome-icon class="animate-spin mt-3" icon="fa-solid fa-spinner" size="2x" />
     </div>
   </div>
@@ -381,9 +390,21 @@ function uploadSavedFlow(event) {
 // Makes API call, providing flow data, the server will
 // return the generated code
 const generatedClasses = reactive([]);
-async function requestCodeGeneration() {
+const displayGeneratingModal = ref(false);
+function codeGenerationClicked() {
+  // Display loading modal
+  displayGeneratingModal.value = true;
+
+  // Close dropdown
   loseFocus();
 
+  // Make request to API
+  requestCodeGeneration().then(() => {
+    // Close loading modal when request is finished
+    displayGeneratingModal.value = false;
+  });
+}
+async function requestCodeGeneration() {
   try {
     // Get the entire flow data
     const flowData = toObject();
@@ -430,6 +451,7 @@ async function requestCodeGeneration() {
   } catch (e) {
     console.log("Error while trying to reach API: ", e);
   }
+
 }
 
 
