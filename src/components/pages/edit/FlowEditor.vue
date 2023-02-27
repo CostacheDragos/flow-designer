@@ -56,13 +56,20 @@
              <p class="text-white text-sm normal-case my-auto">Save status:</p>
 
              <!-- Icon for when the flow is up to date in the database -->
-             <div v-show="flowStore.isSaved && !showSaving" class="tooltip tooltip-bottom my-auto mx-2 h-fit normal-case" data-tip="Saved">
+             <div v-show="flowStore.isSaved() && !showSaving" class="tooltip tooltip-bottom my-auto mx-2 h-fit normal-case" data-tip="Saved">
                 <i class="bi bi-cloud-check-fill text-green-500 text-sm align-bottom"></i>
              </div>
 
             <!-- Icon for when the flow has not been uploaded -->
-             <div v-show="!flowStore.isSaved && !showSaving" class="tooltip tooltip-bottom my-auto mx-2 h-fit normal-case" data-tip="Unsaved changes">
+             <div v-show="flowStore.saveStatus === flowStore.possibleSaveStates.unsaved && !showSaving"
+                  class="tooltip tooltip-bottom my-auto mx-2 h-fit normal-case" data-tip="Unsaved">
                <i class="bi bi-cloud-slash-fill text-rose-600 text-sm align-bottom"></i>
+             </div>
+
+             <!-- Icon for when the flow has unsaved changes -->
+             <div v-show="flowStore.saveStatus === flowStore.possibleSaveStates.unsavedChanges && !showSaving"
+                  class="tooltip tooltip-bottom my-auto mx-2 h-fit normal-case" data-tip="Unsaved changes">
+               <i class="bi bi-cloud-arrow-up-fill text-sky-500 text-sm align-bottom"></i>
              </div>
 
              <!-- Icon for when the flow is being saved -->
@@ -141,6 +148,7 @@ import { db, auth, storage } from "@/includes/firebase.js";
 import html2canvas from "html2canvas";
 
 import { useFlowStore } from "@/stores/flow.js";
+import {onBeforeRouteLeave} from "vue-router";
 
 const { addNodes, addEdges, removeNodes, findNode, findEdge, getSelectedNodes, vueFlowRef, project, onConnect, toObject,
         setNodes, setEdges, setTransform, onNodesChange, onEdgesChange, onPaneReady } = useVueFlow();
@@ -188,7 +196,7 @@ onNodesChange(() => {
   // If the isSaved value indicates that the flow is saved, change the value to false as this method
   // is called when the flow changes
   else
-    flowStore.setIsSaved(false);
+    flowStore.changesOccurred();
 });
 
 // Called when edges are added, removed or selected
@@ -213,7 +221,7 @@ onEdgesChange((edgeEvents) => {
   })
 
   if(finishedLoading.value)
-    flowStore.setIsSaved(false);
+    flowStore.changesOccurred();
 });
 
 
@@ -283,7 +291,7 @@ const finishedLoading = ref(false);
 
 onPaneReady(async (vueFlowInstance) => {
   // Check if the opened flow is new or not
-  if(flowStore.isSaved) {
+  if(flowStore.isSaved()) {
     // If it's not new, load the data from the database
     const flowContent = (await getDoc(doc(db, "flowsContent", flowStore.currentFlowMetadata.flowId))).data();
 
@@ -344,7 +352,7 @@ function saveFlow() {
       await setDoc(doc(db, "flowsMetadata", flowStore.currentFlowMetadata.flowId), flowStore.currentFlowMetadata);
       await setDoc(doc(db, "flowsContent", flowStore.currentFlowMetadata.flowId), flowData);
 
-      flowStore.isSaved = true;
+      flowStore.setSaveStatus(flowStore.possibleSaveStates.saved);
       showSaving.value = false;
     });
 
@@ -473,11 +481,38 @@ const handleResize = () => {
 onMounted(() => {
   handleResize();
   window.addEventListener("resize", handleResize);
+
+  // For exit confirmation when there are unsaved changes
+  window.addEventListener("beforeunload", beforeWindowUnload);
 });
 onUnmounted(() => {
   window.removeEventListener("resize", handleResize);
+  window.removeEventListener("beforeunload", beforeWindowUnload);
 });
 
+
+// Before leaving the page, check if the flow is saved
+// and ask the user for confirmation if it is not
+function confirmPageExit() {
+  if(flowStore.isSaved())
+    return true;
+
+  return window.confirm('Do you really want to leave? you have unsaved changes!')
+};
+
+onBeforeRouteLeave((to, from, next) => {
+  if (confirmPageExit())
+    next();
+  else
+    next(false);
+});
+
+function beforeWindowUnload(event) {
+  if(!confirmPageExit()) {
+    event.preventDefault();
+    event.returnValue = '';
+  }
+}
 
 // Auxiliary
 // Focuses on a temporary element, useful to unfocus any currently focused element

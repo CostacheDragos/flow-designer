@@ -278,7 +278,7 @@ function changeClassName(inputElement) {
     inputElement.classList.remove("focus:border-red-600");
 
     // Change the save state of the flow
-    flowStore.setIsSaved(false);
+    flowStore.changesOccurred();
   }
   else {
     // Color the border red to let the user know that the value is not valid
@@ -309,11 +309,11 @@ function addProperty() {
     generateGetter: false,
   };
   selectedNodeData.value.classData.properties.push(newProperty);
-  flowStore.setIsSaved(false);
+  flowStore.changesOccurred();
 }
 function removeProperty(propertyIndex) {
   selectedNodeData.value.classData.properties.splice(propertyIndex, 1);
-  flowStore.setIsSaved(false);
+  flowStore.changesOccurred();
 }
 
 // Called when the user presses enter in a property name input field signaling that he wishes to change
@@ -326,7 +326,7 @@ function changePropertyName(inputElement, property) {
     // Remove the red border if there was any previous error
     inputElement.classList.remove("focus:border-red-600");
 
-    flowStore.setIsSaved(false);
+    flowStore.changesOccurred();
   }
   else {
     // Color the border red to let the user know that the value is not valid
@@ -355,7 +355,7 @@ function changePropertyType(inputElement, property) {
     // Remove the red border if there was any previous error
     inputElement.classList.remove("focus:border-red-600");
 
-    flowStore.setIsSaved(false);
+    flowStore.changesOccurred();
   }
   else {
     // Color the border red to let the user know that the value is not valid
@@ -383,11 +383,11 @@ function addMethod() {
     parameters: [],
   }
   selectedNodeData.value.classData.methods.push(newMethod);
-  flowStore.setIsSaved(false);
+  flowStore.changesOccurred();
 }
 function removeMethod(methodIndex) {
   selectedNodeData.value.classData.methods.splice(methodIndex, 1);
-  flowStore.setIsSaved(false);
+  flowStore.changesOccurred();
 }
 
 // Method name editing
@@ -398,7 +398,7 @@ function changeMethodName(inputElement, method) {
     // Remove the red border if there was any previous error
     inputElement.classList.remove("focus:border-red-600");
 
-    flowStore.setIsSaved(false);
+    flowStore.changesOccurred();
   }
   else {
     // Color the border red to let the user know that the value is not valid
@@ -424,7 +424,7 @@ function changeMethodReturnType(inputElement, method) {
 
     // Remove the red border if there was any previous error
     inputElement.classList.remove("focus:border-red-600");
-    flowStore.setIsSaved(false);
+    flowStore.changesOccurred();
   }
   else {
     // Color the border red to let the user know that the value is not valid
@@ -448,14 +448,14 @@ function addParameter(method) {
   };
   method.parameters.push(newParameter);
   method.selectedParameter = newParameter;
-  flowStore.setIsSaved(false);
+  flowStore.changesOccurred();
 }
 function removeSelectedParameter(method) {
   const parameterIndex = method.parameters.indexOf(method.selectedParameter);
   if(parameterIndex !== -1) {
     method.parameters.splice(parameterIndex, 1);
     method.selectedParameter = undefined;
-    flowStore.setIsSaved(false);
+    flowStore.changesOccurred();
   }
 }
 
@@ -466,7 +466,7 @@ function changeMethodParameterName(inputElement, method) {
 
     // Remove the red border if there was any previous error
     inputElement.classList.remove("focus:border-red-600");
-    flowStore.setIsSaved(false);
+    flowStore.changesOccurred();
   }
   else {
     // Color the border red to let the user know that the value is not valid
@@ -492,7 +492,7 @@ function changeMethodParameterType(inputElement, method) {
 
     // Remove the red border if there was any previous error
     inputElement.classList.remove("focus:border-red-600");
-    flowStore.setIsSaved(false);
+    flowStore.changesOccurred();
   }
   else {
     // Color the border red to let the user know that the value is not valid

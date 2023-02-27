@@ -76,7 +76,7 @@ onMounted(async () => {
 async function openFlow(flow) {
   // Set the values in the store to the loaded data
   flowStore.setCurrentFlowMetadata(flow.metadata);
-  flowStore.setIsSaved(true);
+  flowStore.setSaveStatus(flowStore.possibleSaveStates.saved);
 
   // Redirect to edit
   await router.push("/edit");
@@ -86,7 +86,7 @@ async function openFlow(flow) {
 // the edit page
 function createNewFlow() {
   // Indicate in the flow state that it is not new
-  flowStore.setIsSaved(false);
+  flowStore.setSaveStatus(flowStore.possibleSaveStates.unsaved);
 
   router.push("/edit");
 }
