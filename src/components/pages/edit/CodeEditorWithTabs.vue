@@ -2,12 +2,23 @@
 
   <div class="w-full h-2 bg-gray-900 cursor-row-resize flex-shrink-0" @mousedown="resizeStart"/>
   <div class="bg-gray-700 h-60 normal-case" id="code-editor-container">
-    <button class="float-right px-2 rounded-l bg-gray-800 transition hover:bg-gray-600" @click="emit('close_editor')">
-      <font-awesome-icon icon="fa-solid fa-angle-down" color="white" size="sm"/>
-    </button>
+    <div class="flex float-right">
+      <!-- Download files button -->
+      <div class="mr-1 tooltip tooltip-bottom" data-tip="Download editor contents">
+        <button class="px-2 bg-gray-800 rounded-b transition hover:bg-gray-600" @click="downloadFiles">
+          <i class="bi bi-download text-white"></i>
+        </button>
+      </div>
+      <!-- Close button -->
+      <div class="ml-1 tooltip tooltip-bottom" data-tip="Close">
+        <button class="px-2 bg-gray-800 rounded-b transition hover:bg-gray-600" @click="emit('close_editor')">
+          <font-awesome-icon icon="fa-solid fa-angle-down" color="white" size="sm"/>
+        </button>
+      </div>
+    </div>
 
     <!-- TODO change the way you handle many tabs, don't wrap them because it causes resize problems -->
-    <div class="flex flex-wrap w-10/12 mx-auto pl-1">
+    <div class="flex flex-wrap w-10/12 mx-auto pl-1 select-none">
       <button v-for="(classData, idx) in props.generatedClasses" :key="classData.id"
               class="bg-gray-500 px-3 mt-1 rounded-t text-gray-300 transition hover:text-black hover:bg-gray-200"
               :class="classData.isTabOpen ? 'bg-white text-black mx-1 shadow-lg shadow-white' : ''"
@@ -31,8 +42,8 @@ import hljs from "highlight.js";
 import  CodeEditor  from 'simple-code-editor';
 
 
-import {computed, ref} from "vue";
 import {v4 as uuidv4} from "uuid";
+import JSZip from "jszip";
 
 const props = defineProps(["generatedClasses"]);
 const emit = defineEmits(["close_editor"]);
@@ -59,6 +70,29 @@ function createNewTab() {
 
   changeTab(props.generatedClasses.length - 1);
 }
+
+
+// Downloads an archive containing all the files open if the editor
+function downloadFiles() {
+  // Create a new instance of JSZip
+  const zip = new JSZip();
+
+  // Add the files open in the editor to the archive
+  props.generatedClasses.forEach((classData) => {
+    zip.file(`${classData.className}.cs`, classData.code);
+  });
+
+  // generate the zip file asynchronously
+  zip.generateAsync({type:"blob"})
+      .then(function(content) {
+        // create a download link for the zip file
+        const downloadLink = document.createElement('a');
+        downloadLink.download = 'generated.zip';
+        downloadLink.href = URL.createObjectURL(content);
+        downloadLink.click();
+      });
+}
+
 
 // Resize bar functions
 let isBeingResized = false;

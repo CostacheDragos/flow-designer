@@ -23,6 +23,7 @@
     "firebase": "^9.17.1",
     "highlight.js": "^11.7.0",
     "html2canvas": "^1.4.1",
+    "jszip": "^3.10.1",
     "pinia": "^2.0.30",
     "simple-code-editor": "^1.2.2",
     "uuid": "^9.0.0",
