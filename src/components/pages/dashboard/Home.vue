@@ -24,8 +24,8 @@
             <img :src="flow.metadata.imageURL" alt="Minimap" class="rounded-lg h-full" />
           </figure>
           <div class="card-body">
-            <h2 class="card-title">{{ flow.metadata.flowId }}</h2>
-            <p class="h-20 overflow-y-auto p-2">Dummy flow description: If a dog chews shoes whose shoes does he choose? Dummy flow description: If a dog chews shoes whose shoes does he choose?</p>
+            <h2 class="card-title mx-auto">{{ flow.metadata.title }}</h2>
+            <p class="h-20 overflow-y-auto p-2">{{ flow.metadata.description }}</p>
             <div class="card-actions mt-2">
               <button class="btn btn-primary normal-case w-28" @click="openFlow(flow)">Open</button>
               <button class="btn bg-rose-600 border-none normal-case ml-auto w-28 hover:bg-rose-700" @click="deleteFlow(flow, flowIdx)">

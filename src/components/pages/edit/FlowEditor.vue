@@ -14,6 +14,12 @@
                      <font-awesome-icon icon="fa-solid fa-cloud-arrow-up" color="white"/>
                      <p class="text-white normal-case ml-3 mr-auto">Save</p>
                    </li>
+                   <label for="detail-edit-modal">
+                     <li class="rounded hover:bg-gray-500 bg-gray-600 cursor-pointer px-3 py-1 mx-1 flex">
+                       <font-awesome-icon icon="fa-solid fa-file-pen" color="white"/>
+                       <p class="text-white normal-case ml-3 mr-auto">Details</p>
+                     </li>
+                   </label>
                    <li class="rounded hover:bg-gray-500 bg-gray-600 cursor-pointer px-3 py-1 mx-1 flex" @click="downloadSaveFile">
                      <font-awesome-icon icon="fa-solid fa-download" color="white" />
                      <p class="text-white normal-case ml-3 mr-auto">Download</p>
@@ -125,6 +131,33 @@
       </div>
     </div>
   </div>
+
+  <!-- Modal will be displayed when the user wishes to edit the flow's details -->
+  <input type="checkbox" id="detail-edit-modal" class="modal-toggle" />
+  <div class="modal normal-case text-white">
+    <div class="modal-box bg-gray-600">
+      <h3 class="font-bold text-lg">Edit flow details</h3>
+      <div class="h-full py-5">
+        <label class="block text-left mb-1" for="flow-title-input">
+          Title
+        </label>
+        <input type="text" id="flow-title-input" v-model="flowTitleInputModel"
+               class="block bg-gray-500 rounded ml-1 px-2 w-full border border-gray-500
+               focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none">
+
+        <label class="block text-left mt-5 mb-1" for="flow-description-input">
+          Description
+        </label>
+        <textarea id="flow-description-input" v-model="flowDescriptionInputModel"
+                  class="block resize-none bg-gray-500 rounded ml-1 px-2 w-full h-32 border border-gray-500
+                  focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"/>
+      </div>
+      <div class="modal-action flex">
+        <label for="detail-edit-modal" class="btn bg-green-500 flex-grow" @click="submitNewFlowDetails">Save</label>
+        <label for="detail-edit-modal" class="btn bg-rose-500 flex-grow" @click="cancelFlowDetailsEdit">Cancel</label>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -208,6 +241,7 @@ onEdgesChange((edgeEvents) => {
   edgeEvents.forEach(edgeEvent => {
     if(edgeEvent.type === "remove") {
       const edge = findEdge(edgeEvent.id);
+
       if(edge.type === "inheritance") {
         const targetNode = findNode(edge.target);
         // Check that the target node was not deleted (node deletion also triggers
@@ -305,20 +339,22 @@ onPaneReady(async (vueFlowInstance) => {
     // is called
     setNodes(flowContent.nodes);
     setEdges(flowContent.edges);
-    // vueFlowInstance.fitView();
-
-    const [x = 0, y = 0] = flowContent.position;
-    setTransform({x, y, zoom: flowContent.zoom || 0});
+    vueFlowInstance.fitView();
   } else {
     // If the flow is new, populate the metadata
     flowStore.setCurrentFlowMetadata({
       flowId: uuidv4(),
       userId: auth.currentUser.uid,
       imageURL: "",
+      title: "",
+      description: "",
     });
 
     finishedLoading.value = true;
   }
+
+  flowTitleInputModel.value = flowStore.currentFlowMetadata.title;
+  flowDescriptionInputModel.value = flowStore.currentFlowMetadata.description;
 });
 
 const showSaving = ref(false);
@@ -361,6 +397,22 @@ function saveFlow() {
   }
 }
 
+
+// Tracks the flow details from the modal
+const flowTitleInputModel = ref("");
+const flowDescriptionInputModel = ref("");
+// If the user submits the new details update the store values
+function submitNewFlowDetails() {
+  flowStore.setTitle(flowTitleInputModel.value);
+  flowStore.setDescription(flowDescriptionInputModel.value);
+
+  flowStore.changesOccurred();
+}
+// If the user cancels, update the local values with the ones from the store
+function cancelFlowDetailsEdit() {
+  flowTitleInputModel.value = flowStore.currentFlowMetadata.title;
+  flowDescriptionInputModel.value = flowStore.currentFlowMetadata.description;
+}
 
 // Download to device & upload from device
 function downloadSaveFile() {

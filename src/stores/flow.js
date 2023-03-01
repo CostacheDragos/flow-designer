@@ -13,12 +13,20 @@ export const useFlowStore = defineStore("flow", () => {
           flowId: "",
           userId: "",
           imageURL: "",
+          title: "",
+          description: "",
       },
       saveStatus: possibleSaveStates.unsaved,
     };
 
 
-    const currentFlowMetadata = reactive({});
+    const currentFlowMetadata = reactive({
+        flowId: "",
+        userId: "",
+        imageURL: "",
+        title: "",
+        description: "",
+    });
     const saveStatus = ref(defaultValues.saveStatus);
 
     function setCurrentFlowMetadata(newData) {
@@ -32,6 +40,14 @@ export const useFlowStore = defineStore("flow", () => {
     // Verify if the save stated is set to 'saved'
     function isSaved() {
         return saveStatus.value === possibleSaveStates.saved;
+    }
+
+
+    function setTitle(newTitle) {
+        currentFlowMetadata.title = newTitle;
+    }
+    function setDescription(newDescription) {
+        currentFlowMetadata.description = newDescription;
     }
 
     // Call whenever changes occur in the flow,
@@ -52,5 +68,6 @@ export const useFlowStore = defineStore("flow", () => {
         saveStatus.value = defaultValues.saveStatus;
     }
 
-    return {currentFlowMetadata, saveStatus, possibleSaveStates, setCurrentFlowMetadata, setSaveStatus, resetState, isSaved, changesOccurred};
+    return {currentFlowMetadata, saveStatus, possibleSaveStates, setCurrentFlowMetadata, setSaveStatus, resetState, isSaved,
+        setTitle, setDescription, changesOccurred};
 })
