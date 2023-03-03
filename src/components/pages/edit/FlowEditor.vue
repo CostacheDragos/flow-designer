@@ -142,8 +142,9 @@
           Title
         </label>
         <input type="text" id="flow-title-input" v-model="flowTitleInputModel"
-               class="block bg-gray-500 rounded ml-1 px-2 w-full border border-gray-500
-               focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none">
+               class="block bg-gray-500 rounded ml-1 px-2 w-full border border-gray-500 focus:text-gray-700 focus:bg-white"
+               :class="displayTitleInputError ? 'outline outline-2 outline-rose-600 focus:border-rose-600' :
+                                                'focus:border-blue-600 focus:outline-none'">
 
         <label class="block text-left mt-5 mb-1" for="flow-description-input">
           Description
@@ -363,6 +364,13 @@ function saveFlow() {
   // Unfocus the dropdown in order to close it
   loseFocus();
 
+  // Check that the flow has a title assigned, if not, ask the user to provide one
+  if(flowStore.currentFlowMetadata.title === "") {
+    // Display the details editing panel
+    document.getElementById("detail-edit-modal").checked = true;
+    return;
+  }
+
   // Display loading icon
   showSaving.value = true;
 
@@ -401,17 +409,35 @@ function saveFlow() {
 // Tracks the flow details from the modal
 const flowTitleInputModel = ref("");
 const flowDescriptionInputModel = ref("");
+const displayTitleInputError = ref(false);
 // If the user submits the new details update the store values
-function submitNewFlowDetails() {
+function submitNewFlowDetails(event) {
+
+  // Remove white spaces from the ends of the input values
+  flowTitleInputModel.value = flowTitleInputModel.value.trim();
+  flowDescriptionInputModel.value = flowDescriptionInputModel.value.trim();
+
+  // Update the store data
   flowStore.setTitle(flowTitleInputModel.value);
   flowStore.setDescription(flowDescriptionInputModel.value);
 
-  flowStore.changesOccurred();
+  // Check that the title is valid before saving to the database
+  if(flowStore.currentFlowMetadata.title === "") {
+    // If the title is invalid, do not save and warn the user
+    event.preventDefault();
+    displayTitleInputError.value = true;
+    return;
+  }
+
+  displayTitleInputError.value = false;
+  saveFlow();
 }
 // If the user cancels, update the local values with the ones from the store
 function cancelFlowDetailsEdit() {
   flowTitleInputModel.value = flowStore.currentFlowMetadata.title;
   flowDescriptionInputModel.value = flowStore.currentFlowMetadata.description;
+
+  displayTitleInputError.value = false;
 }
 
 // Download to device & upload from device
