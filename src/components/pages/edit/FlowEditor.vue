@@ -417,17 +417,17 @@ function submitNewFlowDetails(event) {
   flowTitleInputModel.value = flowTitleInputModel.value.trim();
   flowDescriptionInputModel.value = flowDescriptionInputModel.value.trim();
 
-  // Update the store data
-  flowStore.setTitle(flowTitleInputModel.value);
-  flowStore.setDescription(flowDescriptionInputModel.value);
-
   // Check that the title is valid before saving to the database
-  if(flowStore.currentFlowMetadata.title === "") {
+  if(flowTitleInputModel.value === "") {
     // If the title is invalid, do not save and warn the user
     event.preventDefault();
     displayTitleInputError.value = true;
     return;
   }
+
+  // Update the store data
+  flowStore.setTitle(flowTitleInputModel.value);
+  flowStore.setDescription(flowDescriptionInputModel.value);
 
   displayTitleInputError.value = false;
   saveFlow();
