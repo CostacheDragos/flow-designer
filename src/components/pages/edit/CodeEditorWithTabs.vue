@@ -32,7 +32,7 @@
     <CodeEditor v-for="classData in props.generatedClasses" v-show="classData.isTabOpen" :key="classData.id"
                 v-model="classData.code" height="100%" width="91%"
                 class="pb-6 mx-auto"
-                :language_selector="true" :languages="[['csharp', 'C#']]"/>
+                :language_selector="true" :languages="[['csharp', 'C#'], ['cpp', 'C++']]"/>
   </div>
 
 </template>
@@ -47,6 +47,7 @@ import JSZip from "jszip";
 
 const props = defineProps(["generatedClasses"]);
 const emit = defineEmits(["close_editor"]);
+
 
 // If the user opens the code editor with no generated code
 // open a new empty tab

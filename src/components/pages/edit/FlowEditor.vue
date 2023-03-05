@@ -37,10 +37,12 @@
                <div class="dropdown">
                  <button class="text-white rounded hover:bg-gray-500 px-2 normal-case">Tools</button>
                  <ul tabindex="0" class="dropdown-content rounded py-2 bg-gray-600 w-40 mt-2">
-                   <li class="rounded hover:bg-gray-500 bg-gray-600 cursor-pointer px-3 py-1 mx-1 flex" @click="codeGenerationClicked">
-                     <font-awesome-icon icon="fa-solid fa-code" class="my-auto" color="white" />
-                     <p class="text-white normal-case ml-3 mr-auto">Code Gen.</p>
-                   </li>
+                   <label for="code-generation-options-modal">
+                     <li class="rounded hover:bg-gray-500 bg-gray-600 cursor-pointer px-3 py-1 mx-1 flex">
+                       <font-awesome-icon icon="fa-solid fa-code" class="my-auto" color="white" />
+                       <p class="text-white normal-case ml-3 mr-auto">Code Gen.</p>
+                     </li>
+                   </label>
                  </ul>
                </div>
              </li>
@@ -156,6 +158,29 @@
       <div class="modal-action flex">
         <label for="detail-edit-modal" class="btn bg-green-500 flex-grow" @click="submitNewFlowDetails">Save</label>
         <label for="detail-edit-modal" class="btn bg-rose-500 flex-grow" @click="cancelFlowDetailsEdit">Cancel</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal will be displayed when the user wishes to generate code -->
+  <input type="checkbox" id="code-generation-options-modal" class="modal-toggle" />
+  <div class="modal normal-case text-white">
+    <div class="modal-box bg-gray-600">
+      <h3 class="font-bold text-lg">Generate Code</h3>
+      <div class="h-full py-5">
+        <label class="block text-left mb-1" for="generation-language-input">
+          Language
+        </label>
+        <select id="generation-language-input" v-model="codeGenerationLanguage"
+                class="block bg-gray-500 rounded ml-1 px-2 w-full border border-gray-500
+                focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none">
+          <option value="CSharp">C#</option>
+          <option value="Cpp">C++</option>
+        </select>
+      </div>
+      <div class="modal-action flex">
+        <label for="code-generation-options-modal" class="btn bg-blue-500 flex-grow" @click="codeGenerationClicked">Generate</label>
+        <label for="code-generation-options-modal" class="btn bg-rose-500 flex-grow">Cancel</label>
       </div>
     </div>
   </div>
@@ -476,6 +501,7 @@ function uploadSavedFlow(event) {
 // Makes API call, providing flow data, the server will
 // return the generated code
 const generatedClasses = reactive([]);
+const codeGenerationLanguage = ref("CSharp");
 const displayGeneratingModal = ref(false);
 function codeGenerationClicked() {
   // Display loading modal
@@ -496,7 +522,7 @@ async function requestCodeGeneration() {
     const flowData = toObject();
 
     // Create data object that contains only code generation specific data (data about the classes to be generated)
-    const generationData = flowData.nodes.map(node => {
+    const classNodes = flowData.nodes.map(node => {
       return {
         id: node.id,
         parentClassNodesIds: node.data.parentClassNodesIds,
@@ -510,7 +536,10 @@ async function requestCodeGeneration() {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(generationData),
+      body: JSON.stringify({
+        classNodes,
+        language: codeGenerationLanguage.value,
+      }),
     })).text();
 
 
@@ -530,7 +559,7 @@ async function requestCodeGeneration() {
       );
     }
     generatedClasses[0].isTabOpen = true;
-
+    console.log(generatedClasses);
     // If closed, open the code editor
     if(showCodeEditor.value === false)
       showCodeEditor.value = true;

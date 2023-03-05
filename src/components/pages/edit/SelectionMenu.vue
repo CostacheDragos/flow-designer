@@ -76,7 +76,7 @@
                       <select class="bg-gray-500 rounded ml-1 px-2 w-36
                                     border border-gray-500
                                     focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                             v-model="property.accessModifier">
+                             v-model="property.accessModifier" @change="propertyAccessChanged">
                         <option value="private">private</option>
                         <option value="public">public</option>
                       </select>
@@ -161,7 +161,7 @@
                       <select class="bg-gray-500 rounded ml-1 px-2 w-36
                                     border border-gray-500
                                     focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                              v-model="method.accessModifier">
+                              v-model="method.accessModifier" @change="methodAccessChanged">
                         <option value="private">private</option>
                         <option value="public">public</option>
                       </select>
@@ -371,7 +371,10 @@ function onPropertyTypeInputLostFocus(inputElement, property) {
   inputElement.classList.remove("focus:border-red-600");
 }
 
-
+// When a new access modifier is selected for a property
+function propertyAccessChanged() {
+  flowStore.changesOccurred();
+}
 
 // ****** Class methods functions ******
 function addMethod() {
@@ -415,6 +418,11 @@ function onMethodNameInputLostFocus(inputElement, method) {
 
   // Remove the red border if there was any previous error
   inputElement.classList.remove("focus:border-red-600");
+}
+
+// When a new access modifier is selected for a method
+function methodAccessChanged() {
+  flowStore.changesOccurred();
 }
 
 // Method return type editing
