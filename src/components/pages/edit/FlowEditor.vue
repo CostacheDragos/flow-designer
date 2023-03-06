@@ -604,7 +604,7 @@ function confirmPageExit() {
   if(flowStore.isSaved())
     return true;
 
-  return window.confirm('Do you really want to leave? you have unsaved changes!')
+  return window.confirm('Do you really want to leave? You have unsaved changes!')
 };
 
 onBeforeRouteLeave((to, from, next) => {

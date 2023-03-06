@@ -48,13 +48,8 @@ const router = createRouter({
 router.beforeEach((to, from) => {
     const { isLoggedIn } = useUserStore();
 
-    // If the user tries to access login or register but he is already logged, redirect to home
-    if(to.name === "Login" || to.name === "Register") {
-        if (isLoggedIn)
-            return {name: "Home"};
-    }
     // If the user tries to access other pages and is not logged in, redirect to login
-    else if(!isLoggedIn) {
+    if(!isLoggedIn && to.name !== "Login" && to.name !== "Register") {
         return {name: "Login"};
     }
 

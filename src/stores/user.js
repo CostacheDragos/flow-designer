@@ -54,9 +54,13 @@ export const useUserStore = defineStore('user', () => {
     }
 
     async function logout() {
-        await signOut(auth);
+        const navigationResult = await router.push("/login");
 
-        await router.push("/login");
+        // If the navigation result is anything but undefined, the
+        // route was blocked
+        if(!navigationResult)
+            await signOut(auth);
+
     }
 
     return {isLoggedIn, registerWithEmailAndPassword, loginWithEmailAndPassword, loginWithGoogle, logout};
