@@ -176,6 +176,7 @@
                 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none">
           <option value="CSharp">C#</option>
           <option value="Cpp">C++</option>
+          <option value="Java">Java</option>
         </select>
       </div>
       <div class="modal-action flex">

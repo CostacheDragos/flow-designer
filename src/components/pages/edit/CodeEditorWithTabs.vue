@@ -32,7 +32,7 @@
     <CodeEditor v-for="classData in props.generatedClasses" v-show="classData.isTabOpen" :key="classData.id"
                 v-model="classData.code" height="100%" width="91%"
                 class="pb-6 mx-auto"
-                :language_selector="true" :languages="[['csharp', 'C#'], ['cpp', 'C++']]"/>
+                :language_selector="true" :languages="[['csharp', 'C#'], ['cpp', 'C++'], ['java', 'Java']]"/>
   </div>
 
 </template>
@@ -130,4 +130,10 @@ function resizing(event) {
 
 
 </script>
+
+<style scoped>
+#code-editor-container {
+  max-height: 95%;
+}
+</style>
 
