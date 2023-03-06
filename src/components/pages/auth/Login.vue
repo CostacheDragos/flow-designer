@@ -1,6 +1,7 @@
 <template>
-  <div class="bg-gray-900 w-screen h-screen flex">
-    <div class="mx-auto my-auto border border-gray-500 rounded-xl p-5 w-96 bg-gray-800 shadow">
+  <div class="bg-gray-900 w-screen h-screen flex" :class="isLoggedIn ? 'border-t border-gray-400' : ''">
+    <!-- Login form -->
+    <div v-if="!isLoggedIn" class="mx-auto my-auto border border-gray-500 rounded-xl p-5 w-96 bg-gray-800 shadow">
       <div class="flex mb-5 h-14">
         <h1 class="flex flex-grow text-xl font-bold leading-tight tracking-tight text-white normal-case">
           <span class="mx-auto my-auto"> Sign into your account </span>
@@ -39,14 +40,20 @@
         </p>
       </form>
     </div>
+
+    <!-- Info card to be displayed when the user is already logged in -->
+    <AlreadyLoggedInInfoCard v-if="isLoggedIn" class="mx-auto my-auto"/>
   </div>
 </template>
 
 <script setup>
 import {useUserStore} from "@/stores/user.js";
 import {reactive} from "vue";
+import AlreadyLoggedInInfoCard from "@/components/pages/auth/AlreadyLoggedInInfoCard.vue";
+import {storeToRefs} from "pinia";
 
-const {loginWithEmailAndPassword, loginWithGoogle} = useUserStore();
+const { loginWithEmailAndPassword, loginWithGoogle } = useUserStore();
+const {isLoggedIn} = storeToRefs(useUserStore());
 
 const credentials = reactive({
   email: {

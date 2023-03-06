@@ -54,6 +54,14 @@ export const useUserStore = defineStore('user', () => {
     }
 
     async function logout() {
+        // If the current route is login do not attempt to change to
+        // login as the push method will return an error because
+        // of redundant navigation
+        if(router.currentRoute.value.path === "/login") {
+            await signOut(auth);
+            return;
+        }
+
         const navigationResult = await router.push("/login");
 
         // If the navigation result is anything but undefined, the
