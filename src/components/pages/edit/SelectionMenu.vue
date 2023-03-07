@@ -106,7 +106,7 @@
                                     border border-gray-500
                                     cursor-pointer
                                     focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                              v-model="property.generateSetter">
+                              v-model="property.generateSetter" @change="flowStore.changesOccurred()">
 
                       <label class="normal-case text-left w-16 ml-auto">Getter:</label>
                       <input type="checkbox"
@@ -114,7 +114,7 @@
                                     border border-gray-500
                                     cursor-pointer
                                     focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                             v-model="property.generateGetter">
+                             v-model="property.generateGetter" @change="flowStore.changesOccurred()">
                     </li>
                   </ul>
                 </div>

@@ -564,10 +564,11 @@ async function requestCodeGeneration() {
         id: node.id,
         parentClassNodesIds: node.data.parentClassNodesIds,
         classData: node.data.classData,
+        isInterface: node.data.isInterface,
       }
     });
-
-    const responseText = await (await fetch("https://localhost:7024/api/CodeGenerator", {
+    console.log(classNodes);
+    const responseText = await (await fetch("http://82.78.25.124:16261/api/CodeGenerator", {
       method: "POST",
       headers: {
         'Accept': 'application/json',
