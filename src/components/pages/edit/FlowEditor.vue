@@ -91,7 +91,7 @@
            <MiniMap id="minimap" class="border border-4 border-gray-900 rounded-lg" :mask-color="minimapMaskColor"/>
            <Background/>
            <template v-slot:node-class="props">
-             <class-node :label="props.label" :data="props.data" :selected="props.selected" :id="props.id" />
+             <class-node :label="props.label" :data="props.data" :selected="props.selected" :id="props.id"/>
            </template>
            <template v-slot:edge-inheritance="props">
              <inheritance-edge v-bind="props"/>
@@ -293,30 +293,20 @@ function onDragOver(event) {
   event.dataTransfer.dropEffect = "move";
 }
 function onDrop(event) {
-  // Create a new node on the position of the cursor
+  // Get the position of the cursor
   const { left, top } = vueFlowRef.value.getBoundingClientRect()
   const position = project({
     x: event.clientX - left,
     y: event.clientY - top
   });
 
-  const newNodeId = uuidv4();
-  const newNode = {
-    id: newNodeId,
-    label: `Class`,
-    type: "class",
-    position,
-    data: {
-      toolbarPosition: Position.Right,
-      isExpanded: false,
-      parentClassNodesIds: [],
-      classData: {
-        name: "Class",
-        properties: [],
-        methods: [],
-      },
-    },
-  }
+  // Retrieve the node type from the event data (set in the sidebar onDragStart event)
+  // and create the new node
+  const newNode = createNewNode(event.dataTransfer.getData("node-type"), position);
+
+  // Check that the newNode creation was successful, if not, stop
+  if(newNode === null)
+    return;
 
   // Add the node to vue flow
   addNodes([newNode]);
@@ -335,6 +325,52 @@ function onDrop(event) {
         { deep: true, flush: 'post' },
     )
   })
+}
+function createNewNode(nodeType, position) {
+  let newNode = null;
+
+  switch (nodeType) {
+    case "class":
+      newNode = {
+        id: uuidv4(),
+        label: `Class`,
+        type: "class",
+        position,
+        data: {
+          toolbarPosition: Position.Right,
+          isExpanded: false,
+          isInterface: false,
+          parentClassNodesIds: [],
+          classData: {
+            name: "Class",
+            properties: [],
+            methods: [],
+          },
+        },
+      };
+      break;
+    case "interface":
+      newNode = {
+        id: uuidv4(),
+        label: `Interface`,
+        type: "class",
+        position,
+        data: {
+          toolbarPosition: Position.Right,
+          isExpanded: false,
+          isInterface: true,
+          parentClassNodesIds: [],
+          classData: {
+            name: "Interface",
+            properties: [],
+            methods: [],
+          },
+        },
+      };
+      break;
+  };
+
+  return newNode;
 }
 
 

@@ -6,9 +6,11 @@
       <div class="p-2">
         <ul>
           <li>
-            <div class="vue-flow__node-default mx-auto hover:cursor-pointer normal-case" :draggable="true" @dragstart="onDragStart($event, 'classNode')">
+            <div class="vue-flow__node-default mx-auto hover:cursor-pointer normal-case my-2" :draggable="true" @dragstart="onDragStart($event, 'class')">
               Class
             </div>
+            <div class="vue-flow__node-default mx-auto hover:cursor-pointer normal-case my-2 italic" :draggable="true" @dragstart="onDragStart($event, 'interface')"
+            v-text="'<< Interface >>'"/>
           </li>
         </ul>
       </div>
@@ -22,8 +24,12 @@
 <script setup>
 
 // Called when the node is being dragged
-function onDragStart(event) {
+function onDragStart(event, nodeType) {
   event.dataTransfer.effectAllowed = 'move';
+
+  // Set the node type in the drag event so the editor
+  // can pick it up when the user drops the new node
+  event.dataTransfer.setData("node-type", nodeType);
 }
 
 // Resize bar functions

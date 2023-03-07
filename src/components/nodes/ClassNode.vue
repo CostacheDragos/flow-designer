@@ -10,15 +10,20 @@
     </div>
   </NodeToolbar>
 
-  <div :class="{'border-sky-400 border-2': selected, 'border-black border-2': !selected}" class="vue-flow__node-default">
+  <div :class="{'border-sky-400 border-2': selected, 'border-black border-2': !selected}" class="vue-flow__node-default w-40">
     <div class="flex">
       <div class="my-auto rounded-full hover:bg-sky-400 px-1" @click="toggleExpanded">
         <font-awesome-icon v-show="!props.data.isExpanded" icon="fa-solid fa-angle-right"/>
         <font-awesome-icon v-show="props.data.isExpanded" icon="fa-solid fa-angle-down"/>
       </div>
-      <h2 class="normal-case grow break-all">
+
+      <!-- Regular class label -->
+      <h2 class="normal-case grow break-all" v-if="!data.isInterface">
         {{ label }}
       </h2>
+      <!-- Interface label -->
+      <h2 class="normal-case grow break-all italic" v-if="data.isInterface" v-text="`<< ${ label } >>`"/>
+
       <div class="my-auto rounded-full hover:bg-sky-400 px-1" @click="toggleToolbarVisibility">
         <font-awesome-icon v-show="!isToolbarVisible" icon="fa-plus fa-solid"/>
         <font-awesome-icon v-show="isToolbarVisible" icon="fa-solid fa-minus"/>

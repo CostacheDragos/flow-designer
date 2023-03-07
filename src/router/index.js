@@ -12,7 +12,7 @@ import { useFlowStore } from "@/stores/flow.js";
 const routes = [
     {
         path: "/",
-        redirect: "/login",
+        redirect: "/home",
     },
     {
         path: "/login",
