@@ -123,13 +123,13 @@
   </div>
 
   <!--  This Modal will be displayed when the user tries to add an edge that will create an inheritance cycle -->
-  <input type="checkbox" id="cycle-warning-modal" class="modal-toggle" />
+  <input type="checkbox" id="warning-modal" class="modal-toggle" />
   <div class="modal">
     <div class="modal-box normal-case bg-gray-500 text-white">
       <h3 class="font-bold text-lg bg-rose-600 mx-auto rounded-lg w-fit p-3">Warning!</h3>
-      <p class="py-4">The edge you are trying to add will create an inheritance cycle in you class hierarchy.</p>
+      <p class="py-4">{{ warningModalText }}</p>
       <div class="modal-action">
-        <label for="cycle-warning-modal" class="btn">Close</label>
+        <label for="warning-modal" class="btn">Close</label>
       </div>
     </div>
   </div>
@@ -216,18 +216,15 @@ const { addNodes, addEdges, removeNodes, findNode, findEdge, getSelectedNodes, v
 
 // Initial elements (for testing only)
 const elements = ref([]);
-
+const warningModalText = ref("Something went wrong...");
 // Vue Flow Events
 // Called when 2 nodes are connected
 onConnect((params) => {
 
   // Check if adding this edge will create an inheritance cycle
   if(checkInheritanceCycle(params.source, params.target)) {
-    console.log("Adding this edge will create a cycle!");
-
     // Display warning to user
-    const modalToggle = document.getElementById("cycle-warning-modal");
-    modalToggle.checked = true;
+    displayWarningModal("The edge you are trying to add will create an inheritance cycle in you class hierarchy.")
 
     return;
   }
@@ -555,56 +552,72 @@ function codeGenerationClicked() {
 }
 async function requestCodeGeneration() {
   try {
-    // Get the entire flow data
-    const flowData = toObject();
-
-    // Create data object that contains only code generation specific data (data about the classes to be generated)
-    const classNodes = flowData.nodes.map(node => {
-      return {
-        id: node.id,
-        parentClassNodesIds: node.data.parentClassNodesIds,
-        classData: node.data.classData,
-        isInterface: node.data.isInterface,
-      }
-    });
-    console.log(classNodes);
-    const responseText = await (await fetch("http://82.78.25.124:16261/api/CodeGenerator", {
+    const response = await fetch("https://localhost:7024/api/CodeGenerator", {
       method: "POST",
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        classNodes,
+        classNodes: prepareFlowDataForCodeGenerationRequest(),
         language: codeGenerationLanguage.value,
       }),
-    })).text();
+    });
+    const responseText = await response.text();
 
+    // If the server returned any status but 200, give the user feedback
+    if(response.status !== 200) {
+      console.log(responseText);
+      if(response.status === 500)
+        displayWarningModal("Server was unable to generate the requested code...");
+      else
+        displayWarningModal(JSON.parse(responseText));
 
-    // Create a list from the generated code
-    // The API will return a dictionary in which
-    // the key is the id of the class/node and the value is the generated code
-    const formatedResponse = JSON.parse(responseText);
-    generatedClasses.splice(0, generatedClasses.length);
-
-    for(const classId in formatedResponse) {
-      generatedClasses.push({
-            id: classId,
-            className: findNode(classId).data.classData.name,
-            code: formatedResponse[classId],
-            isTabOpen: false,
-          }
-      );
+      return;
     }
-    generatedClasses[0].isTabOpen = true;
-    console.log(generatedClasses);
-    // If closed, open the code editor
-    if(showCodeEditor.value === false)
-      showCodeEditor.value = true;
+
+    formatReceivedGeneratedCode(responseText);
   } catch (e) {
     console.log("Error while trying to reach API: ", e);
   }
+}
+function prepareFlowDataForCodeGenerationRequest() {
+  // Get the entire flow data
+  const flowData = toObject();
 
+  // Create data object that contains only code generation specific data (data about the classes to be generated)
+  const classNodes = flowData.nodes.map(node => {
+    return {
+      id: node.id,
+      parentClassNodesIds: node.data.parentClassNodesIds,
+      classData: node.data.classData,
+      isInterface: node.data.isInterface,
+    }
+  });
+
+  return classNodes;
+}
+function formatReceivedGeneratedCode(responseText) {
+  // Create a list from the generated code
+  // The API will return a dictionary in which
+  // the key is the id of the class/node and the value is the generated code
+  const formatedResponse = JSON.parse(responseText);
+  generatedClasses.splice(0, generatedClasses.length);
+
+  for(const classId in formatedResponse) {
+    generatedClasses.push({
+          id: classId,
+          className: findNode(classId).data.classData.name,
+          code: formatedResponse[classId],
+          isTabOpen: false,
+        }
+    );
+  }
+  generatedClasses[0].isTabOpen = true;
+
+  // If closed, open the code editor
+  if(showCodeEditor.value === false)
+    showCodeEditor.value = true;
 }
 
 
@@ -666,6 +679,12 @@ function loseFocus() {
   document.body.appendChild(tmp);
   tmp.focus();
   document.body.removeChild(tmp);
+}
+
+function displayWarningModal(warningText) {
+  warningModalText.value = warningText;
+  const modalToggle = document.getElementById("warning-modal");
+  modalToggle.checked = true;
 }
 
 // Convert dataURL to Blob
