@@ -270,7 +270,8 @@ const generalDataTypes = ["int", "long", "float", "double", "bool", "char", "str
 
 // ****** General class functions ******
 function changeClassName(inputElement) {
-  if(inputElement.value.length) {
+  inputElement.value = inputElement.value.trim();
+  if(checkNameValidity(inputElement.value)) {
     selectedNodeData.value.classData.name = inputElement.value;
     getSelectedNodes.value[0].label = inputElement.value;
 
@@ -318,9 +319,9 @@ function removeProperty(propertyIndex) {
 
 // Called when the user presses enter in a property name input field signaling that he wishes to change
 // the property name
-// TODO IMPLEMENT MORE VALIDATIONS ON NAMES (do this for methods as well)
 function changePropertyName(inputElement, property) {
-  if(inputElement.value.length) {
+  inputElement.value = inputElement.value.trim();
+  if(checkNameValidity(inputElement.value)) {
     property.name = inputElement.value;
 
     // Remove the red border if there was any previous error
@@ -347,9 +348,9 @@ function onPropertyNameInputLostFocus(inputElement, property) {
   // Remove the red border if there was any previous error
   inputElement.classList.remove("focus:border-red-600");
 }
-// TODO IMPLEMENT MORE VALIDATIONS ON TYPES (do this for methods as well)
 function changePropertyType(inputElement, property) {
-  if(inputElement.value.length) {
+  inputElement.value = inputElement.value.trim();
+  if(checkNameValidity(inputElement.value)) {
     property.type = inputElement.value;
 
     // Remove the red border if there was any previous error
@@ -395,7 +396,8 @@ function removeMethod(methodIndex) {
 
 // Method name editing
 function changeMethodName(inputElement, method) {
-  if(inputElement.value.length) {
+  inputElement.value = inputElement.value.trim();
+  if(checkNameValidity(inputElement.value)) {
     method.name = inputElement.value;
 
     // Remove the red border if there was any previous error
@@ -427,7 +429,8 @@ function methodAccessChanged() {
 
 // Method return type editing
 function changeMethodReturnType(inputElement, method) {
-  if(inputElement.value.length) {
+  inputElement.value = inputElement.value.trim();
+  if(checkNameValidity(inputElement.value)) {
     method.returnType = inputElement.value;
 
     // Remove the red border if there was any previous error
@@ -469,7 +472,8 @@ function removeSelectedParameter(method) {
 
 // Method parameter name editing
 function changeMethodParameterName(inputElement, method) {
-  if(inputElement.value.length) {
+  inputElement.value = inputElement.value.trim();
+  if(checkNameValidity(inputElement.value)) {
     method.selectedParameter.name = inputElement.value;
 
     // Remove the red border if there was any previous error
@@ -495,7 +499,8 @@ function onMethodParameterNameInputLostFocus(inputElement, method) {
 
 // Method parameter type editing
 function changeMethodParameterType(inputElement, method) {
-  if(inputElement.value.length) {
+  inputElement.value = inputElement.value.trim();
+  if(checkNameValidity(inputElement.value)) {
     method.selectedParameter.type = inputElement.value;
 
     // Remove the red border if there was any previous error
@@ -519,6 +524,12 @@ function onMethodParameterTypeInputLostFocus(inputElement, method) {
   inputElement.classList.remove("focus:border-red-600");
 }
 
+// Validation functions
+// Checks the validity of the names given to
+// classes, methods, parameters, properties etc
+function checkNameValidity(name) {
+  return /^[A-Za-z][A-Za-z0-9_]*$/.test(name);
+}
 
 
 // Resize bar functions

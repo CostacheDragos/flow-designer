@@ -10,7 +10,8 @@
     </div>
   </NodeToolbar>
 
-  <div :class="{'border-sky-400 border-2': selected, 'border-black border-2': !selected}" class="vue-flow__node-default w-40">
+  <div :class="{'border-sky-400 border-2 shadow-md shadow-sky-400': selected, 'border-black border-2': !selected}"
+       class="vue-flow__node-default w-fit">
     <div class="flex">
       <div class="my-auto rounded-full hover:bg-sky-400 px-1" @click="toggleExpanded">
         <font-awesome-icon v-show="!props.data.isExpanded" icon="fa-solid fa-angle-right"/>
@@ -32,12 +33,12 @@
 
     <div v-show="props.data.isExpanded" class="divide-y-2 divide-black mt-2">
       <ul class="pb-2">
-        <li v-for="property in data.classData.properties" class="my-1 shadow border border-gray-500 rounded">
+        <li v-for="property in data.classData.properties" class="my-1 px-1 shadow border border-gray-500 rounded">
           <p class="normal-case">{{ property.accessModifier }} {{ property.type }} {{ property.name }}</p>
         </li>
       </ul>
       <ul class="pt-2">
-        <li v-for="method in data.classData.methods" class="my-1 shadow border border-gray-500 rounded">
+        <li v-for="method in data.classData.methods" class="my-1 px-1 shadow border border-gray-500 rounded">
           <p class="normal-case">{{ method.accessModifier }} {{ method.returnType }} {{ method.name }}{{ method.parameters.length > 0 ? '(...)' : '()' }}</p>
         </li>
       </ul>

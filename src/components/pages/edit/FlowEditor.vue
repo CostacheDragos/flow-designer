@@ -579,6 +579,7 @@ async function requestCodeGeneration() {
     formatReceivedGeneratedCode(responseText);
   } catch (e) {
     console.log("Error while trying to reach API: ", e);
+    displayWarningModal("An error has occurred while trying to reach the server...");
   }
 }
 function prepareFlowDataForCodeGenerationRequest() {
