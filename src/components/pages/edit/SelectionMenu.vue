@@ -258,10 +258,10 @@ const flowStore = useFlowStore();
 // Listens for when the node selection changes and updates the selection menu accordingly
 const selectedNodeData = ref();
 watch(getSelectedNodes, () => {
-  if(getSelectedNodes.value.length === 1) {
+  if(getSelectedNodes.value.length === 1 && getSelectedNodes.value[0].type === "class") {
     selectedNodeData.value = getSelectedNodes.value[0].data;
   } else {
-    selectedNodeData.value = undefined;
+    selectedNodeData.value = null;
   }
 });
 

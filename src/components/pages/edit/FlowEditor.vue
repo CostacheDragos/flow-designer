@@ -93,6 +93,9 @@
            <template v-slot:node-class="props">
              <class-node :label="props.label" :data="props.data" :selected="props.selected" :id="props.id"/>
            </template>
+           <template v-slot:node-package="props">
+             <package-node :label="props.label" :id="props.id" :data="props.data"/>
+           </template>
            <template v-slot:edge-inheritance="props">
              <inheritance-edge v-bind="props"/>
            </template>
@@ -198,6 +201,7 @@ import {MiniMap} from "@vue-flow/minimap";
 import Sidebar from "@/components/pages/edit/Sidebar.vue";
 import SelectionMenu from "@/components/pages/edit/SelectionMenu.vue"
 import ClassNode from "@/components/nodes/ClassNode.vue";
+import PackageNode from "@/components/nodes/PackageNode.vue";
 import InheritanceEdge from "@/components/edges/InheritanceEdge.vue";
 import CodeEditorWithTabs from "@/components/pages/edit/CodeEditorWithTabs.vue";
 
@@ -211,7 +215,7 @@ import { useFlowStore } from "@/stores/flow.js";
 import {onBeforeRouteLeave} from "vue-router";
 
 const { addNodes, addEdges, removeNodes, findNode, findEdge, getSelectedNodes, vueFlowRef, project, onConnect, toObject,
-        setNodes, setEdges, setTransform, onNodesChange, onEdgesChange, onPaneReady } = useVueFlow();
+        getNodes, setNodes, setEdges, setTransform, onNodesChange, onNodeDrag, onNodeDragStop, onEdgesChange, onPaneReady } = useVueFlow();
 
 
 // Initial elements (for testing only)
@@ -219,6 +223,7 @@ const elements = ref([]);
 const warningModalText = ref("Something went wrong...");
 // Vue Flow Events
 // Called when 2 nodes are connected
+// TODO: create more edge types and add them according to what handles the user tries to link
 onConnect((params) => {
 
   // Check if adding this edge will create an inheritance cycle
@@ -255,6 +260,22 @@ onNodesChange(() => {
   else
     flowStore.changesOccurred();
 });
+
+onNodeDrag(({ intersections }) => {
+  const intersectingIDs = intersections.map(intersect => intersect.id);
+  getNodes.value.forEach(node => {
+    if(node.type === "package")
+      node.data.isIntersecting = intersectingIDs.includes(node.id);
+  })
+});
+
+// Reset the intersection colors after dragging is over
+onNodeDragStop(() => {
+  getNodes.value.forEach(node => {
+    if(node.type === "package")
+      node.data.isIntersecting = false;
+  })
+})
 
 // Called when edges are added, removed or selected
 onEdgesChange((edgeEvents) => {
@@ -364,6 +385,17 @@ function createNewNode(nodeType, position) {
           },
         },
       };
+      break;
+    case "package":
+      newNode = {
+        id: uuidv4(),
+        label: `Package`,
+        type: "package",
+        position,
+        data: {
+          isIntersecting: false,
+        }
+      }
       break;
   };
 
