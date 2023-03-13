@@ -97,3 +97,9 @@ function toggleToolbarVisibility() {
 
 
 </script>
+
+<style scoped>
+.vue-flow__node-default {
+  min-width: 10rem;
+}
+</style>

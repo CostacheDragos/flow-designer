@@ -611,6 +611,7 @@ function formatReceivedGeneratedCode(responseText) {
           className: findNode(classId).data.classData.name,
           code: formatedResponse[classId],
           isTabOpen: false,
+          language: codeGenerationLanguage.value,
         }
     );
   }
