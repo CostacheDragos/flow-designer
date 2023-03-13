@@ -94,7 +94,7 @@
              <class-node :label="props.label" :data="props.data" :selected="props.selected" :id="props.id"/>
            </template>
            <template v-slot:node-package="props">
-             <package-node :label="props.label" :id="props.id" :data="props.data"/>
+             <package-node :label="props.label" :id="props.id" :data="props.data" :selected="props.selected"/>
            </template>
            <template v-slot:edge-inheritance="props">
              <inheritance-edge v-bind="props"/>
@@ -215,7 +215,8 @@ import { useFlowStore } from "@/stores/flow.js";
 import {onBeforeRouteLeave} from "vue-router";
 
 const { addNodes, addEdges, removeNodes, findNode, findEdge, getSelectedNodes, vueFlowRef, project, onConnect, toObject,
-        getNodes, setNodes, setEdges, setTransform, onNodesChange, onNodeDrag, onNodeDragStop, onEdgesChange, onPaneReady } = useVueFlow();
+        getNodes, setNodes, setEdges, setTransform, onNodesChange, onNodeDrag, onNodeDragStop, onEdgesChange, onPaneReady } =
+    useVueFlow();
 
 
 // Initial elements (for testing only)
@@ -266,15 +267,26 @@ onNodeDrag(({ intersections }) => {
   getNodes.value.forEach(node => {
     if(node.type === "package")
       node.data.isIntersecting = intersectingIDs.includes(node.id);
-  })
+  });
 });
 
 // Reset the intersection colors after dragging is over
-onNodeDragStop(() => {
+// TODO: if the node intersects multiple package nodes on drop, prompt the user to pick one
+onNodeDragStop(({ intersections, node }) => {
+  const intersectingIDs = intersections.map(intersect => intersect.id);
+  const intersectingPackageNodes = [];
   getNodes.value.forEach(node => {
-    if(node.type === "package")
+    if(intersectingIDs.includes(node.id) && node.type === "package") {
       node.data.isIntersecting = false;
-  })
+      intersectingPackageNodes.push(node);
+    }
+  });
+
+  // Make the dragged node the child of the package node that it's being dragged over
+  if(node.type === "class") {
+    node.parentNode = intersectingPackageNodes[0].id;
+    node.extent = "parent";
+  }
 })
 
 // Called when edges are added, removed or selected
@@ -318,9 +330,18 @@ function onDrop(event) {
     y: event.clientY - top
   });
 
+  // Check if the new node was dropped on a package node, and set its parent accordingly if yes
+  let targetId = event.target.id;
+  if(targetId) {
+    const targetNode = findNode(targetId);
+    if(targetNode.type !== "package")
+      targetId = null;
+  }
+
+
   // Retrieve the node type from the event data (set in the sidebar onDragStart event)
   // and create the new node
-  const newNode = createNewNode(event.dataTransfer.getData("node-type"), position);
+  const newNode = createNewNode(event.dataTransfer.getData("node-type"), position, targetId);
 
   // Check that the newNode creation was successful, if not, stop
   if(newNode === null)
@@ -344,7 +365,7 @@ function onDrop(event) {
     )
   })
 }
-function createNewNode(nodeType, position) {
+function createNewNode(nodeType, position, parentId) {
   let newNode = null;
 
   switch (nodeType) {
@@ -354,6 +375,8 @@ function createNewNode(nodeType, position) {
         label: `Class`,
         type: "class",
         position,
+        parentNode: parentId,
+        extent: parentId ? "parent" : undefined,
         data: {
           toolbarPosition: Position.Right,
           isExpanded: false,
@@ -373,6 +396,8 @@ function createNewNode(nodeType, position) {
         label: `Interface`,
         type: "class",
         position,
+        parentNode: parentId,
+        extent: parentId ? "parent" : undefined,
         data: {
           toolbarPosition: Position.Right,
           isExpanded: false,
@@ -392,6 +417,7 @@ function createNewNode(nodeType, position) {
         label: `Package`,
         type: "package",
         position,
+        zIndex: -10,
         data: {
           isIntersecting: false,
         }
