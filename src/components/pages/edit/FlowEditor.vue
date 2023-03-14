@@ -104,7 +104,7 @@
       </div>
       <CodeEditorWithTabs v-if="showCodeEditor" :generated-classes="generatedClasses" @close_editor="toggleCodeEditorVisibility"/>
     </div>
-    <SelectionMenu/>
+    <SelectionMenu @removeNodeFromParentPackage="removeNodeFromParentPackage"/>
   </div>
 
 
@@ -262,7 +262,7 @@ onNodesChange((events) => {
   }
 
   // If the events are of remove type, check if the removed node is a package,
-  // if yes, update the data of it's child nodes
+  // if yes, update the data of its child nodes
   events.forEach(event => {
     const removedNode = findNode(event.id);
     if(event.type === "remove" && removedNode.type === "package") {
@@ -462,8 +462,13 @@ function addNodeToPackage(nodeId, packageId) {
 }
 function removeNodeFromParentPackage(nodeId) {
   const childNode = findNode(nodeId);
+  const parentNode = findNode(childNode.parentNode);
+
   childNode.parentNode = '';
   childNode.extent = null;
+
+  const childIdIndex = parentNode.data.packageData.childrenIds.indexOf(nodeId);
+  parentNode.data.packageData.childrenIds.splice(childIdIndex, 1);
 }
 
 // Deletes the selected nodes when the 'delete' key is pressed

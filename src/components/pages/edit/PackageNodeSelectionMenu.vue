@@ -27,6 +27,21 @@
     </div>
   </details>
 
+  <!-- Child nodes controls -->
+  <details class="bg-inherit duration-300 border-b-4 border-gray-900">
+    <summary class="bg-inherit px-5 py-3 text-lg cursor-pointer text-white border-b border-gray-900">Contents</summary>
+    <div class="py-2 text-white normal-case">
+      <ul>
+        <li v-for="childNodeId in selectedNodeData.packageData.childrenIds" :key="childNodeId">
+          <div @click.prevent class="flex grow">
+            <p class="grow">{{ findNode(childNodeId).label }}</p>
+            <font-awesome-icon icon="fa-solid fa-xmark" color="red" class="my-auto cursor-pointer mx-2"
+                               @click="emits('removeNodeFromParentPackage', childNodeId)"/>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </details>
 </template>
 
 <script setup>
@@ -35,10 +50,11 @@ import {useFlowStore} from "@/stores/flow.js";
 import { checkNameValidity } from "@/Utility/Utility.js";
 
 
-const { getSelectedNodes, removeNodes } = useVueFlow();
+const { findNode, getSelectedNodes, removeNodes } = useVueFlow();
 const flowStore = useFlowStore();
 
-const props = defineProps(["selectedNodeData"])
+const emits = defineEmits(["removeNodeFromParentPackage"]);
+const props = defineProps(["selectedNodeData"]);
 const selectedNodeData = props.selectedNodeData;
 
 // ****** General package functions ******
