@@ -653,7 +653,7 @@ function prepareFlowDataForCodeGenerationRequest() {
   const flowData = toObject();
 
   // Create data object that contains only code generation specific data (data about the classes to be generated)
-  const classNodes = flowData.nodes.map(node => {
+  const classNodes = flowData.nodes.filter(node => node.type === "class").map(node => {
     return {
       id: node.id,
       parentClassNodesIds: node.data.parentClassNodesIds,
