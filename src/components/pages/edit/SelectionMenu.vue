@@ -34,11 +34,17 @@ watch(getSelectedNodes, () => {
     switch (getSelectedNodes.value[0].type) {
       case "class":
         selectedPackageNodeData.value = null;
-        selectedClassNodeData.value = getSelectedNodes.value[0].data;
+        selectedClassNodeData.value = {
+          ...getSelectedNodes.value[0].data,
+          id: getSelectedNodes.value[0].id,
+        };
         break;
       case "package":
         selectedClassNodeData.value = null;
-        selectedPackageNodeData.value = getSelectedNodes.value[0].data;
+        selectedPackageNodeData.value = {
+          ...getSelectedNodes.value[0].data,
+          id: getSelectedNodes.value[0].id,
+        };
         break;
     }
   else {

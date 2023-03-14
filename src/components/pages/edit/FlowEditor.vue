@@ -214,6 +214,7 @@ import html2canvas from "html2canvas";
 
 import { useFlowStore } from "@/stores/flow.js";
 import {onBeforeRouteLeave} from "vue-router";
+import {mapActions} from "pinia";
 
 const { addNodes, addEdges, removeNodes, findNode, findEdge, getSelectedNodes, vueFlowRef, project, onConnect, toObject,
         getNodes, setNodes, setEdges, setTransform, onNodesChange, onNodeDrag, onNodeDragStop, onEdgesChange, onPaneReady } =
@@ -251,16 +252,28 @@ onConnect((params) => {
 });
 
 // Called when there was a change regarding nodes
-onNodesChange(() => {
+onNodesChange((events) => {
   // If this event is triggered without the finishedLoading variable
   // being set to false, it means that the flow is not new and this is the first call
   // of this event, we need to set the finishedLoading to true
-  if(!finishedLoading.value)
+  if(!finishedLoading.value) {
     finishedLoading.value = true;
+    return;
+  }
+
+  // If the events are of remove type, check if the removed node is a package,
+  // if yes, update the data of it's child nodes
+  events.forEach(event => {
+    const removedNode = findNode(event.id);
+    if(event.type === "remove" && removedNode.type === "package") {
+      // If the removed node is a package, reset the parent constraints on the child nodes
+      removedNode.data.packageData.childrenIds.forEach(childNodeId => removeNodeFromParentPackage(childNodeId));
+    }
+  });
+
   // If the isSaved value indicates that the flow is saved, change the value to false as this method
   // is called when the flow changes
-  else
-    flowStore.changesOccurred();
+  flowStore.changesOccurred();
 });
 
 onNodeDrag(({ intersections }) => {
@@ -287,6 +300,7 @@ onNodeDragStop(({ intersections, node }) => {
   if(intersectingPackageNodes.length && node.type === "class") {
     node.parentNode = intersectingPackageNodes[0].id;
     node.extent = "parent";
+    addNodeToPackage(node.id, intersectingPackageNodes[0].id);
   }
 })
 
@@ -390,6 +404,9 @@ function createNewNode(nodeType, position, parentId) {
           },
         },
       };
+
+      if(parentId)
+        addNodeToPackage(newNode.id, parentId);
       break;
     case "interface":
       newNode = {
@@ -411,6 +428,9 @@ function createNewNode(nodeType, position, parentId) {
           },
         },
       };
+
+      if(parentId)
+        addNodeToPackage(newNode.id, parentId);
       break;
     case "package":
       newNode = {
@@ -423,6 +443,7 @@ function createNewNode(nodeType, position, parentId) {
           isIntersecting: false,
           packageData: {
             name: "Package",
+            childrenIds: [],
           },
         },
       };
@@ -430,6 +451,14 @@ function createNewNode(nodeType, position, parentId) {
   };
 
   return newNode;
+}
+function addNodeToPackage(nodeId, packageId) {
+  // Get the package node
+  const packageNode = findNode(packageId);
+
+  // Check that the node is not already in the package before adding it
+  if(!packageNode.data.packageData.childrenIds.includes(nodeId))
+    packageNode.data.packageData.childrenIds.push(nodeId);
 }
 function removeNodeFromParentPackage(nodeId) {
   const childNode = findNode(nodeId);
