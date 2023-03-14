@@ -91,7 +91,8 @@
            <MiniMap id="minimap" class="border border-4 border-gray-900 rounded-lg" :mask-color="minimapMaskColor"/>
            <Background/>
            <template v-slot:node-class="props">
-             <class-node :label="props.label" :data="props.data" :selected="props.selected" :id="props.id"/>
+            <class-node :label="props.label" :data="props.data" :selected="props.selected" :id="props.id" :parent-node="props.parentNode"
+                        @removeNodeFromParentPackage="removeNodeFromParentPackage"/>
            </template>
            <template v-slot:node-package="props">
              <package-node :label="props.label" :id="props.id" :data="props.data" :selected="props.selected"/>
@@ -283,7 +284,7 @@ onNodeDragStop(({ intersections, node }) => {
   });
 
   // Make the dragged node the child of the package node that it's being dragged over
-  if(node.type === "class") {
+  if(intersectingPackageNodes.length && node.type === "class") {
     node.parentNode = intersectingPackageNodes[0].id;
     node.extent = "parent";
   }
@@ -427,7 +428,11 @@ function createNewNode(nodeType, position, parentId) {
 
   return newNode;
 }
-
+function removeNodeFromParentPackage(nodeId) {
+  const childNode = findNode(nodeId);
+  childNode.parentNode = '';
+  childNode.extent = null;
+}
 
 // Deletes the selected nodes when the 'delete' key is pressed
 function onDeleteKeyup() {

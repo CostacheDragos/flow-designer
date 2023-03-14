@@ -1,16 +1,20 @@
 <template>
   <NodeToolbar :is-visible="isToolbarVisible" :position="data.toolbarPosition">
-    <div class="flex flex-col di">
-      <button class="bg-blue-500 text-white rounded py-2 px-4 block" @click="addProperty">
+    <div class="flex flex-col w-fit">
+      <button class="bg-blue-500 text-white rounded py-2 px-4 block text-sm font-bold w-full" @click="addProperty">
         Add Property
       </button>
-      <button class="bg-blue-500 text-white rounded py-2 px-4 block mt-1" @click="addMethod">
+      <button class="bg-blue-500 text-white rounded py-2 px-4 block mt-1 text-sm font-bold w-full" @click="addMethod">
         Add Method
+      </button>
+      <button class="rounded py-2 px-4 block mt-1 text-sm font-bold w-full" @click="emits('removeNodeFromParentPackage', id)"
+          :class="parentNode === '' ? 'disabled bg-gray-400 text-gray-200' : 'bg-blue-500 text-white'">
+        Remove from Package
       </button>
     </div>
   </NodeToolbar>
 
-  <div :class="{'border-sky-400 border-2 shadow-md shadow-sky-400': selected, 'border-black border-2': !selected}"
+  <div :class="{'border-sky-400 border-2 shadow-sm shadow-sky-400': selected, 'border-black border-2': !selected}"
        class="vue-flow__node-default w-fit">
     <div class="flex">
       <div class="my-auto rounded-full hover:bg-sky-400 px-1" @click="toggleExpanded">
@@ -56,8 +60,8 @@ import {NodeToolbar} from "@vue-flow/node-toolbar";
 import {ref} from "vue";
 
 // Accepting props
-const props = defineProps(["label", "id", "data", "selected"]);
-
+const props = defineProps(["label", "id", "data", "selected", "parentNode"]);
+const emits = defineEmits(["removeNodeFromParentPackage"]);
 
 // Called when adding properties & methods using the node toolbar
 function addProperty() {
@@ -70,6 +74,7 @@ function addProperty() {
     generateGetter: false,
   };
   props.data.classData.properties.push(newProperty);
+  props.data.isExpanded = true;
 }
 function addMethod() {
   const newMethod = {
@@ -80,6 +85,7 @@ function addMethod() {
     parameters: [],
   }
   props.data.classData.methods.push(newMethod);
+  props.data.isExpanded = true;
 }
 
 
