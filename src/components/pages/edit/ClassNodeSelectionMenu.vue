@@ -232,7 +232,7 @@
 import {v4 as uuidv4} from "uuid";
 import { useVueFlow } from "@vue-flow/core";
 import { useFlowStore } from "@/stores/flow.js";
-
+import { checkNameValidity } from "@/Utility/Utility.js";
 
 const { getSelectedNodes, removeNodes } = useVueFlow();
 const flowStore = useFlowStore();
@@ -496,12 +496,5 @@ function onMethodParameterTypeInputLostFocus(inputElement, method) {
 
   // Remove the red border if there was any previous error
   inputElement.classList.remove("focus:border-red-600");
-}
-
-// Validation functions
-// Checks the validity of the names given to
-// classes, methods, parameters, properties etc
-function checkNameValidity(name) {
-  return /^[A-Za-z][A-Za-z0-9_]*$/.test(name);
 }
 </script>

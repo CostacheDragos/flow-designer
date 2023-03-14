@@ -415,14 +415,17 @@ function createNewNode(nodeType, position, parentId) {
     case "package":
       newNode = {
         id: uuidv4(),
-        label: `Package`,
+        label: "Package",
         type: "package",
         position,
         zIndex: -10,
         data: {
           isIntersecting: false,
-        }
-      }
+          packageData: {
+            name: "Package",
+          },
+        },
+      };
       break;
   };
 

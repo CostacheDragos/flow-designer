@@ -2,33 +2,48 @@
   <div class="h-full w-1.5 bg-gray-900 cursor-col-resize flex-shrink-0" @mousedown="resizeStart"/>
 
   <div class="bg-slate-600 w-72 select-none overflow-y-auto overflow-x-hidden max-w-lg min-w-fit" id="selection-menu-container">
-    <div v-if="!selectedNodeData" class="grid place-items-center h-full">
+    <!-- Information about the selected node. Different menus based on the type on node -->
+    <ClassNodeSelectionMenu v-if="selectedClassNodeData" :selected-node-data="selectedClassNodeData"/>
+    <PackageNodeSelectionMenu v-else-if="selectedPackageNodeData" :selected-node-data="selectedPackageNodeData"/>
+
+    <!-- Placeholder if no node is selected -->
+    <div v-else class="grid place-items-center h-full">
       <div>
         <font-awesome-icon icon="fa-solid fa-gears" color="white"  size="10x"/>
         <h2 class="text-white normal-case mt-2">Select a node to edit</h2>
       </div>
     </div>
-
-    <!-- Information about the selected class node -->
-    <ClassNodeSelectionMenu v-if="selectedNodeData" :selected-node-data="selectedNodeData"/>
   </div>
 </template>
 
 <script setup>
 import {ref, watch} from "vue";
 import { useVueFlow } from "@vue-flow/core";
+
 import ClassNodeSelectionMenu from "@/components/pages/edit/ClassNodeSelectionMenu.vue";
+import PackageNodeSelectionMenu from "@/components/pages/edit/PackageNodeSelectionMenu.vue";
 
 const { getSelectedNodes } = useVueFlow();
 
 
 // Listens for when the node selection changes and updates the selection menu accordingly
-const selectedNodeData = ref();
+const selectedClassNodeData = ref();
+const selectedPackageNodeData = ref();
 watch(getSelectedNodes, () => {
-  if(getSelectedNodes.value.length === 1 && getSelectedNodes.value[0].type === "class") {
-    selectedNodeData.value = getSelectedNodes.value[0].data;
-  } else {
-    selectedNodeData.value = null;
+  if(getSelectedNodes.value.length === 1)
+    switch (getSelectedNodes.value[0].type) {
+      case "class":
+        selectedPackageNodeData.value = null;
+        selectedClassNodeData.value = getSelectedNodes.value[0].data;
+        break;
+      case "package":
+        selectedClassNodeData.value = null;
+        selectedPackageNodeData.value = getSelectedNodes.value[0].data;
+        break;
+    }
+  else {
+    selectedClassNodeData.value = null;
+    selectedPackageNodeData.value = null;
   }
 });
 
