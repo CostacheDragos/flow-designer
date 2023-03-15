@@ -265,9 +265,12 @@ onNodesChange((events) => {
   // if yes, update the data of its child nodes
   events.forEach(event => {
     const removedNode = findNode(event.id);
-    if(event.type === "remove" && removedNode.type === "package") {
+    if(event.type === "remove") {
       // If the removed node is a package, reset the parent constraints on the child nodes
-      removedNode.data.packageData.childrenIds.forEach(childNodeId => removeNodeFromParentPackage(childNodeId));
+      if(removedNode.type === "package")
+        removedNode.data.packageData.childrenIds.forEach(childNodeId => removeNodeFromParentPackage(childNodeId));
+      else if(removedNode.type === "class" && removedNode.parentNode !== "")
+        removeNodeFromParentPackage(removedNode.id);
     }
   });
 
