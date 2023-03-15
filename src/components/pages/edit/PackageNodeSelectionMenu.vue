@@ -48,6 +48,7 @@
 import {useVueFlow} from "@vue-flow/core";
 import {useFlowStore} from "@/stores/flow.js";
 import { checkNameValidity } from "@/Utility/Utility.js";
+import {toRef} from "vue";
 
 
 const { findNode, getSelectedNodes, removeNodes } = useVueFlow();
@@ -55,13 +56,13 @@ const flowStore = useFlowStore();
 
 const emits = defineEmits(["removeNodeFromParentPackage"]);
 const props = defineProps(["selectedNodeData"]);
-const selectedNodeData = props.selectedNodeData;
+const selectedNodeData =  toRef(props, "selectedNodeData");
 
 // ****** General package functions ******
 function changePackageName(inputElement) {
   inputElement.value = inputElement.value.trim();
   if(checkNameValidity(inputElement.value)) {
-    selectedNodeData.packageData.name = inputElement.value;
+    selectedNodeData.value.packageData.name = inputElement.value;
     getSelectedNodes.value[0].label = inputElement.value;
 
     // Remove the red border if there was any previous error
@@ -81,7 +82,7 @@ function onPackageNameInputLostFocus(inputElement) {
 
   // If the input at the time of focus lost is not valid, we need to
   // give the input value the value of the actual property
-  inputElement.value = selectedNodeData.packageData.name;
+  inputElement.value = selectedNodeData.value.packageData.name;
 
   // Remove the red border if there was any previous error
   inputElement.classList.remove("focus:border-red-600");

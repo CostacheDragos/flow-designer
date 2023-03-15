@@ -8,7 +8,7 @@
        @dragleave="onDragLeave"
        @dragover="onDragOver"
        @drop="onDragLeave">
-    <h2 class="font-bold text-xl border-b border-black h-7">{{ label }}</h2>
+    <h2 class="font-bold normal-case text-xl border-b border-black h-7">{{ label }}</h2>
     <div :id="id"
          class="flex-grow rounded-lg mt-2"
          :class="{'border border-dashed border-2 border-black': data.isIntersecting}"

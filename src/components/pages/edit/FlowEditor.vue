@@ -465,7 +465,7 @@ function removeNodeFromParentPackage(nodeId) {
   const parentNode = findNode(childNode.parentNode);
 
   childNode.parentNode = '';
-  childNode.extent = null;
+  childNode.extent = undefined;
 
   const childIdIndex = parentNode.data.packageData.childrenIds.indexOf(nodeId);
   parentNode.data.packageData.childrenIds.splice(childIdIndex, 1);
@@ -690,7 +690,8 @@ function prepareFlowDataForCodeGenerationRequest() {
   const classNodes = flowData.nodes.filter(node => node.type === "class").map(node => {
     return {
       id: node.id,
-      parentClassNodesIds: node.data.parentClassNodesIds,
+      packageId: node.parentNode, // The id of the package that contains this class (empty string if no package contains it)
+      parentClassNodesIds: node.data.parentClassNodesIds, // Inherited class nodes
       classData: node.data.classData,
       isInterface: node.data.isInterface,
     }

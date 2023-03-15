@@ -233,11 +233,12 @@ import {v4 as uuidv4} from "uuid";
 import { useVueFlow } from "@vue-flow/core";
 import { useFlowStore } from "@/stores/flow.js";
 import { checkNameValidity } from "@/Utility/Utility.js";
+import {toRef} from "vue";
 
 const { getSelectedNodes, removeNodes } = useVueFlow();
 const flowStore = useFlowStore();
 const props = defineProps(["selectedNodeData"]);
-const selectedNodeData = props.selectedNodeData;
+const selectedNodeData =  toRef(props, "selectedNodeData");
 
 const generalDataTypes = ["int", "long", "float", "double", "bool", "char", "string"];
 
@@ -246,7 +247,7 @@ const generalDataTypes = ["int", "long", "float", "double", "bool", "char", "str
 function changeClassName(inputElement) {
   inputElement.value = inputElement.value.trim();
   if(checkNameValidity(inputElement.value)) {
-    selectedNodeData.classData.name = inputElement.value;
+    selectedNodeData.value.classData.name = inputElement.value;
     getSelectedNodes.value[0].label = inputElement.value;
 
     // Remove the red border if there was any previous error
@@ -266,7 +267,7 @@ function onClassNameInputLostFocus(inputElement) {
 
   // If the input at the time of focus lost is not valid, we need to
   // give the input value the value of the actual property
-  inputElement.value = selectedNodeData.classData.name;
+  inputElement.value = selectedNodeData.value.classData.name;
 
   // Remove the red border if there was any previous error
   inputElement.classList.remove("focus:border-red-600");
@@ -283,11 +284,11 @@ function addProperty() {
     generateSetter: false,
     generateGetter: false,
   };
-  selectedNodeData.classData.properties.push(newProperty);
+  selectedNodeData.value.classData.properties.push(newProperty);
   flowStore.changesOccurred();
 }
 function removeProperty(propertyIndex) {
-  selectedNodeData.classData.properties.splice(propertyIndex, 1);
+  selectedNodeData.value.classData.properties.splice(propertyIndex, 1);
   flowStore.changesOccurred();
 }
 
@@ -360,11 +361,11 @@ function addMethod() {
     returnType: "Object",
     parameters: [],
   }
-  selectedNodeData.classData.methods.push(newMethod);
+  selectedNodeData.value.classData.methods.push(newMethod);
   flowStore.changesOccurred();
 }
 function removeMethod(methodIndex) {
-  selectedNodeData.classData.methods.splice(methodIndex, 1);
+  selectedNodeData.value.classData.methods.splice(methodIndex, 1);
   flowStore.changesOccurred();
 }
 
