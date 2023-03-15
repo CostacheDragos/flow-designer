@@ -662,7 +662,7 @@ async function requestCodeGeneration() {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        classNodes: prepareFlowDataForCodeGenerationRequest(),
+        ...prepareFlowDataForCodeGenerationRequest(),
         language: codeGenerationLanguage.value,
       }),
     });
@@ -690,17 +690,29 @@ function prepareFlowDataForCodeGenerationRequest() {
   const flowData = toObject();
 
   // Create data object that contains only code generation specific data (data about the classes to be generated)
-  const classNodes = flowData.nodes.filter(node => node.type === "class").map(node => {
-    return {
-      id: node.id,
-      packageId: node.parentNode, // The id of the package that contains this class (empty string if no package contains it)
-      parentClassNodesIds: node.data.parentClassNodesIds, // Inherited class nodes
-      classData: node.data.classData,
-      isInterface: node.data.isInterface,
+  const classNodes = [];
+  const packageNodes = [];
+
+  flowData.nodes.forEach(node => {
+    switch (node.type) {
+      case "class":
+        classNodes.push({
+          id: node.id,
+          packageId: node.parentNode, // The id of the package that contains this class (empty string if no package contains it)
+          parentClassNodesIds: node.data.parentClassNodesIds, // Inherited class nodes
+          classData: node.data.classData,
+          isInterface: node.data.isInterface,
+        });
+        break;
+      case "package":
+        packageNodes.push({
+          id: node.id,
+          packageData: node.data.packageData,
+        });
     }
   });
 
-  return classNodes;
+  return {classNodes, packageNodes};
 }
 function formatReceivedGeneratedCode(responseText) {
   // Create a list from the generated code
