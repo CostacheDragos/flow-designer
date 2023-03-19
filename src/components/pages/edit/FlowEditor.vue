@@ -269,7 +269,8 @@ onNodesChange((events) => {
       // If the removed node is a package, reset the parent constraints on the child nodes
       if(removedNode.type === "package")
         removedNode.data.packageData.childrenIds.forEach(childNodeId => removeNodeFromParentPackage(childNodeId));
-      else if(removedNode.type === "class" && removedNode.parentNode !== "")
+
+      if(removedNode.parentNode !== "")
         removeNodeFromParentPackage(removedNode.id);
     }
   });
@@ -279,32 +280,58 @@ onNodesChange((events) => {
   flowStore.changesOccurred();
 });
 
-onNodeDrag(({ intersections }) => {
-  const intersectingIDs = intersections.map(intersect => intersect.id);
-  getNodes.value.forEach(node => {
-    if(node.type === "package")
-      node.data.isIntersecting = intersectingIDs.includes(node.id);
-  });
+// The id of the package node which will become
+// the parent of the currently dragged node if the user drops it now.
+// Used to highlight the correct node if multiple packages are intersected
+let favoredIntersectedPackage = null;
+onNodeDrag(({ node, intersections }) => {
+  // If the node already has a parent, don't highlight anything
+  if(node.parentNode !== "")
+    return;
+
+  // If no node is intersected reset the favored node
+  intersections = intersections.filter(intersect => intersect.type === "package");
+  if(!intersections.length) {
+    if(favoredIntersectedPackage) {
+      favoredIntersectedPackage.data.isIntersecting = false;
+      favoredIntersectedPackage = null;
+    }
+    return;
+  }
+
+  // If no favored node is set, set it to the first one in the intersections list
+  const lastIdx = intersections.length - 1;
+  if(favoredIntersectedPackage) {
+    favoredIntersectedPackage.data.isIntersecting = false;
+  }
+
+  favoredIntersectedPackage = intersections[lastIdx];
+  favoredIntersectedPackage.data.isIntersecting = true;
 });
 
 // Reset the intersection colors after dragging is over
 // TODO: if the node intersects multiple package nodes on drop, prompt the user to pick one
-onNodeDragStop(({ intersections, node }) => {
-  const intersectingIDs = intersections.map(intersect => intersect.id);
-  const intersectingPackageNodes = [];
-  getNodes.value.forEach(node => {
-    if(intersectingIDs.includes(node.id) && node.type === "package") {
-      node.data.isIntersecting = false;
-      intersectingPackageNodes.push(node);
-    }
-  });
+onNodeDragStop(({ node }) => {
+  // If the node already has a parent, don't highlight anything
+  if(node.parentNode !== "")
+    return;
 
   // Make the dragged node the child of the package node that it's being dragged over
-  if(intersectingPackageNodes.length && node.type === "class") {
-    node.parentNode = intersectingPackageNodes[0].id;
+  if(favoredIntersectedPackage) {
+    favoredIntersectedPackage.data.isIntersecting = false;
+    const parentNodeId = favoredIntersectedPackage.id;
+    favoredIntersectedPackage = null;
+
+    // If by adding the dragged node to the intersecting package will create a nesting cycle,
+    // stop the proccess
+    if(checkNestingCycle(parentNodeId, node.id))
+      return;
+
+    node.parentNode = parentNodeId;
     node.extent = "parent";
-    addNodeToPackage(node.id, intersectingPackageNodes[0].id);
+    addNodeToPackage(node.id, parentNodeId);
   }
+
 })
 
 // Called when edges are added, removed or selected
@@ -408,8 +435,6 @@ function createNewNode(nodeType, position, parentId) {
         },
       };
 
-      if(parentId)
-        addNodeToPackage(newNode.id, parentId);
       break;
     case "interface":
       newNode = {
@@ -432,8 +457,6 @@ function createNewNode(nodeType, position, parentId) {
         },
       };
 
-      if(parentId)
-        addNodeToPackage(newNode.id, parentId);
       break;
     case "package":
       newNode = {
@@ -441,6 +464,8 @@ function createNewNode(nodeType, position, parentId) {
         label: "Package",
         type: "package",
         position,
+        parentNode: parentId,
+        extent: parentId ? "parent" : undefined,
         zIndex: -10,
         data: {
           isIntersecting: false,
@@ -452,6 +477,9 @@ function createNewNode(nodeType, position, parentId) {
       };
       break;
   };
+
+  if(parentId)
+    addNodeToPackage(newNode.id, parentId);
 
   return newNode;
 }
@@ -844,6 +872,27 @@ function checkInheritanceCycle(sourceNodeId, targetNodeId) {
 
     // Add the current node's parents to the queue
     nodeIdsQueue.push(...currentNode.data.parentClassNodesIds);
+  }
+
+  return false;
+}
+
+// Performs a BFS search in order to determine if the packaging
+// that the user intends to define will create a nesting cycle
+function checkNestingCycle(parentNodeId, childNodeId) {
+  const nodeIdsQueue = [parentNodeId];
+
+  while (nodeIdsQueue.length) {
+    // Get the first node id and pop it
+    const currentNode = findNode(nodeIdsQueue.shift());
+
+    // Check if the current node's parent is the intended child
+    if(currentNode.parentNode === childNodeId)
+      return true;
+
+    // Add the current node's parents to the queue
+    if(currentNode.parentNode !== "")
+      nodeIdsQueue.push(currentNode.parentNode);
   }
 
   return false;

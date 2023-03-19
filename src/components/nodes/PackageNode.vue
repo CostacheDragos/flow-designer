@@ -3,7 +3,7 @@
   <!-- !!!! DO NOT remove the id from this element, it is being used in the flowEditor component
     when a new node is being dropped. If the new element is being dropped on top of this package node, then that node's parent
     will be this package node -->
-  <div class="vue-flow__node-default package-node bg-cyan-700 h-full w-full flex flex-col"
+  <div class="vue-flow__node-default package-node bg-cyan-700 h-full w-full flex flex-col p-3"
        :class="{'bg-opacity-30': !selected, 'bg-opacity-70 shadow-lg shadow-sky-400': selected}"
        @dragleave="onDragLeave"
        @dragover="onDragOver"
