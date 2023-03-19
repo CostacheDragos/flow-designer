@@ -91,7 +91,7 @@
            <MiniMap id="minimap" class="border border-4 border-gray-900 rounded-lg" :mask-color="minimapMaskColor"/>
            <Background/>
            <template v-slot:node-class="props">
-            <class-node :label="props.label" :data="props.data" :selected="props.selected" :id="props.id" :parent-node="props.parentNode"
+            <class-node :label="props.label" :data="props.data" :selected="props.selected" :id="props.id" :parent-node="props.parent"
                         @removeNodeFromParentPackage="removeNodeFromParentPackage"/>
            </template>
            <template v-slot:node-package="props">
