@@ -97,6 +97,9 @@
            <template v-slot:node-package="props">
              <package-node :label="props.label" :id="props.id" :data="props.data" :selected="props.selected"/>
            </template>
+           <template v-slot:node-image="props">
+             <image-node :label="props.label" :selected="props.selected" :data="props.data"/>
+           </template>
            <template v-slot:edge-inheritance="props">
              <inheritance-edge v-bind="props"/>
            </template>
@@ -203,6 +206,7 @@ import Sidebar from "@/components/pages/edit/Sidebar.vue";
 import SelectionMenu from "@/components/pages/edit/SelectionMenu.vue"
 import ClassNode from "@/components/nodes/ClassNode.vue";
 import PackageNode from "@/components/nodes/PackageNode.vue";
+import ImageNode from "@/components/nodes/ImageNode.vue";
 import InheritanceEdge from "@/components/edges/InheritanceEdge.vue";
 import CodeEditorWithTabs from "@/components/pages/edit/CodeEditorWithTabs.vue";
 
@@ -224,6 +228,12 @@ const { addNodes, addEdges, removeNodes, findNode, findEdge, getSelectedNodes, v
 // Initial elements (for testing only)
 const elements = ref([]);
 const warningModalText = ref("Something went wrong...");
+const nodeTypes = {
+  classNode: "class",
+  packageNode: "package",
+  imageNode: "image",
+};
+
 // Vue Flow Events
 // Called when 2 nodes are connected
 // TODO: create more edge types and add them according to what handles the user tries to link
@@ -267,11 +277,13 @@ onNodesChange((events) => {
     const removedNode = findNode(event.id);
     if(event.type === "remove") {
       // If the removed node is a package, reset the parent constraints on the child nodes
-      if(removedNode.type === "package")
+      if(removedNode.type === nodeTypes.packageNode)
         removedNode.data.packageData.childrenIds.forEach(childNodeId => removeNodeFromParentPackage(childNodeId));
 
-      if(removedNode.parentNode !== "")
+      if(removedNode.parentNode !== "" && removedNode.parentNode !== undefined) {
+        console.log(removedNode.parentNode);
         removeNodeFromParentPackage(removedNode.id);
+      }
     }
   });
 
@@ -290,7 +302,7 @@ onNodeDrag(({ node, intersections }) => {
     return;
 
   // If no node is intersected reset the favored node
-  intersections = intersections.filter(intersect => intersect.type === "package");
+  intersections = intersections.filter(intersect => intersect.type === nodeTypes.packageNode);
   if(!intersections.length) {
     if(favoredIntersectedPackage) {
       favoredIntersectedPackage.data.isIntersecting = false;
@@ -310,10 +322,9 @@ onNodeDrag(({ node, intersections }) => {
 });
 
 // Reset the intersection colors after dragging is over
-// TODO: if the node intersects multiple package nodes on drop, prompt the user to pick one
 onNodeDragStop(({ node }) => {
   // If the node already has a parent, don't highlight anything
-  if(node.parentNode !== "")
+  if(node.parentNode !== "" || node.type !== nodeTypes.classNode && node.type !== nodeTypes.packageNode)
     return;
 
   // Make the dragged node the child of the package node that it's being dragged over
@@ -379,7 +390,7 @@ function onDrop(event) {
   let targetId = event.target.id;
   if(targetId) {
     const targetNode = findNode(targetId);
-    if(targetNode.type !== "package")
+    if(targetNode.type !== nodeTypes.packageNode)
       targetId = null;
   }
 
@@ -418,7 +429,7 @@ function createNewNode(nodeType, position, parentId) {
       newNode = {
         id: uuidv4(),
         label: `Class`,
-        type: "class",
+        type: nodeTypes.classNode,
         position,
         parentNode: parentId,
         extent: parentId ? "parent" : undefined,
@@ -434,13 +445,12 @@ function createNewNode(nodeType, position, parentId) {
           },
         },
       };
-
       break;
     case "interface":
       newNode = {
         id: uuidv4(),
         label: `Interface`,
-        type: "class",
+        type: nodeTypes.classNode,
         position,
         parentNode: parentId,
         extent: parentId ? "parent" : undefined,
@@ -456,13 +466,12 @@ function createNewNode(nodeType, position, parentId) {
           },
         },
       };
-
       break;
     case "package":
       newNode = {
         id: uuidv4(),
         label: "Package",
-        type: "package",
+        type: nodeTypes.packageNode,
         position,
         parentNode: parentId,
         extent: parentId ? "parent" : undefined,
@@ -476,6 +485,17 @@ function createNewNode(nodeType, position, parentId) {
         },
       };
       break;
+    case "image":
+      newNode = {
+        id: uuidv4(),
+        label: "Img",
+        type: nodeTypes.imageNode,
+        position,
+        data: {
+          href: "https://imgs.search.brave.com/ToRVheIVFOHdWRebW6v6BriMZf_slwrqoAXvU-I62CY/rs:fit:1200:1200:1/g:ce/aHR0cHM6Ly90aGV3/b3dzdHlsZS5jb20v/d3AtY29udGVudC91/cGxvYWRzLzIwMTUv/MDEvbmF0dXJlLWlt/YWdlcy4uanBn",
+        },
+      };
+      return newNode;
   };
 
   if(parentId)
@@ -723,7 +743,7 @@ function prepareFlowDataForCodeGenerationRequest() {
 
   flowData.nodes.forEach(node => {
     switch (node.type) {
-      case "class":
+      case nodeTypes.classNode:
         classNodes.push({
           id: node.id,
           packageId: node.parentNode, // The id of the package that contains this class (empty string if no package contains it)
@@ -732,7 +752,7 @@ function prepareFlowDataForCodeGenerationRequest() {
           isInterface: node.data.isInterface,
         });
         break;
-      case "package":
+      case nodeTypes.packageNode:
         packageNodes.push({
           id: node.id,
           packageData: node.data.packageData,
