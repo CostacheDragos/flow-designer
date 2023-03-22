@@ -1,8 +1,8 @@
 <template>
   <div class="bg-slate-600 w-60 min-w-fit max-w-lg select-none" id="sidebar-menu-container">
+    <p class="text-white normal-case text-xs border-b-2 border-gray-900 py-2">Drag & Drop to place</p>
     <details class="bg-inherit duration-300 border-b-4 border-gray-900">
       <summary class="bg-inherit px-5 py-3 text-lg cursor-pointer text-white border-b border-gray-900">Nodes</summary>
-      <p class="text-white normal-case text-xs">Drag & Drop to place nodes</p>
       <div class="p-2">
         <ul>
           <li>
@@ -13,6 +13,25 @@
             v-text="'<< Interface >>'"/>
             <div class="vue-flow__node-default mx-auto hover:cursor-pointer normal-case my-2 bg-cyan-700 font-bold" :draggable="true" @dragstart="onDragStart($event, 'package')">
               Package
+            </div>
+            <div class="vue-flow__node-default mx-auto hover:cursor-pointer normal-case my-2" :draggable="true" @dragstart="onDragStart($event, 'shape')">
+              Shape
+            </div>
+            <div class="vue-flow__node-default mx-auto hover:cursor-pointer normal-case my-2" :draggable="true" @dragstart="onDragStart($event, 'image')">
+              Image
+            </div>
+          </li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="bg-inherit duration-300 border-b-4 border-gray-900">
+      <summary class="bg-inherit px-5 py-3 text-lg cursor-pointer text-white border-b border-gray-900">Shapes</summary>
+      <div class="p-2">
+        <ul>
+          <li>
+            <div class="vue-flow__node-default mx-auto hover:cursor-pointer normal-case my-2" :draggable="true" @dragstart="onDragStart($event, 'shape')">
+              Shape
             </div>
             <div class="vue-flow__node-default mx-auto hover:cursor-pointer normal-case my-2" :draggable="true" @dragstart="onDragStart($event, 'image')">
               Image

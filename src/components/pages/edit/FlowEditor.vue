@@ -100,6 +100,9 @@
            <template v-slot:node-image="props">
              <image-node :label="props.label" :selected="props.selected" :data="props.data"/>
            </template>
+           <template v-slot:node-shape="props">
+             <shape-node :label="props.label" :selected="props.selected"/>
+           </template>
            <template v-slot:edge-inheritance="props">
              <inheritance-edge v-bind="props"/>
            </template>
@@ -207,6 +210,7 @@ import SelectionMenu from "@/components/pages/edit/SelectionMenu.vue"
 import ClassNode from "@/components/nodes/ClassNode.vue";
 import PackageNode from "@/components/nodes/PackageNode.vue";
 import ImageNode from "@/components/nodes/ImageNode.vue";
+import ShapeNode from "@/components/nodes/ShapeNode.vue";
 import InheritanceEdge from "@/components/edges/InheritanceEdge.vue";
 import CodeEditorWithTabs from "@/components/pages/edit/CodeEditorWithTabs.vue";
 
@@ -232,6 +236,7 @@ const nodeTypes = {
   classNode: "class",
   packageNode: "package",
   imageNode: "image",
+  shapeNode: "shape",
 };
 
 // Vue Flow Events
@@ -494,6 +499,14 @@ function createNewNode(nodeType, position, parentId) {
         data: {
           href: "https://imgs.search.brave.com/ToRVheIVFOHdWRebW6v6BriMZf_slwrqoAXvU-I62CY/rs:fit:1200:1200:1/g:ce/aHR0cHM6Ly90aGV3/b3dzdHlsZS5jb20v/d3AtY29udGVudC91/cGxvYWRzLzIwMTUv/MDEvbmF0dXJlLWlt/YWdlcy4uanBn",
         },
+      };
+      return newNode;
+    case "shape":
+      newNode = {
+        id: uuidv4(),
+        label: "Shape",
+        type: nodeTypes.shapeNode,
+        position,
       };
       return newNode;
   };
