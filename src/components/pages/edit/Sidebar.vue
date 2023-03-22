@@ -14,12 +14,6 @@
             <div class="vue-flow__node-default mx-auto hover:cursor-pointer normal-case my-2 bg-cyan-700 font-bold" :draggable="true" @dragstart="onDragStart($event, 'package')">
               Package
             </div>
-            <div class="vue-flow__node-default mx-auto hover:cursor-pointer normal-case my-2" :draggable="true" @dragstart="onDragStart($event, 'shape')">
-              Shape
-            </div>
-            <div class="vue-flow__node-default mx-auto hover:cursor-pointer normal-case my-2" :draggable="true" @dragstart="onDragStart($event, 'image')">
-              Image
-            </div>
           </li>
         </ul>
       </div>
