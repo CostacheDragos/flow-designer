@@ -92,6 +92,7 @@ function downloadFiles() {
   const zip = new JSZip();
 
   // Add the files open in the editor to the archive
+  const fileNamesOcc = {};
   props.generatedClasses.forEach((classData) => {
     let extension = "";
     if(classData.language === "CSharp")
@@ -101,7 +102,15 @@ function downloadFiles() {
     else if(classData.language === "Java")
       extension = ".java";
 
-    zip.file(`${classData.className}${extension}`, classData.code);
+    let fullFileName = `${classData.className}${extension}`;
+    if(!(fullFileName in fileNamesOcc))
+      fileNamesOcc[fullFileName] = 1;
+    else {
+      fileNamesOcc[fullFileName]++;
+      fullFileName = `${classData.className} (${fileNamesOcc[fullFileName]})${extension}`;
+    }
+
+    zip.file(fullFileName, classData.code);
   });
 
   // generate the zip file asynchronously
