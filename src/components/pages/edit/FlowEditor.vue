@@ -101,7 +101,7 @@
              <image-node :label="props.label" :selected="props.selected" :data="props.data"/>
            </template>
            <template v-slot:node-shape="props">
-             <shape-node :label="props.label" :selected="props.selected"/>
+             <shape-node :label="props.label" :selected="props.selected" :data="props.data"/>
            </template>
            <template v-slot:edge-inheritance="props">
              <inheritance-edge v-bind="props"/>
@@ -402,7 +402,7 @@ function onDrop(event) {
 
   // Retrieve the node type from the event data (set in the sidebar onDragStart event)
   // and create the new node
-  const newNode = createNewNode(event.dataTransfer.getData("node-type"), position, targetId);
+  const newNode = createNewNode(JSON.parse(event.dataTransfer.getData("node-data")), position, targetId);
 
   // Check that the newNode creation was successful, if not, stop
   if(newNode === null)
@@ -426,10 +426,10 @@ function onDrop(event) {
     )
   })
 }
-function createNewNode(nodeType, position, parentId) {
+function createNewNode(nodeData, position, parentId) {
   let newNode = null;
 
-  switch (nodeType) {
+  switch (nodeData.nodeType) {
     case "class":
       newNode = {
         id: uuidv4(),
@@ -507,6 +507,9 @@ function createNewNode(nodeType, position, parentId) {
         label: "Shape",
         type: nodeTypes.shapeNode,
         position,
+        data: {
+          shapeSrc: nodeData.additionalData.shapeSrc,
+        },
       };
       return newNode;
   };
