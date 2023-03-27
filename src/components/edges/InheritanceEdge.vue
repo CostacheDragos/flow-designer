@@ -1,5 +1,5 @@
 <template>
-  <BaseEdge :id="id" :style="style" :path="path[0]" :marker-end="markerEnd" :animated="selected"/>
+  <BaseEdge :id="id" :style="selected ? animatedStyle : basicStyle" :path="path[0]" :marker-end="markerEnd"/>
 
   <EdgeLabelRenderer>
     <div :style="{
@@ -14,55 +14,14 @@
 
 <script setup>
 import { BaseEdge, EdgeLabelRenderer, useVueFlow, getSmoothStepPath } from "@vue-flow/core";
-import { computed } from "vue";
+import {computed, toRef} from "vue";
 
 // Define the props
-const props = defineProps({
-  id: {
-    type: String,
-    required: true,
-  },
-  sourceX: {
-    type: Number,
-    required: true,
-  },
-  sourceY: {
-    type: Number,
-    required: true,
-  },
-  targetX: {
-    type: Number,
-    required: true,
-  },
-  targetY: {
-    type: Number,
-    required: true,
-  },
-  sourcePosition: {
-    type: String,
-    required: true,
-  },
-  targetPosition: {
-    type: String,
-    required: true,
-  },
-  selected: {
-    type: Boolean,
-    required: false,
-  },
-  data: {
-    type: Object,
-    required: false,
-  },
-  markerEnd: {
-    type: String,
-    required: false,
-  },
-  style: {
-    type: Object,
-    required: false,
-  },
-});
+const props = defineProps(["id", "sourceX", "sourceY", "targetX", "targetY",
+                "sourcePosition", "targetPosition", "selected", "data", "markerEnd", "style"]);
+
+const animatedStyle = 'stroke-width: 2.5; stroke-dasharray: 5; animation: dashdraw 0.5s linear infinite';
+const basicStyle = 'stroke-width: 2.5;';
 
 // Import the remove edges function
 const { removeEdges } = useVueFlow();
