@@ -81,6 +81,7 @@ function addMethod() {
     accessModifier: "private",
     returnType: "Object",
     parameters: [],
+    isVirtual: false,
   }
   props.data.classData.methods.push(newMethod);
   props.data.isExpanded = true;

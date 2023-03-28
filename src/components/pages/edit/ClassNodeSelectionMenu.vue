@@ -221,6 +221,16 @@
                     <font-awesome-icon icon="fa-solid fa-trash" color="red" class="cursor-pointer my-auto ml-2" @click="removeSelectedParameter(method)"/>
                   </div>
                 </li>
+                <!-- Method virtual check -->
+                <li>
+                  <label class="normal-case text-left w-16">Virtual:</label>
+                  <input type="checkbox"
+                         class="bg-gray-500 rounded ml-1 my-auto px-2 h-5 w-5
+                                    border border-gray-500
+                                    cursor-pointer
+                                    focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                         v-model="method.isVirtual" @change="flowStore.changesOccurred()">
+                </li>
               </ul>
             </div>
           </details>
