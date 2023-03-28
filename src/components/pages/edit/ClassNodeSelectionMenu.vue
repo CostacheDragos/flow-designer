@@ -65,8 +65,9 @@
                                     border border-gray-500
                                     focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
                           v-model="property.accessModifier" @change="propertyAccessChanged">
-                    <option value="private">private</option>
                     <option value="public">public</option>
+                    <option value="private">private</option>
+                    <option value="protected">protected</option>
                   </select>
                 </li>
                 <!-- Property type editing -->
@@ -150,8 +151,9 @@
                                     border border-gray-500
                                     focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
                           v-model="method.accessModifier" @change="methodAccessChanged">
-                    <option value="private">private</option>
                     <option value="public">public</option>
+                    <option value="private">private</option>
+                    <option value="protected">protected</option>
                   </select>
                 </li>
                 <!-- Method return type editing -->

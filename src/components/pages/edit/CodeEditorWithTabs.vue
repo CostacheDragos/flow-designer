@@ -30,19 +30,11 @@
       </button>
     </div>
 
-    <!-- Assign a code editor that matches the language of the generated class -->
+    <!-- Assign a code editor to each class -->
     <div v-for="classData in props.generatedClasses" v-show="classData.isTabOpen" :key="classData.id" class="h-full">
-      <CodeEditor v-if="classData.language === 'CSharp'" v-model="classData.code" height="100%" width="91%"
-                  class="pb-6 mx-auto"
-                  :language_selector="false" :languages="[['csharp', 'C#']]"/>
-
-      <CodeEditor v-if="classData.language === 'Cpp'" v-model="classData.code" height="100%" width="91%"
+      <CodeEditor v-model="classData.code" height="100%" width="91%"
                   class="pb-6 mx-auto"
                   :language_selector="false" :languages="[['cpp', 'C++']]"/>
-
-      <CodeEditor v-if="classData.language === 'Java'" v-model="classData.code" height="100%" width="91%"
-                  class="pb-6 mx-auto"
-                  :language_selector="false" :languages="[['java', 'Java']]"/>
     </div>
 
   </div>
@@ -79,7 +71,6 @@ function createNewTab() {
     className: "NewClass",
     code: "",
     isTabOpen: false,
-    language: "CSharp",
   });
 
   changeTab(props.generatedClasses.length - 1);
@@ -94,13 +85,7 @@ function downloadFiles() {
   // Add the files open in the editor to the archive
   const fileNamesOcc = {};
   props.generatedClasses.forEach((classData) => {
-    let extension = "";
-    if(classData.language === "CSharp")
-      extension = ".cs";
-    else if(classData.language === "Cpp")
-      extension = ".h";
-    else if(classData.language === "Java")
-      extension = ".java";
+    let extension = ".h";
 
     let fullFileName = `${classData.className}${extension}`;
     if(!(fullFileName in fileNamesOcc))

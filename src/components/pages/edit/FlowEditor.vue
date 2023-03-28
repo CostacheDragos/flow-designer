@@ -38,7 +38,7 @@
                  <button class="text-white rounded hover:bg-gray-500 px-2 normal-case">Tools</button>
                  <ul tabindex="0" class="dropdown-content rounded py-2 bg-gray-600 w-40 mt-2">
                    <label for="code-generation-options-modal">
-                     <li class="rounded hover:bg-gray-500 bg-gray-600 cursor-pointer px-3 py-1 mx-1 flex">
+                     <li class="rounded hover:bg-gray-500 bg-gray-600 cursor-pointer px-3 py-1 mx-1 flex" @click="codeGenerationClicked">
                        <font-awesome-icon icon="fa-solid fa-code" class="my-auto" color="white" />
                        <p class="text-white normal-case ml-3 mr-auto">Code Gen.</p>
                      </li>
@@ -168,30 +168,6 @@
       <div class="modal-action flex">
         <label for="detail-edit-modal" class="btn bg-green-500 flex-grow" @click="submitNewFlowDetails">Save</label>
         <label for="detail-edit-modal" class="btn bg-rose-500 flex-grow" @click="cancelFlowDetailsEdit">Cancel</label>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal will be displayed when the user wishes to generate code -->
-  <input type="checkbox" id="code-generation-options-modal" class="modal-toggle" />
-  <div class="modal normal-case text-white">
-    <div class="modal-box bg-gray-600">
-      <h3 class="font-bold text-lg">Generate Code</h3>
-      <div class="h-full py-5">
-        <label class="block text-left mb-1" for="generation-language-input">
-          Language
-        </label>
-        <select id="generation-language-input" v-model="codeGenerationLanguage"
-                class="block bg-gray-500 rounded ml-1 px-2 w-full border border-gray-500
-                focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none">
-          <option value="CSharp">C#</option>
-          <option value="Cpp">C++</option>
-          <option value="Java">Java</option>
-        </select>
-      </div>
-      <div class="modal-action flex">
-        <label for="code-generation-options-modal" class="btn bg-blue-500 flex-grow" @click="codeGenerationClicked">Generate</label>
-        <label for="code-generation-options-modal" class="btn bg-rose-500 flex-grow">Cancel</label>
       </div>
     </div>
   </div>
@@ -430,7 +406,7 @@ function createNewNode(nodeData, position, parentId) {
   let newNode = null;
 
   switch (nodeData.nodeType) {
-    case "class":
+    case nodeTypes.classNode:
       newNode = {
         id: uuidv4(),
         label: `Class`,
@@ -441,7 +417,6 @@ function createNewNode(nodeData, position, parentId) {
         data: {
           toolbarPosition: Position.Right,
           isExpanded: false,
-          isInterface: false,
           parentClassNodesIds: [],
           classData: {
             name: "Class",
@@ -451,28 +426,7 @@ function createNewNode(nodeData, position, parentId) {
         },
       };
       break;
-    case "interface":
-      newNode = {
-        id: uuidv4(),
-        label: `Interface`,
-        type: nodeTypes.classNode,
-        position,
-        parentNode: parentId,
-        extent: parentId ? "parent" : undefined,
-        data: {
-          toolbarPosition: Position.Right,
-          isExpanded: false,
-          isInterface: true,
-          parentClassNodesIds: [],
-          classData: {
-            name: "Interface",
-            properties: [],
-            methods: [],
-          },
-        },
-      };
-      break;
-    case "package":
+    case nodeTypes.packageNode:
       newNode = {
         id: uuidv4(),
         label: "Package",
@@ -490,7 +444,7 @@ function createNewNode(nodeData, position, parentId) {
         },
       };
       break;
-    case "image":
+    case nodeTypes.imageNode:
       newNode = {
         id: uuidv4(),
         label: "Img",
@@ -501,7 +455,7 @@ function createNewNode(nodeData, position, parentId) {
         },
       };
       return newNode;
-    case "shape":
+    case nodeTypes.shapeNode:
       newNode = {
         id: uuidv4(),
         label: "Shape",
@@ -702,7 +656,6 @@ function uploadSavedFlow(event) {
 // Makes API call, providing flow data, the server will
 // return the generated code
 const generatedClasses = reactive([]);
-const codeGenerationLanguage = ref("CSharp");
 const displayGeneratingModal = ref(false);
 function codeGenerationClicked() {
   // Display loading modal
@@ -727,7 +680,6 @@ async function requestCodeGeneration() {
       },
       body: JSON.stringify({
         ...prepareFlowDataForCodeGenerationRequest(),
-        language: codeGenerationLanguage.value,
       }),
     });
     const responseText = await response.text();
@@ -765,7 +717,6 @@ function prepareFlowDataForCodeGenerationRequest() {
           packageId: node.parentNode, // The id of the package that contains this class (empty string if no package contains it)
           parentClassNodesIds: node.data.parentClassNodesIds, // Inherited class nodes
           classData: node.data.classData,
-          isInterface: node.data.isInterface,
         });
         break;
       case nodeTypes.packageNode:
@@ -791,7 +742,6 @@ function formatReceivedGeneratedCode(responseText) {
           className: findNode(classId).data.classData.name,
           code: formatedResponse[classId],
           isTabOpen: false,
-          language: codeGenerationLanguage.value,
         }
     );
   }

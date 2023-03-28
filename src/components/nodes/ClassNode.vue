@@ -23,11 +23,9 @@
       </div>
 
       <!-- Regular class label -->
-      <h2 class="normal-case grow break-all" v-if="!data.isInterface">
+      <h2 class="normal-case grow break-all">
         {{ label }}
       </h2>
-      <!-- Interface label -->
-      <h2 class="normal-case grow break-all italic" v-if="data.isInterface" v-text="`<< ${ label } >>`"/>
 
       <div class="my-auto rounded-full hover:bg-sky-400 px-1" @click="toggleToolbarVisibility">
         <font-awesome-icon v-show="!isToolbarVisible" icon="fa-plus fa-solid"/>
