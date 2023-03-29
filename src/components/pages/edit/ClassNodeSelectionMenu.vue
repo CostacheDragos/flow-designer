@@ -65,9 +65,7 @@
                                     border border-gray-500
                                     focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
                           v-model="property.accessModifier" @change="propertyAccessChanged">
-                    <option value="public">public</option>
-                    <option value="private">private</option>
-                    <option value="protected">protected</option>
+                    <option v-for="modifier in accessModifiers" :value="modifier">{{ modifier }}</option>
                   </select>
                 </li>
                 <!-- Property type editing -->
@@ -151,9 +149,7 @@
                                     border border-gray-500
                                     focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
                           v-model="method.accessModifier" @change="methodAccessChanged">
-                    <option value="public">public</option>
-                    <option value="private">private</option>
-                    <option value="protected">protected</option>
+                    <option v-for="modifier in accessModifiers" :value="modifier">{{ modifier }}</option>
                   </select>
                 </li>
                 <!-- Method return type editing -->
@@ -238,16 +234,37 @@
       </ul>
     </div>
   </details>
+
+  <!-- Inheritance controls -->
+  <details class="bg-inherit duration-300 border-b-4 border-gray-900">
+    <summary class="bg-inherit px-5 py-3 text-lg cursor-pointer text-white border-b border-gray-900">Inherited</summary>
+    <div class="py-2 text-white normal-case">
+      <ul>
+        <li v-for="parentClassNode in selectedNodeData.parentClassNodes" :key="parentClassNode.id">
+          <div @click.prevent class="flex grow">
+            <p class="grow">{{ findNode(parentClassNode.id).label }}</p>
+          </div>
+          <label class="normal-case text-left w-16">Access:</label>
+          <select class="bg-gray-500 rounded ml-1 px-2 w-36
+                                    border border-gray-500
+                                    focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                  v-model="parentClassNode.accessSpecifier" @change="flowStore.changesOccurred()">
+            <option v-for="modifier in accessModifiers" :value="modifier">{{ modifier }}</option>
+          </select>
+        </li>
+      </ul>
+    </div>
+  </details>
 </template>
 
 <script setup>
 import {v4 as uuidv4} from "uuid";
 import { useVueFlow } from "@vue-flow/core";
 import { useFlowStore } from "@/stores/flow.js";
-import { checkNameValidity } from "@/Utility/Utility.js";
+import { checkNameValidity, accessModifiers } from "@/Utility/Utility.js";
 import {toRef} from "vue";
 
-const { getSelectedNodes, removeNodes } = useVueFlow();
+const { findNode, getSelectedNodes, removeNodes } = useVueFlow();
 const flowStore = useFlowStore();
 const props = defineProps(["selectedNodeData"]);
 const selectedNodeData =  toRef(props, "selectedNodeData");

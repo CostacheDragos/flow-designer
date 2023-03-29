@@ -5,4 +5,10 @@ function checkNameValidity(name) {
     return /^[A-Za-z][A-Za-z0-9_]*$/.test(name);
 }
 
-export { checkNameValidity };
+const accessModifiers = {
+    public: "public",
+    protected: "protected",
+    private: "private",
+}
+
+export { checkNameValidity, accessModifiers };

@@ -194,11 +194,12 @@ import {doc, getDoc, setDoc} from "firebase/firestore";
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, auth, storage } from "@/includes/firebase.js";
 
+import {accessModifiers} from "@/Utility/Utility.js";
+
 import html2canvas from "html2canvas";
 
 import { useFlowStore } from "@/stores/flow.js";
 import {onBeforeRouteLeave} from "vue-router";
-import {mapActions} from "pinia";
 
 const { addNodes, addEdges, removeNodes, findNode, findEdge, getSelectedNodes, vueFlowRef, project, onConnect, toObject,
         getNodes, setNodes, setEdges, setTransform, onNodesChange, onNodeDrag, onNodeDragStop, onEdgesChange, onPaneReady } =
@@ -239,7 +240,7 @@ onConnect((params) => {
   // After adding the edge to the flow, add the corresponding data
   // to the target node (mark that the class inherits another class)
   const targetNode = findNode(params.target);
-  targetNode.data.parentClassNodesIds.push(params.source);
+  targetNode.data.parentClassNodes.push({id: params.source, accessSpecifier: accessModifiers.public});
 });
 
 // Called when there was a change regarding nodes
@@ -341,8 +342,7 @@ onEdgesChange((edgeEvents) => {
         // Check that the target node was not deleted (node deletion also triggers
         // the deletion of all edges linked to it)
         if(targetNode) {
-          const deletedParentIdx = targetNode.data.parentClassNodesIds.indexOf(edge.source);
-          targetNode.data.parentClassNodesIds.splice(deletedParentIdx, 1);
+          targetNode.data.parentClassNodes = targetNode.data.parentClassNodes.filter(parentClassNode => parentClassNode.id !== edge.source)
         }
       }
     }
@@ -417,7 +417,7 @@ function createNewNode(nodeData, position, parentId) {
         data: {
           toolbarPosition: Position.Right,
           isExpanded: false,
-          parentClassNodesIds: [],
+          parentClassNodes: [],
           classData: {
             name: "Class",
             properties: [],
@@ -715,7 +715,7 @@ function prepareFlowDataForCodeGenerationRequest() {
         classNodes.push({
           id: node.id,
           packageId: node.parentNode, // The id of the package that contains this class (empty string if no package contains it)
-          parentClassNodesIds: node.data.parentClassNodesIds, // Inherited class nodes
+          parentClassNodes: node.data.parentClassNodes, // Inherited class nodes
           classData: node.data.classData,
         });
         break;
@@ -853,11 +853,11 @@ function checkInheritanceCycle(sourceNodeId, targetNodeId) {
 
     // Check if the current node's parents contain the searched node id
     // if yes, there is a cycle
-    if(currentNode.data.parentClassNodesIds.includes(targetNodeId))
+    if(currentNode.data.parentClassNodes.find(parentClassNode => parentClassNode.id === targetNodeId) !== undefined)
       return true;
 
     // Add the current node's parents to the queue
-    nodeIdsQueue.push(...currentNode.data.parentClassNodesIds);
+    nodeIdsQueue.push(...currentNode.data.parentClassNodes.map(parentClassNode => parentClassNode.id));
   }
 
   return false;
