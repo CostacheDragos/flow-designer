@@ -27,6 +27,58 @@
     </div>
   </details>
 
+  <!-- Constructor controls -->
+  <details class="bg-inherit duration-300 border-b-4 border-gray-900">
+    <summary class="bg-inherit px-5 py-3 text-lg cursor-pointer text-white border-b border-gray-900">Constructors</summary>
+    <div class="hover:bg-gray-400 py-2 border-b border-gray-900 cursor-pointer" @click="addConstructor">
+      <font-awesome-icon icon="fa-plus fa-solid" color="white" />
+    </div>
+    <div class="py-2 text-white normal-case">
+      <ul>
+        <li v-for="(constructor, constructorIndex) in selectedNodeData.classData.constructors" :key="constructor.id">
+          <details class="duration-300 text-white" >
+            <summary class="flex my-1">
+              <font-awesome-icon icon="fa-solid fa-pen-to-square" color="white" class="my-auto cursor-pointer mx-2"/>
+              <div @click.prevent class="flex grow">
+                <p class="grow text-white normal-case"> {{ constructor.name }} </p>
+                <font-awesome-icon icon="fa-solid fa-xmark" color="red" class="my-auto cursor-pointer mx-2"
+                                   @click.prevent="removeConstructor(`${constructorIndex}`)"/>
+              </div>
+            </summary>
+            <div class="mx-2 hover:shadow-lg hover:shadow-gray-500 border border-slate-600 hover:border-gray-500">
+              <ul class="p-2 space-y-2">
+                <!-- Constructor name editing -->
+                <li class="flex">
+                  <label class="normal-case text-left w-16">Name:</label>
+                  <input class="bg-gray-500 rounded ml-1 px-2 w-36
+                                    border border-gray-500
+                                    focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                         :value="constructor.name"
+                         @keyup.enter="changeConstructorName($event.target, constructor)"
+                         @focusout="onConstructorNameInputLostFocus($event.target, constructor)"
+                  />
+                </li>
+                <!-- Constructor initialized fields editing -->
+                <li>
+                  <div v-for="property in selectedNodeData.classData.properties" :key="property.id" class="flex">
+                    <input type="checkbox"
+                           class="bg-gray-500 rounded ml-1 my-auto px-2 h-5 w-5
+                                      border border-gray-500
+                                      cursor-pointer
+                                      focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                           :checked="constructor.initializedFieldsIDs.find(fieldID => fieldID === property.id) !== undefined"
+                           @change="constructorFieldStatusChanged(constructor, property, $event.target.checked)">
+                    <label class="normal-case text-left w-16 ml-3">{{ property.name }}</label>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </details>
+        </li>
+      </ul>
+    </div>
+  </details>
+
   <!-- Properties controls -->
   <details class="bg-inherit duration-300 border-b-4 border-gray-900">
     <summary class="bg-inherit px-5 py-3 text-lg cursor-pointer text-white border-b border-gray-900">Properties</summary>
@@ -303,13 +355,81 @@ function onClassNameInputLostFocus(inputElement) {
 }
 
 
+// ****** Class constructors functions ******
+function addConstructor() {
+  const newConstructor = {
+    id: uuidv4(),
+    name: "newConstructor",
+    initializedFieldsIDs: [],
+  };
+  selectedNodeData.value.classData.constructors.push(newConstructor);
+  flowStore.changesOccurred();
+}
+function removeConstructor(constructorIndex) {
+  selectedNodeData.value.classData.constructors.splice(constructorIndex, 1);
+  flowStore.changesOccurred();
+}
+function changeConstructorName(inputElement, constructor) {
+  inputElement.value = inputElement.value.trim();
+  if(checkNameValidity(inputElement.value)) {
+    constructor.name = inputElement.value;
+
+    // Remove the red border if there was any previous error
+    inputElement.classList.remove("focus:border-red-600");
+
+    flowStore.changesOccurred();
+  }
+  else {
+    // Color the border red to let the user know that the value is not valid
+    inputElement.classList.add("focus:border-red-600");
+  }
+}
+function onConstructorNameInputLostFocus(inputElement, constructor) {
+  // Save changes
+  changePropertyName(inputElement, constructor);
+
+  // If the input at the time of focus lost is not valid, we need to
+  // give the input value the value of the actual property
+  inputElement.value = constructor.name;
+
+  // Remove the red border if there was any previous error
+  inputElement.classList.remove("focus:border-red-600");
+}
+
+// Called when a checkbox related to initializing a field in a constructor is checked or unchecked
+// isFieldInitialized will be true if the checkbox was checked, so we add the field to the initialization list
+// else, remove the field from the initialization list
+function constructorFieldStatusChanged(constructor, field, isFieldInitialized) {
+  if(isFieldInitialized)
+    addFieldToConstructorInitializationList(constructor, field);
+  else
+    removeFieldFromConstructorInitializationList(constructor, field);
+}
+
+function addFieldToConstructorInitializationList(constructor, field) {
+  constructor.initializedFieldsIDs.push(field.id);
+  flowStore.changesOccurred();
+}
+
+function removeFieldFromConstructorInitializationList(constructor, field) {
+  const fieldIdx = constructor.initializedFieldsIDs.indexOf(field.id);
+  if(fieldIdx !== -1) {
+    constructor.initializedFieldsIDs.splice(fieldIdx, 1);
+    flowStore.changesOccurred();
+  }
+}
+
+function updateConstructorsInitializationListsOnPropertyDelete(deletedProperty) {
+  selectedNodeData.value.classData.constructors.forEach(constructor => removeFieldFromConstructorInitializationList(constructor, deletedProperty));
+}
+
 // ****** Class properties functions ******
 function addProperty() {
   const newProperty = {
     id: uuidv4(),
     name: "newProperty",
     accessModifier: "private",
-    type: "Object",
+    type: "char",
     generateSetter: false,
     generateGetter: false,
   };
@@ -317,6 +437,7 @@ function addProperty() {
   flowStore.changesOccurred();
 }
 function removeProperty(propertyIndex) {
+  updateConstructorsInitializationListsOnPropertyDelete(selectedNodeData.value.classData.properties[propertyIndex]);
   selectedNodeData.value.classData.properties.splice(propertyIndex, 1);
   flowStore.changesOccurred();
 }
@@ -387,7 +508,7 @@ function addMethod() {
     id: uuidv4(),
     name: "newMethod",
     accessModifier: "private",
-    returnType: "Object",
+    returnType: "void",
     parameters: [],
   }
   selectedNodeData.value.classData.methods.push(newMethod);
@@ -459,7 +580,7 @@ function onMethodReturnTypeInputLostFocus(inputElement, method) {
 function addParameter(method) {
   const newParameter = {
     name: "newParameter",
-    type: "Object",
+    type: "char",
   };
   method.parameters.push(newParameter);
   method.selectedParameter = newParameter;

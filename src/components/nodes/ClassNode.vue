@@ -67,7 +67,7 @@ function addProperty() {
     id: uuidv4(),
     name: "newProperty",
     accessModifier: "private",
-    type: "Object",
+    type: "char",
     generateSetter: false,
     generateGetter: false,
   };
@@ -79,7 +79,7 @@ function addMethod() {
     id: uuidv4(),
     name: "newMethod",
     accessModifier: "private",
-    returnType: "Object",
+    returnType: "void",
     parameters: [],
     isVirtual: false,
   }

@@ -263,7 +263,6 @@ onNodesChange((events) => {
         removedNode.data.packageData.childrenIds.forEach(childNodeId => removeNodeFromParentPackage(childNodeId));
 
       if(removedNode.parentNode !== "" && removedNode.parentNode !== undefined) {
-        console.log(removedNode.parentNode);
         removeNodeFromParentPackage(removedNode.id);
       }
     }
@@ -422,6 +421,7 @@ function createNewNode(nodeData, position, parentId) {
             name: "Class",
             properties: [],
             methods: [],
+            constructors: [],
           },
         },
       };
