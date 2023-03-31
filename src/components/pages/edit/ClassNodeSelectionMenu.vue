@@ -227,15 +227,15 @@
                   <div class="flex">
                     <label class="normal-case w-16 text-left">Param:</label>
                     <select class="bg-gray-500 focus:bg-white focus:text-black rounded ml-1 px-2 w-36 border border-gray-500"
-                            v-model="method.selectedParameter" :disabled="method.parameters.length === 0">
-                      <option v-for="parameter in method.parameters" :value="parameter">{{ parameter.type }} {{ parameter.name }}</option>
+                            v-model="method.selectedParameterID" :disabled="method.parameters.length === 0">
+                      <option v-for="parameter in method.parameters" :value="parameter.id">{{ parameter.type }} {{ parameter.name }}</option>
                     </select>
                     <div class="ml-1">
                       <font-awesome-icon icon="fa-plus fa-solid" color="white" size="xs" class="cursor-pointer" @click="addParameter(method)"/>
                     </div>
                   </div>
 
-                  <div v-if="method.selectedParameter" class="ml-5 flex">
+                  <div v-if="method.selectedParameterID" class="ml-5 flex">
                     <ul class="p-2 space-y-2 list-disc grow">
                       <!-- Parameter name editing -->
                       <li class="flex">
@@ -243,7 +243,7 @@
                         <input class="bg-gray-500 rounded ml-1 px-2 w-28
                                     border border-gray-500
                                     focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                               :value="method.selectedParameter.name"
+                               :value="getSelectedParameterFromMethod(method).name"
                                @keyup.enter="changeMethodParameterName($event.target, method)"
                                @focusout="onMethodParameterNameInputLostFocus($event.target, method)"
                         />
@@ -255,7 +255,7 @@
                                class="bg-gray-500 rounded ml-1 px-2 w-28
                                     border border-gray-500
                                     focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                               :value="method.selectedParameter.type"
+                               :value="getSelectedParameterFromMethod(method).type"
                                @keyup.enter="changeMethodParameterType($event.target, method)"
                                @focusout="onMethodParameterTypeInputLostFocus($event.target, method)"
                         />
@@ -264,6 +264,24 @@
                             {{ dataType }}
                           </option>
                         </datalist>
+                      </li>
+                      <!-- Parameter const & ref check -->
+                      <li class="flex">
+                        <label class="normal-case text-left w-12">Const:</label>
+                        <input type="checkbox"
+                               class="bg-gray-500 rounded ml-2 my-auto px-2 h-5 w-5
+                                    border border-gray-500
+                                    cursor-pointer
+                                    focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                               v-model="getSelectedParameterFromMethod(method).isConst" @change="flowStore.changesOccurred()">
+
+                        <label class="normal-case text-left w-8 ml-5">Ref:</label>
+                        <input type="checkbox"
+                               class="bg-gray-500 rounded ml-2 my-auto px-2 h-5 w-5
+                                    border border-gray-500
+                                    cursor-pointer
+                                    focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                               v-model="getSelectedParameterFromMethod(method).isRef" @change="flowStore.changesOccurred()">
                       </li>
                     </ul>
                     <font-awesome-icon icon="fa-solid fa-trash" color="red" class="cursor-pointer my-auto ml-2" @click="removeSelectedParameter(method)"/>
@@ -510,6 +528,7 @@ function addMethod() {
     accessModifier: "private",
     returnType: "void",
     parameters: [],
+    selectedParameterID: null,
   }
   selectedNodeData.value.classData.methods.push(newMethod);
   flowStore.changesOccurred();
@@ -577,20 +596,26 @@ function onMethodReturnTypeInputLostFocus(inputElement, method) {
 }
 
 // Method parameters editing
+function getSelectedParameterFromMethod(method) {
+  return method.parameters.find(param => param.id === method.selectedParameterID);
+}
 function addParameter(method) {
   const newParameter = {
+    id: uuidv4(),
     name: "newParameter",
     type: "char",
+    isConst: false,
+    isRef: false,
   };
   method.parameters.push(newParameter);
-  method.selectedParameter = newParameter;
+  method.selectedParameterID = newParameter.id;
   flowStore.changesOccurred();
 }
 function removeSelectedParameter(method) {
-  const parameterIndex = method.parameters.indexOf(method.selectedParameter);
+  const parameterIndex = method.parameters.indexOf(getSelectedParameterFromMethod(method));
   if(parameterIndex !== -1) {
     method.parameters.splice(parameterIndex, 1);
-    method.selectedParameter = undefined;
+    method.selectedParameterID = null;
     flowStore.changesOccurred();
   }
 }
@@ -599,7 +624,7 @@ function removeSelectedParameter(method) {
 function changeMethodParameterName(inputElement, method) {
   inputElement.value = inputElement.value.trim();
   if(checkNameValidity(inputElement.value)) {
-    method.selectedParameter.name = inputElement.value;
+    getSelectedParameterFromMethod(method).name = inputElement.value;
 
     // Remove the red border if there was any previous error
     inputElement.classList.remove("focus:border-red-600");
@@ -616,7 +641,7 @@ function onMethodParameterNameInputLostFocus(inputElement, method) {
 
   // If the input at the time of focus lost is not valid, we need to
   // give the input value the value of the actual method
-  inputElement.value = method.selectedParameter.name;
+  inputElement.value = getSelectedParameterFromMethod(method).name;
 
   // Remove the red border if there was any previous error
   inputElement.classList.remove("focus:border-red-600");
@@ -626,7 +651,7 @@ function onMethodParameterNameInputLostFocus(inputElement, method) {
 function changeMethodParameterType(inputElement, method) {
   inputElement.value = inputElement.value.trim();
   if(checkNameValidity(inputElement.value)) {
-    method.selectedParameter.type = inputElement.value;
+    getSelectedParameterFromMethod(method).type = inputElement.value;
 
     // Remove the red border if there was any previous error
     inputElement.classList.remove("focus:border-red-600");
@@ -643,7 +668,7 @@ function onMethodParameterTypeInputLostFocus(inputElement, method) {
 
   // If the input at the time of focus lost is not valid, we need to
   // give the input value the value of the actual method
-  inputElement.value = method.selectedParameter.type;
+  inputElement.value = getSelectedParameterFromMethod(method).type;
 
   // Remove the red border if there was any previous error
   inputElement.classList.remove("focus:border-red-600");
