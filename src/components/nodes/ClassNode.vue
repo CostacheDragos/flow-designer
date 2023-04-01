@@ -82,6 +82,8 @@ function addMethod() {
     returnType: "void",
     parameters: [],
     isVirtual: false,
+    isStatic: false,
+    selectedParameterID: null,
   }
   props.data.classData.methods.push(newMethod);
   props.data.isExpanded = true;

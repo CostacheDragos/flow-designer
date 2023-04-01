@@ -222,6 +222,26 @@
                     <option>void</option>
                   </datalist>
                 </li>
+                <!-- Method virtual check -->
+                <li class="flex">
+                  <label class="normal-case text-left w-16">Virtual:</label>
+                  <input type="checkbox"
+                         class="bg-gray-500 rounded ml-3 my-auto px-2 h-5 w-5
+                                    border border-gray-500
+                                    cursor-pointer
+                                    focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                         v-model="method.isVirtual" @change="methodVirtualStatusChanged(method, $event.target.checked)">
+                </li>
+                <!-- Method static check -->
+                <li class="flex">
+                  <label class="normal-case text-left w-16">Static:</label>
+                  <input type="checkbox"
+                         class="bg-gray-500 rounded ml-3 my-auto px-2 h-5 w-5
+                                    border border-gray-500
+                                    cursor-pointer
+                                    focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                         v-model="method.isStatic" @change="methodStaticStatusChanged(method, $event.target.checked)">
+                </li>
                 <!-- Method parameters editing -->
                 <li>
                   <div class="flex">
@@ -287,16 +307,6 @@
                     <font-awesome-icon icon="fa-solid fa-trash" color="red" class="cursor-pointer my-auto ml-2" @click="removeSelectedParameter(method)"/>
                   </div>
                 </li>
-                <!-- Method virtual check -->
-                <li>
-                  <label class="normal-case text-left w-16">Virtual:</label>
-                  <input type="checkbox"
-                         class="bg-gray-500 rounded ml-1 my-auto px-2 h-5 w-5
-                                    border border-gray-500
-                                    cursor-pointer
-                                    focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                         v-model="method.isVirtual" @change="flowStore.changesOccurred()">
-                </li>
               </ul>
             </div>
           </details>
@@ -337,6 +347,7 @@ import {toRef} from "vue";
 const { findNode, getSelectedNodes, removeNodes } = useVueFlow();
 const flowStore = useFlowStore();
 const props = defineProps(["selectedNodeData"]);
+const emits = defineEmits(["warning"]);
 const selectedNodeData =  toRef(props, "selectedNodeData");
 
 const generalDataTypes = ["int", "long", "float", "double", "bool", "char", "string"];
@@ -528,6 +539,8 @@ function addMethod() {
     accessModifier: "private",
     returnType: "void",
     parameters: [],
+    isVirtual: false,
+    isStatic: false,
     selectedParameterID: null,
   }
   selectedNodeData.value.classData.methods.push(newMethod);
@@ -593,6 +606,24 @@ function onMethodReturnTypeInputLostFocus(inputElement, method) {
 
   // Remove the red border if there was any previous error
   inputElement.classList.remove("focus:border-red-600");
+}
+
+// Checks for conflicts between static and virtual status of the method
+function methodVirtualStatusChanged(method, newVirtualStatus) {
+  if(method.isStatic && newVirtualStatus) {
+    method.isVirtual = false;
+    emits("warning", "Static methods cannot be virtual!");
+  }
+  else
+    flowStore.changesOccurred();
+}
+function methodStaticStatusChanged(method, newStaticStatus) {
+  if(method.isVirtual && newStaticStatus) {
+    method.isStatic = false;
+    emits("warning", "Virtual methods cannot be static!");
+  }
+  else
+    flowStore.changesOccurred();
 }
 
 // Method parameters editing

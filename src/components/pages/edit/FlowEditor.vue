@@ -110,7 +110,7 @@
       </div>
       <CodeEditorWithTabs v-if="showCodeEditor" :generated-classes="generatedClasses" @close_editor="toggleCodeEditorVisibility"/>
     </div>
-    <SelectionMenu @removeNodeFromParentPackage="removeNodeFromParentPackage"/>
+    <SelectionMenu @removeNodeFromParentPackage="removeNodeFromParentPackage" @warning="displayWarningModal"/>
   </div>
 
 
