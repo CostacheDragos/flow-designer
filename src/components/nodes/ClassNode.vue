@@ -70,6 +70,7 @@ function addProperty() {
     type: "char",
     generateSetter: false,
     generateGetter: false,
+    isStatic: false,
   };
   props.data.classData.properties.push(newProperty);
   props.data.isExpanded = true;

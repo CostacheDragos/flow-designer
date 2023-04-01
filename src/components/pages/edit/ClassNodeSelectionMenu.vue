@@ -137,6 +137,16 @@
                     </option>
                   </datalist>
                 </li>
+                <!-- Property static check -->
+                <li class="flex">
+                  <label class="normal-case text-left w-16">Static:</label>
+                  <input type="checkbox"
+                         class="bg-gray-500 rounded ml-3 my-auto px-2 h-5 w-5
+                                    border border-gray-500
+                                    cursor-pointer
+                                    focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                         v-model="property.isStatic" @change="flowStore.changesOccurred()">
+                </li>
                 <!-- Property setter & getter editing -->
                 <li class="flex">
                   <label class="normal-case text-left w-16">Setter:</label>
@@ -461,6 +471,7 @@ function addProperty() {
     type: "char",
     generateSetter: false,
     generateGetter: false,
+    isStatic: false,
   };
   selectedNodeData.value.classData.properties.push(newProperty);
   flowStore.changesOccurred();
