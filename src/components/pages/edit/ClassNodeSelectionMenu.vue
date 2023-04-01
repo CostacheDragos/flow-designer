@@ -360,7 +360,11 @@ const props = defineProps(["selectedNodeData"]);
 const emits = defineEmits(["warning"]);
 const selectedNodeData =  toRef(props, "selectedNodeData");
 
-const generalDataTypes = ["int", "long", "float", "double", "bool", "char", "string"];
+const generalDataTypes = ["int", "signed int", "unsigned int", "short int", "unsigned short int",
+  "long int", "unsigned long int", "long long int", "unsigned long long int", "long",
+  "float", "double", "long double", "bool",
+  "char", "signed char", "unsigned char", "wchar_t",
+  "std::string"];
 
 
 // ****** General class functions ******
@@ -515,7 +519,8 @@ function onPropertyNameInputLostFocus(inputElement, property) {
 }
 function changePropertyType(inputElement, property) {
   inputElement.value = inputElement.value.trim();
-  if(checkNameValidity(inputElement.value)) {
+  console.log("ya");
+  if(generalDataTypes.includes(inputElement.value) || checkNameValidity(inputElement.value)) {
     property.type = inputElement.value;
 
     // Remove the red border if there was any previous error
@@ -598,7 +603,7 @@ function methodAccessChanged() {
 // Method return type editing
 function changeMethodReturnType(inputElement, method) {
   inputElement.value = inputElement.value.trim();
-  if(checkNameValidity(inputElement.value)) {
+  if(generalDataTypes.includes(inputElement.value) || checkNameValidity(inputElement.value)) {
     method.returnType = inputElement.value;
 
     // Remove the red border if there was any previous error
@@ -692,7 +697,7 @@ function onMethodParameterNameInputLostFocus(inputElement, method) {
 // Method parameter type editing
 function changeMethodParameterType(inputElement, method) {
   inputElement.value = inputElement.value.trim();
-  if(checkNameValidity(inputElement.value)) {
+  if(generalDataTypes.includes(inputElement.value) || checkNameValidity(inputElement.value)) {
     getSelectedParameterFromMethod(method).type = inputElement.value;
 
     // Remove the red border if there was any previous error
