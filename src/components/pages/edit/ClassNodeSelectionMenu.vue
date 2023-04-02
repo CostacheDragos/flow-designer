@@ -127,7 +127,7 @@
                          class="bg-gray-500 rounded ml-1 px-2 w-36
                                     border border-gray-500
                                     focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                         :value="property.type"
+                         :value="property.type.name"
                          @keyup.enter="changePropertyType($event.target, property)"
                          @focusout="onPropertyTypeInputLostFocus($event.target, property)"
                   />
@@ -136,6 +136,16 @@
                       {{ dataType }}
                     </option>
                   </datalist>
+                </li>
+                <!-- Property type pointer check -->
+                <li class="flex">
+                  <label class="normal-case text-left w-16">Pointer:</label>
+                  <input type="checkbox"
+                         class="bg-gray-500 rounded ml-3 my-auto px-2 h-5 w-5
+                                    border border-gray-500
+                                    cursor-pointer
+                                    focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                         v-model="property.type.isPointer" @change="flowStore.changesOccurred()">
                 </li>
                 <!-- Property static check -->
                 <li class="flex">
@@ -221,7 +231,7 @@
                          class="bg-gray-500 rounded ml-1 px-2 w-36
                                     border border-gray-500
                                     focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                         :value="method.returnType"
+                         :value="method.returnType.name"
                          @keyup.enter="changeMethodReturnType($event.target, method)"
                          @focusout="onMethodReturnTypeInputLostFocus($event.target, method)"
                   />
@@ -231,6 +241,16 @@
                     </option>
                     <option>void</option>
                   </datalist>
+                </li>
+                <!-- Method return type pointer check -->
+                <li class="flex">
+                  <label class="normal-case text-left w-16">Pointer:</label>
+                  <input type="checkbox"
+                         class="bg-gray-500 rounded ml-3 my-auto px-2 h-5 w-5
+                                    border border-gray-500
+                                    cursor-pointer
+                                    focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                         v-model="method.returnType.isPointer" @change="flowStore.changesOccurred()">
                 </li>
                 <!-- Method virtual check -->
                 <li class="flex">
@@ -258,7 +278,7 @@
                     <label class="normal-case w-16 text-left">Param:</label>
                     <select class="bg-gray-500 focus:bg-white focus:text-black rounded ml-1 px-2 w-36 border border-gray-500"
                             v-model="method.selectedParameterID" :disabled="method.parameters.length === 0">
-                      <option v-for="parameter in method.parameters" :value="parameter.id">{{ parameter.type }} {{ parameter.name }}</option>
+                      <option v-for="parameter in method.parameters" :value="parameter.id">{{ parameter.type.name }} {{ parameter.name }}</option>
                     </select>
                     <div class="ml-1">
                       <font-awesome-icon icon="fa-plus fa-solid" color="white" size="xs" class="cursor-pointer" @click="addParameter(method)"/>
@@ -285,7 +305,7 @@
                                class="bg-gray-500 rounded ml-1 px-2 w-28
                                     border border-gray-500
                                     focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                               :value="getSelectedParameterFromMethod(method).type"
+                               :value="getSelectedParameterFromMethod(method).type.name"
                                @keyup.enter="changeMethodParameterType($event.target, method)"
                                @focusout="onMethodParameterTypeInputLostFocus($event.target, method)"
                         />
@@ -294,6 +314,16 @@
                             {{ dataType }}
                           </option>
                         </datalist>
+                      </li>
+                      <!-- Parameter type pointer check -->
+                      <li class="flex">
+                        <label class="normal-case text-left w-16">Pointer:</label>
+                        <input type="checkbox"
+                               class="bg-gray-500 rounded ml-3 my-auto px-2 h-5 w-5
+                                    border border-gray-500
+                                    cursor-pointer
+                                    focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                               v-model="getSelectedParameterFromMethod(method).type.isPointer" @change="flowStore.changesOccurred()">
                       </li>
                       <!-- Parameter const & ref check -->
                       <li class="flex">
@@ -472,7 +502,10 @@ function addProperty() {
     id: uuidv4(),
     name: "newProperty",
     accessModifier: "private",
-    type: "char",
+    type: {
+      name: "char",
+      isPointer: false,
+    },
     generateSetter: false,
     generateGetter: false,
     isStatic: false,
@@ -521,7 +554,7 @@ function changePropertyType(inputElement, property) {
   inputElement.value = inputElement.value.trim();
   console.log("ya");
   if(generalDataTypes.includes(inputElement.value) || checkNameValidity(inputElement.value)) {
-    property.type = inputElement.value;
+    property.type.name = inputElement.value;
 
     // Remove the red border if there was any previous error
     inputElement.classList.remove("focus:border-red-600");
@@ -536,7 +569,7 @@ function changePropertyType(inputElement, property) {
 function onPropertyTypeInputLostFocus(inputElement, property) {
   changePropertyType(inputElement, property);
 
-  inputElement.value = property.type;
+  inputElement.value = property.type.name;
 
   // Remove the red border if there was any previous error
   inputElement.classList.remove("focus:border-red-600");
@@ -553,7 +586,10 @@ function addMethod() {
     id: uuidv4(),
     name: "newMethod",
     accessModifier: "private",
-    returnType: "void",
+    returnType: {
+      name: "void",
+      isPointer: false,
+    },
     parameters: [],
     isVirtual: false,
     isStatic: false,
@@ -604,7 +640,7 @@ function methodAccessChanged() {
 function changeMethodReturnType(inputElement, method) {
   inputElement.value = inputElement.value.trim();
   if(generalDataTypes.includes(inputElement.value) || checkNameValidity(inputElement.value)) {
-    method.returnType = inputElement.value;
+    method.returnType.name = inputElement.value;
 
     // Remove the red border if there was any previous error
     inputElement.classList.remove("focus:border-red-600");
@@ -618,7 +654,7 @@ function changeMethodReturnType(inputElement, method) {
 function onMethodReturnTypeInputLostFocus(inputElement, method) {
   changeMethodReturnType(inputElement, method);
 
-  inputElement.value = method.returnType;
+  inputElement.value = method.returnType.name;
 
   // Remove the red border if there was any previous error
   inputElement.classList.remove("focus:border-red-600");
@@ -650,7 +686,10 @@ function addParameter(method) {
   const newParameter = {
     id: uuidv4(),
     name: "newParameter",
-    type: "char",
+    type: {
+      name: "char",
+      isPointer: false,
+    },
     isConst: false,
     isRef: false,
   };
@@ -698,7 +737,7 @@ function onMethodParameterNameInputLostFocus(inputElement, method) {
 function changeMethodParameterType(inputElement, method) {
   inputElement.value = inputElement.value.trim();
   if(generalDataTypes.includes(inputElement.value) || checkNameValidity(inputElement.value)) {
-    getSelectedParameterFromMethod(method).type = inputElement.value;
+    getSelectedParameterFromMethod(method).type.name = inputElement.value;
 
     // Remove the red border if there was any previous error
     inputElement.classList.remove("focus:border-red-600");
@@ -715,7 +754,7 @@ function onMethodParameterTypeInputLostFocus(inputElement, method) {
 
   // If the input at the time of focus lost is not valid, we need to
   // give the input value the value of the actual method
-  inputElement.value = getSelectedParameterFromMethod(method).type;
+  inputElement.value = getSelectedParameterFromMethod(method).type.name;
 
   // Remove the red border if there was any previous error
   inputElement.classList.remove("focus:border-red-600");

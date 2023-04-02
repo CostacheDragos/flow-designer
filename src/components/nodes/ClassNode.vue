@@ -36,12 +36,12 @@
     <div v-show="props.data.isExpanded" class="divide-y-2 divide-black mt-2">
       <ul class="pb-2">
         <li v-for="property in data.classData.properties" class="my-1 px-1 shadow border border-gray-500 rounded">
-          <p class="normal-case">{{ property.accessModifier }} {{ property.type }} {{ property.name }}</p>
+          <p class="normal-case">{{ property.accessModifier }} {{ property.type.name }}{{ property.type.isPointer ? "*" : ""}} {{ property.name }}</p>
         </li>
       </ul>
       <ul class="pt-2">
         <li v-for="method in data.classData.methods" class="my-1 px-1 shadow border border-gray-500 rounded">
-          <p class="normal-case">{{ method.accessModifier }} {{ method.returnType }} {{ method.name }}{{ method.parameters.length > 0 ? '(...)' : '()' }}</p>
+          <p class="normal-case">{{ method.accessModifier }} {{ method.returnType.name }}{{ method.returnType.isPointer ? "*" : ""}} {{ method.name }}{{ method.parameters.length > 0 ? '(...)' : '()' }}</p>
         </li>
       </ul>
     </div>
@@ -67,7 +67,10 @@ function addProperty() {
     id: uuidv4(),
     name: "newProperty",
     accessModifier: "private",
-    type: "char",
+    type: {
+      name: "char",
+      isPointer: false,
+    },
     generateSetter: false,
     generateGetter: false,
     isStatic: false,
@@ -80,7 +83,10 @@ function addMethod() {
     id: uuidv4(),
     name: "newMethod",
     accessModifier: "private",
-    returnType: "void",
+    returnType: {
+      name: "void",
+      isPointer: false,
+    },
     parameters: [],
     isVirtual: false,
     isStatic: false,
