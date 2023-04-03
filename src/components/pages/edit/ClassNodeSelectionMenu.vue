@@ -121,31 +121,53 @@
                   </select>
                 </li>
                 <!-- Property type editing -->
-                <li class="flex">
-                  <label class="normal-case text-left w-16">Type:</label>
-                  <input type="text" list="property-data-types"
-                         class="bg-gray-500 rounded ml-1 px-2 w-36
-                                    border border-gray-500
-                                    focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                         :value="property.type.name"
-                         @keyup.enter="changePropertyType($event.target, property)"
-                         @focusout="onPropertyTypeInputLostFocus($event.target, property)"
-                  />
-                  <datalist id="property-data-types">
-                    <option v-for="dataType in generalDataTypes">
-                      {{ dataType }}
-                    </option>
-                  </datalist>
+                <li>
+                  <div class="flex">
+                    <label class="normal-case text-left w-16">Type:</label>
+                    <input type="text" list="property-data-types"
+                           class="bg-gray-500 rounded ml-1 px-2 w-36
+                                      border border-gray-500
+                                      focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                           :value="property.type.name"
+                           @keyup.enter="changePropertyType($event.target, property)"
+                           @focusout="onPropertyTypeInputLostFocus($event.target, property)"
+                    />
+                    <datalist id="property-data-types">
+                      <option v-for="dataType in generalDataTypes">
+                        {{ dataType }}
+                      </option>
+                    </datalist>
+                  </div>
+                  <!-- Type const check -->
+                  <div class="flex">
+                    <label class="normal-case text-left w-12">Const:</label>
+                    <input type="checkbox"
+                           class="bg-gray-500 rounded ml-2 my-auto px-2 h-5 w-5
+                                      border border-gray-500
+                                      cursor-pointer
+                                      focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                           v-model="property.type.isConst" @change="flowStore.changesOccurred()">
+                  </div>
                 </li>
-                <!-- Property type pointer check -->
+                <!-- Property type pointer list -->
                 <li class="flex">
-                  <label class="normal-case text-left w-16">Pointer:</label>
-                  <input type="checkbox"
-                         class="bg-gray-500 rounded ml-3 my-auto px-2 h-5 w-5
-                                    border border-gray-500
-                                    cursor-pointer
-                                    focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                         v-model="property.type.isPointer" @change="flowStore.changesOccurred()">
+                  <div class="ml-1">
+                    <font-awesome-icon icon="fa-plus fa-solid" color="white" size="xs" class="cursor-pointer" @click="addPointer(property.type)"/>
+                  </div>
+                  <label class="normal-case text-left w-16">Pointers:</label>
+                  <ul class="ml-10">
+                    <li v-for="(pointer, pointerIdx) in property.type.pointerList" :key="pointer.id">
+                      <label class="normal-case text-left w-16">const {{ pointerIdx }}:</label>
+                      <input type="checkbox"
+                             class="bg-gray-500 rounded ml-3 my-auto px-2 h-5 w-5
+                                        border border-gray-500
+                                        cursor-pointer
+                                        focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                             v-model="pointer.isConst" @change="flowStore.changesOccurred()">
+                      <font-awesome-icon icon="fa-solid fa-xmark" color="red" class="my-auto cursor-pointer mx-2"
+                                         @click.prevent="removePointer(property.type, pointerIdx)"/>
+                    </li>
+                  </ul>
                 </li>
                 <!-- Property static check -->
                 <li class="flex">
@@ -225,32 +247,54 @@
                   </select>
                 </li>
                 <!-- Method return type editing -->
-                <li class="flex">
-                  <label class="normal-case w-16 text-left">Return:</label>
-                  <input type="text" list="method-return-data-types"
-                         class="bg-gray-500 rounded ml-1 px-2 w-36
-                                    border border-gray-500
-                                    focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                         :value="method.returnType.name"
-                         @keyup.enter="changeMethodReturnType($event.target, method)"
-                         @focusout="onMethodReturnTypeInputLostFocus($event.target, method)"
-                  />
-                  <datalist id="method-return-data-types">
-                    <option v-for="dataType in generalDataTypes">
-                      {{ dataType }}
-                    </option>
-                    <option>void</option>
-                  </datalist>
+                <li>
+                  <div class="flex">
+                    <label class="normal-case w-16 text-left">Return:</label>
+                    <input type="text" list="method-return-data-types"
+                           class="bg-gray-500 rounded ml-1 px-2 w-36
+                                      border border-gray-500
+                                      focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                           :value="method.returnType.name"
+                           @keyup.enter="changeMethodReturnType($event.target, method)"
+                           @focusout="onMethodReturnTypeInputLostFocus($event.target, method)"
+                    />
+                    <datalist id="method-return-data-types">
+                      <option v-for="dataType in generalDataTypes">
+                        {{ dataType }}
+                      </option>
+                      <option>void</option>
+                    </datalist>
+                  </div>
+                  <!-- Type const check -->
+                  <div class="flex">
+                    <label class="normal-case text-left w-12">Const:</label>
+                    <input type="checkbox"
+                           class="bg-gray-500 rounded ml-2 my-auto px-2 h-5 w-5
+                                      border border-gray-500
+                                      cursor-pointer
+                                      focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                           v-model="method.returnType.isConst" @change="flowStore.changesOccurred()">
+                  </div>
                 </li>
-                <!-- Method return type pointer check -->
+                <!-- Method return type pointer list -->
                 <li class="flex">
-                  <label class="normal-case text-left w-16">Pointer:</label>
-                  <input type="checkbox"
-                         class="bg-gray-500 rounded ml-3 my-auto px-2 h-5 w-5
-                                    border border-gray-500
-                                    cursor-pointer
-                                    focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                         v-model="method.returnType.isPointer" @change="flowStore.changesOccurred()">
+                  <div class="ml-1">
+                    <font-awesome-icon icon="fa-plus fa-solid" color="white" size="xs" class="cursor-pointer" @click="addPointer(method.returnType)"/>
+                  </div>
+                  <label class="normal-case text-left w-16">Pointers:</label>
+                  <ul class="ml-10">
+                    <li v-for="(pointer, pointerIdx) in method.returnType.pointerList" :key="pointer.id">
+                      <label class="normal-case text-left w-16">const {{ pointerIdx }}:</label>
+                      <input type="checkbox"
+                             class="bg-gray-500 rounded ml-3 my-auto px-2 h-5 w-5
+                                        border border-gray-500
+                                        cursor-pointer
+                                        focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                             v-model="pointer.isConst" @change="flowStore.changesOccurred()">
+                      <font-awesome-icon icon="fa-solid fa-xmark" color="red" class="my-auto cursor-pointer mx-2"
+                                         @click.prevent="removePointer(method.returnType, pointerIdx)"/>
+                    </li>
+                  </ul>
                 </li>
                 <!-- Method virtual check -->
                 <li class="flex">
@@ -315,15 +359,25 @@
                           </option>
                         </datalist>
                       </li>
-                      <!-- Parameter type pointer check -->
+                      <!-- Parameter type pointer list -->
                       <li class="flex">
-                        <label class="normal-case text-left w-16">Pointer:</label>
-                        <input type="checkbox"
-                               class="bg-gray-500 rounded ml-3 my-auto px-2 h-5 w-5
-                                    border border-gray-500
-                                    cursor-pointer
-                                    focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                               v-model="getSelectedParameterFromMethod(method).type.isPointer" @change="flowStore.changesOccurred()">
+                        <div class="ml-1">
+                          <font-awesome-icon icon="fa-plus fa-solid" color="white" size="xs" class="cursor-pointer" @click="addPointer(getSelectedParameterFromMethod(method).type)"/>
+                        </div>
+                        <label class="normal-case text-left w-16">Pointers:</label>
+                        <ul class="ml-10">
+                          <li v-for="(pointer, pointerIdx) in getSelectedParameterFromMethod(method).type.pointerList" :key="pointer.id">
+                            <label class="normal-case text-left w-16">const {{ pointerIdx }}:</label>
+                            <input type="checkbox"
+                                   class="bg-gray-500 rounded ml-3 my-auto px-2 h-5 w-5
+                                        border border-gray-500
+                                        cursor-pointer
+                                        focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                                   v-model="pointer.isConst" @change="flowStore.changesOccurred()">
+                            <font-awesome-icon icon="fa-solid fa-xmark" color="red" class="my-auto cursor-pointer mx-2"
+                                               @click.prevent="removePointer(getSelectedParameterFromMethod(method).type, pointerIdx)"/>
+                          </li>
+                        </ul>
                       </li>
                       <!-- Parameter const & ref check -->
                       <li class="flex">
@@ -496,6 +550,7 @@ function updateConstructorsInitializationListsOnPropertyDelete(deletedProperty) 
   selectedNodeData.value.classData.constructors.forEach(constructor => removeFieldFromConstructorInitializationList(constructor, deletedProperty));
 }
 
+
 // ****** Class properties functions ******
 function addProperty() {
   const newProperty = {
@@ -504,7 +559,8 @@ function addProperty() {
     accessModifier: "private",
     type: {
       name: "char",
-      isPointer: false,
+      isConst: false,
+      pointerList: [],
     },
     generateSetter: false,
     generateGetter: false,
@@ -574,6 +630,16 @@ function onPropertyTypeInputLostFocus(inputElement, property) {
   inputElement.classList.remove("focus:border-red-600");
 }
 
+function addPointer(type) {
+  type.pointerList.push({isConst: false, id:uuidv4()});
+  flowStore.changesOccurred();
+}
+function removePointer(type, pointerIdx) {
+  type.pointerList.splice(pointerIdx, 1);
+
+  flowStore.changesOccurred();
+}
+
 // When a new access modifier is selected for a property
 function propertyAccessChanged() {
   flowStore.changesOccurred();
@@ -586,8 +652,9 @@ function addMethod() {
     name: "newMethod",
     accessModifier: "private",
     returnType: {
-      name: "void",
-      isPointer: false,
+      name: "char",
+      isConst: false,
+      pointerList: [],
     },
     parameters: [],
     isVirtual: false,
@@ -688,7 +755,7 @@ function addParameter(method) {
     type: {
       name: "char",
       isConst: false,
-      isPointer: false,
+      pointerList: [],
     },
     isRef: false,
   };

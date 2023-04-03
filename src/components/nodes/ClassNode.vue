@@ -35,13 +35,24 @@
 
     <div v-show="props.data.isExpanded" class="divide-y-2 divide-black mt-2">
       <ul class="pb-2">
-        <li v-for="property in data.classData.properties" class="my-1 px-1 shadow border border-gray-500 rounded">
-          <p class="normal-case">{{ property.accessModifier }} {{ property.type.name }}{{ property.type.isPointer ? "*" : ""}} {{ property.name }}</p>
+        <li v-for="property in data.classData.properties" class="my-1 px-1 shadow border border-gray-500 rounded normal-case flex">
+          <pre class="flex">{{ property.accessModifier }} {{
+              property.type.isConst ? "const " : ""
+            }}{{
+              property.type.name }}<pre v-for="(pointer, pointerIdx) in property.type.pointerList" :key="pointer.id">{{pointerIdx !== 0 && property.type.pointerList[pointerIdx - 1].isConst === true ? " " : ""}}{{ pointer.isConst ? "*const" : "*"}}</pre> {{
+              property.name }}</pre>
         </li>
       </ul>
       <ul class="pt-2">
-        <li v-for="method in data.classData.methods" class="my-1 px-1 shadow border border-gray-500 rounded">
-          <p class="normal-case">{{ method.accessModifier }} {{ method.returnType.name }}{{ method.returnType.isPointer ? "*" : ""}} {{ method.name }}{{ method.parameters.length > 0 ? '(...)' : '()' }}</p>
+        <li v-for="method in data.classData.methods" class="my-1 px-1 shadow border border-gray-500 rounded normal-case">
+          <pre class="flex">{{
+              method.accessModifier
+            }} {{
+              method.returnType.isConst ? "const " : ""
+            }}{{
+              method.returnType.name
+            }}<pre v-for="(pointer, pointerIdx) in method.returnType.pointerList" :key="pointer.id">{{pointerIdx !== 0 && method.returnType.pointerList[pointerIdx - 1].isConst === true ? " " : ""}}{{ pointer.isConst ? "*const" : "*"}}</pre> {{
+              method.name }}{{ method.parameters.length > 0 ? '(...)' : '()' }}</pre>
         </li>
       </ul>
     </div>
@@ -69,7 +80,8 @@ function addProperty() {
     accessModifier: "private",
     type: {
       name: "char",
-      isPointer: false,
+      isConst: false,
+      pointerList: [],
     },
     generateSetter: false,
     generateGetter: false,
@@ -84,8 +96,9 @@ function addMethod() {
     name: "newMethod",
     accessModifier: "private",
     returnType: {
-      name: "void",
-      isPointer: false,
+      name: "char",
+      isConst: false,
+      pointerList: [],
     },
     parameters: [],
     isVirtual: false,
