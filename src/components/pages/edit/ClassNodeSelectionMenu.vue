@@ -333,7 +333,7 @@
                                     border border-gray-500
                                     cursor-pointer
                                     focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                               v-model="getSelectedParameterFromMethod(method).isConst" @change="flowStore.changesOccurred()">
+                               v-model="getSelectedParameterFromMethod(method).type.isConst" @change="flowStore.changesOccurred()">
 
                         <label class="normal-case text-left w-8 ml-5">Ref:</label>
                         <input type="checkbox"
@@ -552,7 +552,6 @@ function onPropertyNameInputLostFocus(inputElement, property) {
 }
 function changePropertyType(inputElement, property) {
   inputElement.value = inputElement.value.trim();
-  console.log("ya");
   if(generalDataTypes.includes(inputElement.value) || checkNameValidity(inputElement.value)) {
     property.type.name = inputElement.value;
 
@@ -688,9 +687,9 @@ function addParameter(method) {
     name: "newParameter",
     type: {
       name: "char",
+      isConst: false,
       isPointer: false,
     },
-    isConst: false,
     isRef: false,
   };
   method.parameters.push(newParameter);
