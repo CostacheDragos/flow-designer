@@ -149,6 +149,27 @@
                            v-model="property.type.isConst" @change="flowStore.changesOccurred()">
                   </div>
                 </li>
+                <!-- Property array props -->
+                <li class="flex">
+                  <div class="flex">
+                    <label class="normal-case text-left w-fit">Array:</label>
+                    <input type="checkbox"
+                           class="bg-gray-500 rounded ml-3 my-auto px-2 h-5 w-5
+                                      border border-gray-500
+                                      cursor-pointer
+                                      focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                           v-model="property.isArray" @change="flowStore.changesOccurred()">
+                  </div>
+                  <div class="flex" v-show="property.isArray">
+                    <label class="normal-case text-left w-fit ml-2">Len. Max:</label>
+                    <input type="number"
+                           class="bg-gray-500 rounded ml-3 my-auto px-2 h-5 w-20
+                                      border border-gray-500
+                                      cursor-pointer
+                                      focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                           :value="property.maxArrayLength" @focusout="maxArrayLenChanged(property, $event.target)" @keyup.enter="loseFocus">
+                  </div>
+                </li>
                 <!-- Property type pointer list -->
                 <li class="flex">
                   <div class="ml-1">
@@ -359,6 +380,29 @@
                           </option>
                         </datalist>
                       </li>
+                      <!-- parameter array props -->
+                      <li class="flex">
+                        <div class="flex">
+                          <label class="normal-case text-left w-fit">Array:</label>
+                          <input type="checkbox"
+                                 class="bg-gray-500 rounded ml-3 my-auto px-2 h-5 w-5
+                                      border border-gray-500
+                                      cursor-pointer
+                                      focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                                 v-model="getSelectedParameterFromMethod(method).isArray" @change="flowStore.changesOccurred()">
+                        </div>
+                        <div class="flex" v-show="getSelectedParameterFromMethod(method).isArray">
+                          <label class="normal-case text-left w-fit ml-2">Len. Max:</label>
+                          <input type="number"
+                                 class="bg-gray-500 rounded ml-3 my-auto px-2 h-5 w-20
+                                      border border-gray-500
+                                      cursor-pointer
+                                      focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                                 :value="getSelectedParameterFromMethod(method).maxArrayLength"
+                                 @focusout="maxArrayLenChanged(getSelectedParameterFromMethod(method), $event.target)"
+                                 @keyup.enter="loseFocus">
+                        </div>
+                      </li>
                       <!-- Parameter type pointer list -->
                       <li class="flex">
                         <div class="ml-1">
@@ -435,7 +479,7 @@
 import {v4 as uuidv4} from "uuid";
 import { useVueFlow } from "@vue-flow/core";
 import { useFlowStore } from "@/stores/flow.js";
-import { checkNameValidity, accessModifiers } from "@/Utility/Utility.js";
+import { checkNameValidity, accessModifiers, loseFocus } from "@/Utility/Utility.js";
 import {toRef} from "vue";
 
 const { findNode, getSelectedNodes, removeNodes } = useVueFlow();
@@ -551,6 +595,28 @@ function updateConstructorsInitializationListsOnPropertyDelete(deletedProperty) 
 }
 
 
+// ****** Data types functions ******
+function addPointer(type) {
+  type.pointerList.push({isConst: false, id:uuidv4()});
+  flowStore.changesOccurred();
+}
+function removePointer(type, pointerIdx) {
+  type.pointerList.splice(pointerIdx, 1);
+
+  flowStore.changesOccurred();
+}
+
+function maxArrayLenChanged(model, inputElement) {
+  const newNumberVal = parseInt(inputElement.value);
+  if(newNumberVal && newNumberVal > 0) {
+    model.maxArrayLength = newNumberVal;
+    flowStore.changesOccurred();
+  }
+  else
+    inputElement.value = model.maxArrayLength.toString();
+}
+
+
 // ****** Class properties functions ******
 function addProperty() {
   const newProperty = {
@@ -562,6 +628,8 @@ function addProperty() {
       isConst: false,
       pointerList: [],
     },
+    isArray: false,
+    maxArrayLength: 1,
     generateSetter: false,
     generateGetter: false,
     isStatic: false,
@@ -630,15 +698,6 @@ function onPropertyTypeInputLostFocus(inputElement, property) {
   inputElement.classList.remove("focus:border-red-600");
 }
 
-function addPointer(type) {
-  type.pointerList.push({isConst: false, id:uuidv4()});
-  flowStore.changesOccurred();
-}
-function removePointer(type, pointerIdx) {
-  type.pointerList.splice(pointerIdx, 1);
-
-  flowStore.changesOccurred();
-}
 
 // When a new access modifier is selected for a property
 function propertyAccessChanged() {
@@ -757,6 +816,8 @@ function addParameter(method) {
       isConst: false,
       pointerList: [],
     },
+    isArray: false,
+    maxArrayLength: 1,
     isRef: false,
   };
   method.parameters.push(newParameter);

@@ -36,16 +36,18 @@
     <div v-show="props.data.isExpanded" class="divide-y-2 divide-black mt-2">
       <ul class="pb-2">
         <li v-for="property in data.classData.properties" class="my-1 px-1 shadow border border-gray-500 rounded normal-case flex">
-          <pre class="flex">{{ property.accessModifier }} {{
+          <pre class="flex mx-auto">{{ property.accessModifier }} {{
               property.type.isConst ? "const " : ""
             }}{{
               property.type.name }}<pre v-for="(pointer, pointerIdx) in property.type.pointerList" :key="pointer.id">{{pointerIdx !== 0 && property.type.pointerList[pointerIdx - 1].isConst === true ? " " : ""}}{{ pointer.isConst ? "*const" : "*"}}</pre> {{
-              property.name }}</pre>
+              property.name }}{{
+              property.isArray ? `[${property.maxArrayLength}]` : ""
+            }}</pre>
         </li>
       </ul>
       <ul class="pt-2">
-        <li v-for="method in data.classData.methods" class="my-1 px-1 shadow border border-gray-500 rounded normal-case">
-          <pre class="flex">{{
+        <li v-for="method in data.classData.methods" class="my-1 px-1 shadow border border-gray-500 rounded normal-case flex">
+          <pre class="flex mx-auto">{{
               method.accessModifier
             }} {{
               method.returnType.isConst ? "const " : ""
@@ -83,6 +85,8 @@ function addProperty() {
       isConst: false,
       pointerList: [],
     },
+    isArray: false,
+    maxArrayLength: 1,
     generateSetter: false,
     generateGetter: false,
     isStatic: false,

@@ -194,7 +194,7 @@ import {doc, getDoc, setDoc} from "firebase/firestore";
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, auth, storage } from "@/includes/firebase.js";
 
-import {accessModifiers} from "@/Utility/Utility.js";
+import {loseFocus, accessModifiers} from "@/Utility/Utility.js";
 
 import html2canvas from "html2canvas";
 
@@ -805,14 +805,6 @@ function beforeWindowUnload(event) {
 }
 
 // Auxiliary
-// Focuses on a temporary element, useful to unfocus any currently focused element
-function loseFocus() {
-  const tmp = document.createElement("input");
-  document.body.appendChild(tmp);
-  tmp.focus();
-  document.body.removeChild(tmp);
-}
-
 function displayWarningModal(warningText) {
   warningModalText.value = warningText;
   const modalToggle = document.getElementById("warning-modal");
