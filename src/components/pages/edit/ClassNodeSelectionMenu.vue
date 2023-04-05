@@ -176,15 +176,38 @@
                     <font-awesome-icon icon="fa-plus fa-solid" color="white" size="xs" class="cursor-pointer" @click="addPointer(property.type)"/>
                   </div>
                   <label class="normal-case text-left w-16">Pointers:</label>
-                  <ul class="ml-10">
-                    <li v-for="(pointer, pointerIdx) in property.type.pointerList" :key="pointer.id">
-                      <label class="normal-case text-left w-16">const {{ pointerIdx }}:</label>
-                      <input type="checkbox"
-                             class="bg-gray-500 rounded ml-3 my-auto px-2 h-5 w-5
-                                        border border-gray-500
-                                        cursor-pointer
-                                        focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                             v-model="pointer.isConst" @change="flowStore.changesOccurred()">
+                  <ul class="ml-5">
+                    <li v-for="(pointer, pointerIdx) in property.type.pointerList" :key="pointer.id" class="flex">
+                      <div class="my-2">
+                        <div class="w-fit">
+                          <label class="normal-case text-left w-16">const {{ pointerIdx }}:</label>
+                          <input type="checkbox"
+                                 class="bg-gray-500 rounded ml-3 my-auto px-2 h-5 w-5
+                                            border border-gray-500
+                                            cursor-pointer
+                                            focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                                 v-model="pointer.isConst" @change="flowStore.changesOccurred()">
+                        </div>
+                        <div class="w-fit">
+                          <label class="normal-case text-left w-16">array {{ pointerIdx }}:</label>
+                          <input type="checkbox"
+                                 class="bg-gray-500 rounded ml-3 my-auto px-2 h-5 w-5
+                                            border border-gray-500
+                                            cursor-pointer
+                                            focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                                 v-model="pointer.isArray" @change="flowStore.changesOccurred()">
+                        </div>
+                        <div v-show="pointer.isArray" class="w-fit">
+                          <label class="normal-case text-left w-16">array len store:</label>
+                          <input type="text"
+                                 class="bg-gray-500 rounded ml-3 my-auto px-2 h-5 w-20
+                                              border border-gray-500
+                                              cursor-pointer
+                                              focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                                 :value="pointer.arrayLengthFieldName" @change="pointerArrayLengthFieldNameChanged(pointer, $event.target)"
+                                 @focusout="onPointerArrayLengthFieldNameFocusLost(pointer, $event.target)">
+                        </div>
+                      </div>
                       <font-awesome-icon icon="fa-solid fa-xmark" color="red" class="my-auto cursor-pointer mx-2"
                                          @click.prevent="removePointer(property.type, pointerIdx)"/>
                     </li>
@@ -408,7 +431,7 @@
                         <div class="ml-1">
                           <font-awesome-icon icon="fa-plus fa-solid" color="white" size="xs" class="cursor-pointer" @click="addPointer(getSelectedParameterFromMethod(method).type)"/>
                         </div>
-                        <label class="normal-case text-left w-16">Pointers:</label>
+                        <label class="normal-case text-left w-fit">Pointers:</label>
                         <ul class="ml-10">
                           <li v-for="(pointer, pointerIdx) in getSelectedParameterFromMethod(method).type.pointerList" :key="pointer.id">
                             <label class="normal-case text-left w-16">const {{ pointerIdx }}:</label>
@@ -597,13 +620,45 @@ function updateConstructorsInitializationListsOnPropertyDelete(deletedProperty) 
 
 // ****** Data types functions ******
 function addPointer(type) {
-  type.pointerList.push({isConst: false, id:uuidv4()});
+  type.pointerList.push({
+    id: uuidv4(),
+    isConst: false,
+    isArray: false,
+    arrayLengthFieldName: "len",
+  });
   flowStore.changesOccurred();
 }
 function removePointer(type, pointerIdx) {
   type.pointerList.splice(pointerIdx, 1);
 
   flowStore.changesOccurred();
+}
+
+function pointerArrayLengthFieldNameChanged(model, inputElement) {
+  inputElement.value = inputElement.value.trim();
+  if(checkNameValidity(inputElement.value)) {
+    model.arrayLengthFieldName = inputElement.value;
+
+    // Remove the red border if there was any previous error
+    inputElement.classList.remove("focus:border-red-600");
+
+    flowStore.changesOccurred();
+  }
+  else {
+    // Color the border red to let the user know that the value is not valid
+    inputElement.classList.add("focus:border-red-600");
+  }
+}
+function onPointerArrayLengthFieldNameFocusLost(model, inputElement) {
+  // Save changes
+  pointerArrayLengthFieldNameChanged(model, inputElement);
+
+  // If the input at the time of focus lost is not valid, we need to
+  // give the input value the value of the actual property
+  inputElement.value = model.arrayLengthFieldName;
+
+  // Remove the red border if there was any previous error
+  inputElement.classList.remove("focus:border-red-600");
 }
 
 function maxArrayLenChanged(model, inputElement) {
