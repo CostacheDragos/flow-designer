@@ -79,6 +79,35 @@
     </div>
   </details>
 
+  <!-- Destructor controls -->
+  <details class="bg-inherit duration-300 border-b-4 border-gray-900 text-white">
+    <summary class="bg-inherit px-5 py-3 text-lg cursor-pointer border-b border-gray-900">Destructor</summary>
+    <div class="flex w-fit mx-auto">
+      <label class="normal-case text-right w-fit my-auto">Generate destructor: </label>
+      <input type="checkbox"
+             class="bg-gray-500 rounded ml-1 my-auto px-2 h-5 w-5
+                                        border border-gray-500
+                                        cursor-pointer
+                                        focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+             v-model="selectedNodeData.classData.generateDestructor">
+    </div>
+    <div v-if="selectedNodeData.classData.generateDestructor" class="mx-2 py-2 text-white normal-case">
+        <p class="flex">Fields to be deleted: </p>
+        <!-- Fields to be deleted by destructor -->
+        <div v-for="property in selectedNodeData.classData.properties" :key="property.id" v-show="property.type.pointerList.length > 0"
+             class="ml-5 flex">
+          <input type="checkbox"
+                 class="bg-gray-500 rounded ml-1 my-auto px-2 h-5 w-5
+                            border border-gray-500
+                            cursor-pointer
+                            focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                 :checked="selectedNodeData.classData.destructor.deletedFieldsIds.find(fieldID => fieldID === property.id) !== undefined"
+                 @change="destructorFieldStatusChanged(property, $event.target.checked)">
+          <label class="normal-case text-left w-16 ml-3">{{ property.name }}</label>
+        </div>
+    </div>
+  </details>
+
   <!-- Properties controls -->
   <details class="bg-inherit duration-300 border-b-4 border-gray-900">
     <summary class="bg-inherit px-5 py-3 text-lg cursor-pointer text-white border-b border-gray-900">Properties</summary>
@@ -209,7 +238,7 @@
                         </div>
                       </div>
                       <font-awesome-icon icon="fa-solid fa-xmark" color="red" class="my-auto cursor-pointer mx-2"
-                                         @click.prevent="removePointer(property.type, pointerIdx)"/>
+                                         @click="removePointer(property.type, pointerIdx), updateDestructorAfterPropertyPointerRemoval(property)"/>
                     </li>
                   </ul>
                 </li>
@@ -599,12 +628,10 @@ function constructorFieldStatusChanged(constructor, field, isFieldInitialized) {
   else
     removeFieldFromConstructorInitializationList(constructor, field);
 }
-
 function addFieldToConstructorInitializationList(constructor, field) {
   constructor.initializedFieldsIDs.push(field.id);
   flowStore.changesOccurred();
 }
-
 function removeFieldFromConstructorInitializationList(constructor, field) {
   const fieldIdx = constructor.initializedFieldsIDs.indexOf(field.id);
   if(fieldIdx !== -1) {
@@ -612,11 +639,34 @@ function removeFieldFromConstructorInitializationList(constructor, field) {
     flowStore.changesOccurred();
   }
 }
-
 function updateConstructorsInitializationListsOnPropertyDelete(deletedProperty) {
   selectedNodeData.value.classData.constructors.forEach(constructor => removeFieldFromConstructorInitializationList(constructor, deletedProperty));
 }
 
+// Same as the constructors but for the destructor
+function destructorFieldStatusChanged(field, isFieldDeleted) {
+  if(isFieldDeleted)
+    addFieldToDestructorDeletionList(field);
+  else
+    removeFieldFromDestructorDeletionList(field);
+}
+function addFieldToDestructorDeletionList(field) {
+  selectedNodeData.value.classData.destructor.deletedFieldsIds.push(field.id);
+  flowStore.changesOccurred();
+}
+function removeFieldFromDestructorDeletionList(field) {
+  const fieldIdx = selectedNodeData.value.classData.destructor.deletedFieldsIds.indexOf(field.id);
+  if(fieldIdx !== -1) {
+    selectedNodeData.value.classData.destructor.deletedFieldsIds.splice(fieldIdx, 1);
+    flowStore.changesOccurred();
+  }
+}
+// If pointers were removed from a property, it is possible that the user had checked the property to be
+// deleted in the destructor but the property no longer being eligible for deletion anymore
+function updateDestructorAfterPropertyPointerRemoval(property) {
+  if(property.type.pointerList.length === 0)
+    removeFieldFromDestructorDeletionList(property);
+}
 
 // ****** Data types functions ******
 function addPointer(type) {
@@ -694,6 +744,7 @@ function addProperty() {
 }
 function removeProperty(propertyIndex) {
   updateConstructorsInitializationListsOnPropertyDelete(selectedNodeData.value.classData.properties[propertyIndex]);
+  removeFieldFromDestructorDeletionList(selectedNodeData.value.classData.properties[propertyIndex]);
   selectedNodeData.value.classData.properties.splice(propertyIndex, 1);
   flowStore.changesOccurred();
 }

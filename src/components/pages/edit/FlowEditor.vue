@@ -422,6 +422,10 @@ function createNewNode(nodeData, position, parentId) {
             properties: [],
             methods: [],
             constructors: [],
+            generateDestructor: false,
+            destructor: {
+              deletedFieldsIds: [],
+            },
           },
         },
       };
