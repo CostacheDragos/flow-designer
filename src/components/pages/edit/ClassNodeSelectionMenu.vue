@@ -525,6 +525,27 @@
       </ul>
     </div>
   </details>
+
+  <!-- Inheritance controls -->
+  <details class="bg-inherit duration-300 border-b-4 border-gray-900">
+    <summary class="bg-inherit px-5 py-3 text-lg cursor-pointer text-white border-b border-gray-900">Friends</summary>
+    <div class="py-2 text-white normal-case">
+      <ul>
+        <li v-for="classNode in getClassNodes()" :key="classNode.id">
+          <div class="flex mr-auto w-fit">
+            <input type="checkbox"
+                   class="bg-gray-500 rounded mr-3 my-auto px-2 h-5 w-5
+                            border border-gray-500
+                            cursor-pointer
+                            focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                   :checked="selectedNodeData.classData.friendClassesIds.find(classId => classId === classNode.id) !== undefined"
+                   @change="friendClassStatusChanged(classNode, $event.target.checked)">
+            <label>{{ classNode.label }}</label>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </details>
 </template>
 
 <script setup>
@@ -533,8 +554,9 @@ import { useVueFlow } from "@vue-flow/core";
 import { useFlowStore } from "@/stores/flow.js";
 import { checkNameValidity, accessModifiers, loseFocus } from "@/Utility/Utility.js";
 import {toRef} from "vue";
+import {nodeTypes} from "@/components/nodes/NodeUtil.js";
 
-const { findNode, getSelectedNodes, removeNodes } = useVueFlow();
+const { findNode, getSelectedNodes, removeNodes, getNodes } = useVueFlow();
 const flowStore = useFlowStore();
 const props = defineProps(["selectedNodeData"]);
 const emits = defineEmits(["warning"]);
@@ -991,5 +1013,25 @@ function onMethodParameterTypeInputLostFocus(inputElement, method) {
 
   // Remove the red border if there was any previous error
   inputElement.classList.remove("focus:border-red-600");
+}
+
+
+// Friend classes editing
+function getClassNodes() {
+  return getNodes.value.filter(node => node.type === nodeTypes.classNode && node.id !== selectedNodeData.value.id);
+}
+
+function friendClassStatusChanged(targetClass, isFriend) {
+  if(isFriend) {
+    selectedNodeData.value.classData.friendClassesIds.push(targetClass.id);
+    flowStore.changesOccurred();
+  }
+  else {
+    const friendClassIdx = selectedNodeData.value.classData.friendClassesIds.indexOf(targetClass.id);
+    if(friendClassIdx !== -1) {
+      selectedNodeData.value.classData.friendClassesIds.splice(friendClassIdx, 1);
+      flowStore.changesOccurred();
+    }
+  }
 }
 </script>

@@ -262,6 +262,20 @@ onNodesChange((events) => {
       if(removedNode.type === nodeTypes.packageNode)
         removedNode.data.packageData.childrenIds.forEach(childNodeId => removeNodeFromParentPackage(childNodeId));
 
+      // If the removed node is a class, we need to iterate through  all the other class nodes
+      // and remove this node from their friend list if it was marked as a friend to other classes
+      if(removedNode.type === nodeTypes.classNode) {
+        getNodes.value.forEach(node => {
+          if (node.type !== nodeTypes.classNode)
+            return;
+
+          const friendClassIdx = node.data.classData.friendClassesIds.indexOf(removedNode.id);
+          if (friendClassIdx !== -1)
+            node.data.classData.friendClassesIds.splice(friendClassIdx, 1);
+        });
+      }
+
+      // If the removed node had a parent package, remove it from said parent package
       if(removedNode.parentNode !== "" && removedNode.parentNode !== undefined) {
         removeNodeFromParentPackage(removedNode.id);
       }
@@ -426,6 +440,7 @@ function createNewNode(nodeData, position, parentId) {
             destructor: {
               deletedFieldsIds: [],
             },
+            friendClassesIds: [],
           },
         },
       };
@@ -807,6 +822,7 @@ function beforeWindowUnload(event) {
     event.returnValue = '';
   }
 }
+
 
 // Auxiliary
 function displayWarningModal(warningText) {
