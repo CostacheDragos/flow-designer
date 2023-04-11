@@ -19,7 +19,7 @@
             <font-awesome-icon class="animate-spin m-3" icon="fa-solid fa-spinner" size="5x" />
           </div>
         </div>
-        <div class="card w-96 h-96 bg-gray-300 shadow-xl normal-case select-none transition hover:shadow-2xl hover:bg-gray-200 hover:scale-105 absolute">
+        <div class="card w-96 h-96 bg-gray-300 shadow-xl normal-case transition hover:shadow-2xl hover:bg-gray-200 hover:scale-105 absolute">
           <figure class="mt-2">
             <img :src="flow.metadata.imageURL" alt="Minimap" class="rounded-lg h-full" />
           </figure>

@@ -178,26 +178,39 @@
                            v-model="property.type.isConst" @change="flowStore.changesOccurred()">
                   </div>
                 </li>
-                <!-- Property array props -->
+                <!-- Property array dimension list -->
                 <li class="flex">
-                  <div class="flex">
-                    <label class="normal-case text-left w-fit">Array:</label>
-                    <input type="checkbox"
-                           class="bg-gray-500 rounded ml-3 my-auto px-2 h-5 w-5
+                  <div class="ml-1">
+                    <font-awesome-icon icon="fa-plus fa-solid" color="white" size="xs" class="cursor-pointer" @click="addArrayDimension(property.type)"/>
+                  </div>
+                  <label class="normal-case text-left w-20">Array dimensions:</label>
+                  <ul class="ml-5">
+                    <li v-for="(dimension, dimensionIdx) in property.type.arrayDimensions" :key="dimension.id" class="flex">
+                      <div class="my-2">
+                        <div class="w-fit">
+                          <label class="normal-case text-left w-16">dimension len store:</label>
+                          <input type="text"
+                                 class="bg-gray-500 rounded ml-3 my-auto px-2 h-5 w-20
+                                              border border-gray-500
+                                              cursor-pointer
+                                              focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                                 :value="dimension.arrayLengthFieldName" @change="arrayLengthFieldNameChanged(dimension, $event.target)"
+                                 @focusout="onArrayLengthFieldNameFocusLost(dimension, $event.target)">
+                        </div>
+                        <div class="flex">
+                          <label class="normal-case text-left w-fit ml-2">Max len.:</label>
+                          <input type="number"
+                                 class="bg-gray-500 rounded ml-3 my-auto px-2 h-5 w-20
                                       border border-gray-500
                                       cursor-pointer
                                       focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                           v-model="property.isArray" @change="flowStore.changesOccurred()">
-                  </div>
-                  <div class="flex" v-show="property.isArray">
-                    <label class="normal-case text-left w-fit ml-2">Len. Max:</label>
-                    <input type="number"
-                           class="bg-gray-500 rounded ml-3 my-auto px-2 h-5 w-20
-                                      border border-gray-500
-                                      cursor-pointer
-                                      focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                           :value="property.maxArrayLength" @focusout="maxArrayLenChanged(property, $event.target)" @keyup.enter="loseFocus">
-                  </div>
+                                 :value="dimension.maxLength" @focusout="maxDimensionLengthChanged(dimension, $event.target)" @keyup.enter="loseFocus">
+                        </div>
+                      </div>
+                      <font-awesome-icon icon="fa-solid fa-xmark" color="red" class="my-auto cursor-pointer mx-2"
+                                         @click="removeArrayDimension(property.type, dimensionIdx)"/>
+                    </li>
+                  </ul>
                 </li>
                 <!-- Property type pointer list -->
                 <li class="flex">
@@ -233,8 +246,8 @@
                                               border border-gray-500
                                               cursor-pointer
                                               focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                                 :value="pointer.arrayLengthFieldName" @change="pointerArrayLengthFieldNameChanged(pointer, $event.target)"
-                                 @focusout="onPointerArrayLengthFieldNameFocusLost(pointer, $event.target)">
+                                 :value="pointer.arrayLengthFieldName" @change="arrayLengthFieldNameChanged(pointer, $event.target)"
+                                 @focusout="onArrayLengthFieldNameFocusLost(pointer, $event.target)">
                         </div>
                       </div>
                       <font-awesome-icon icon="fa-solid fa-xmark" color="red" class="my-auto cursor-pointer mx-2"
@@ -432,28 +445,31 @@
                           </option>
                         </datalist>
                       </li>
-                      <!-- parameter array props -->
+                      <!-- Parameter array dimension list -->
                       <li class="flex">
-                        <div class="flex">
-                          <label class="normal-case text-left w-fit">Array:</label>
-                          <input type="checkbox"
-                                 class="bg-gray-500 rounded ml-3 my-auto px-2 h-5 w-5
+                        <div class="ml-1">
+                          <font-awesome-icon icon="fa-plus fa-solid" color="white" size="xs" class="cursor-pointer"
+                                             @click="addArrayDimension(getSelectedParameterFromMethod(method).type)"/>
+                        </div>
+                        <label class="normal-case text-left w-20">Array dimensions:</label>
+                        <ul class="ml-5">
+                          <li v-for="(dimension, dimensionIdx) in getSelectedParameterFromMethod(method).type.arrayDimensions"
+                              :key="dimension.id" class="flex">
+                            <div class="my-2">
+                              <div class="flex">
+                                <label class="normal-case text-left w-fit ml-2">Max len.:</label>
+                                <input type="number"
+                                       class="bg-gray-500 rounded ml-3 my-auto px-2 h-5 w-20
                                       border border-gray-500
                                       cursor-pointer
                                       focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                                 v-model="getSelectedParameterFromMethod(method).isArray" @change="flowStore.changesOccurred()">
-                        </div>
-                        <div class="flex" v-show="getSelectedParameterFromMethod(method).isArray">
-                          <label class="normal-case text-left w-fit ml-2">Len. Max:</label>
-                          <input type="number"
-                                 class="bg-gray-500 rounded ml-3 my-auto px-2 h-5 w-20
-                                      border border-gray-500
-                                      cursor-pointer
-                                      focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                                 :value="getSelectedParameterFromMethod(method).maxArrayLength"
-                                 @focusout="maxArrayLenChanged(getSelectedParameterFromMethod(method), $event.target)"
-                                 @keyup.enter="loseFocus">
-                        </div>
+                                       :value="dimension.maxLength" @focusout="maxDimensionLengthChanged(dimension, $event.target)" @keyup.enter="loseFocus">
+                              </div>
+                            </div>
+                            <font-awesome-icon icon="fa-solid fa-xmark" color="red" class="my-auto cursor-pointer mx-2"
+                                               @click="removeArrayDimension(getSelectedParameterFromMethod(method).type, dimensionIdx)"/>
+                          </li>
+                        </ul>
                       </li>
                       <!-- Parameter type pointer list -->
                       <li class="flex">
@@ -706,7 +722,21 @@ function removePointer(type, pointerIdx) {
   flowStore.changesOccurred();
 }
 
-function pointerArrayLengthFieldNameChanged(model, inputElement) {
+function addArrayDimension(type) {
+  type.arrayDimensions.push({
+    id: uuidv4(),
+    maxLength: 1,
+    arrayLengthFieldName: "len",
+  });
+  flowStore.changesOccurred();
+}
+function removeArrayDimension(type, dimensionIdx) {
+  type.arrayDimensions.splice(dimensionIdx, 1);
+
+  flowStore.changesOccurred();
+}
+
+function arrayLengthFieldNameChanged(model, inputElement) {
   inputElement.value = inputElement.value.trim();
   if(checkNameValidity(inputElement.value)) {
     model.arrayLengthFieldName = inputElement.value;
@@ -721,9 +751,9 @@ function pointerArrayLengthFieldNameChanged(model, inputElement) {
     inputElement.classList.add("focus:border-red-600");
   }
 }
-function onPointerArrayLengthFieldNameFocusLost(model, inputElement) {
+function onArrayLengthFieldNameFocusLost(model, inputElement) {
   // Save changes
-  pointerArrayLengthFieldNameChanged(model, inputElement);
+  arrayLengthFieldNameChanged(model, inputElement);
 
   // If the input at the time of focus lost is not valid, we need to
   // give the input value the value of the actual property
@@ -732,15 +762,14 @@ function onPointerArrayLengthFieldNameFocusLost(model, inputElement) {
   // Remove the red border if there was any previous error
   inputElement.classList.remove("focus:border-red-600");
 }
-
-function maxArrayLenChanged(model, inputElement) {
+function maxDimensionLengthChanged(model, inputElement) {
   const newNumberVal = parseInt(inputElement.value);
   if(newNumberVal && newNumberVal > 0) {
-    model.maxArrayLength = newNumberVal;
+    model.maxLength = newNumberVal;
     flowStore.changesOccurred();
   }
   else
-    inputElement.value = model.maxArrayLength.toString();
+    inputElement.value = model.maxLength.toString();
 }
 
 
@@ -754,9 +783,8 @@ function addProperty() {
       name: "char",
       isConst: false,
       pointerList: [],
+      arrayDimensions: [],
     },
-    isArray: false,
-    maxArrayLength: 1,
     generateSetter: false,
     generateGetter: false,
     isStatic: false,
@@ -842,6 +870,7 @@ function addMethod() {
       name: "char",
       isConst: false,
       pointerList: [],
+      arrayDimensions: [],
     },
     parameters: [],
     isVirtual: false,
@@ -943,9 +972,8 @@ function addParameter(method) {
       name: "char",
       isConst: false,
       pointerList: [],
+      arrayDimensions: [],
     },
-    isArray: false,
-    maxArrayLength: 1,
     isRef: false,
   };
   method.parameters.push(newParameter);

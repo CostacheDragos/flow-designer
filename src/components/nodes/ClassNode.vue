@@ -40,9 +40,8 @@
               property.type.isConst ? "const " : ""
             }}{{
               property.type.name }}<pre v-for="(pointer, pointerIdx) in property.type.pointerList" :key="pointer.id">{{pointerIdx !== 0 && property.type.pointerList[pointerIdx - 1].isConst === true ? " " : ""}}{{ pointer.isConst ? "*const" : "*"}}</pre> {{
-              property.name }}{{
-              property.isArray ? `[${property.maxArrayLength}]` : ""
-            }}</pre>
+              property.name
+            }}<pre v-for="dimension in property.type.arrayDimensions" :key="dimension.id">[{{dimension.maxLength}}]</pre></pre>
         </li>
       </ul>
       <ul class="pt-2">
@@ -84,9 +83,8 @@ function addProperty() {
       name: "char",
       isConst: false,
       pointerList: [],
+      arrayDimensions: [],
     },
-    isArray: false,
-    maxArrayLength: 1,
     generateSetter: false,
     generateGetter: false,
     isStatic: false,
@@ -103,6 +101,7 @@ function addMethod() {
       name: "char",
       isConst: false,
       pointerList: [],
+      arrayDimensions: [],
     },
     parameters: [],
     isVirtual: false,
