@@ -507,7 +507,7 @@
                                     border border-gray-500
                                     cursor-pointer
                                     focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                               v-model="getSelectedParameterFromMethod(method).isRef" @change="flowStore.changesOccurred()">
+                               v-model="getSelectedParameterFromMethod(method).type.isRef" @change="flowStore.changesOccurred()">
                       </li>
                     </ul>
                     <font-awesome-icon icon="fa-solid fa-trash" color="red" class="cursor-pointer my-auto ml-2" @click="removeSelectedParameter(method)"/>
@@ -973,8 +973,8 @@ function addParameter(method) {
       isConst: false,
       pointerList: [],
       arrayDimensions: [],
+      isRef: false,
     },
-    isRef: false,
   };
   method.parameters.push(newParameter);
   method.selectedParameterID = newParameter.id;
