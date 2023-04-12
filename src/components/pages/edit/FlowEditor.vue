@@ -438,6 +438,7 @@ function createNewNode(nodeData, position, parentId) {
             generateCopyConstructor: false,
             constructors: [],
             generateDestructor: false,
+            generateCopyAssignOperator: false,
             destructor: {
               deletedFieldsIds: [],
             },

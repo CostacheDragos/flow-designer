@@ -45,6 +45,15 @@
                                         focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
                    v-model="selectedNodeData.classData.generateCopyConstructor">
           </div>
+          <div class="flex w-fit mx-auto">
+            <label class="normal-case text-right w-fit">Generate copy assign operator: </label>
+            <input type="checkbox"
+                   class="bg-gray-500 rounded ml-1 px-2 h-5 w-5
+                                        border border-gray-500
+                                        cursor-pointer
+                                        focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                   v-model="selectedNodeData.classData.generateCopyAssignOperator">
+          </div>
         </li>
         <li v-for="(constructor, constructorIndex) in selectedNodeData.classData.constructors" :key="constructor.id">
           <details class="duration-300 text-white" >
