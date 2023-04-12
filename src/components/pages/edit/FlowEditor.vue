@@ -435,6 +435,7 @@ function createNewNode(nodeData, position, parentId) {
             name: "Class",
             properties: [],
             methods: [],
+            generateCopyConstructor: false,
             constructors: [],
             generateDestructor: false,
             destructor: {
