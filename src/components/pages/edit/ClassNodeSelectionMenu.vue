@@ -582,6 +582,41 @@
       </ul>
     </div>
   </details>
+
+  <!-- Template controls -->
+  <details class="bg-inherit duration-300 border-b-4 border-gray-900">
+    <summary class="bg-inherit px-5 py-3 text-lg cursor-pointer text-white border-b border-gray-900">Template</summary>
+    <div class="flex w-fit mx-auto text-white">
+      <label class="normal-case text-right w-fit">Is Template: </label>
+      <input type="checkbox"
+             class="bg-gray-500 rounded ml-1 px-2 h-5 w-5
+                                        border border-gray-500
+                                        cursor-pointer
+                                        focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+             v-model="selectedNodeData.classData.isTemplate">
+    </div>
+    <div class="hover:bg-gray-400 py-2 border-b border-t border-gray-900 cursor-pointer" v-if="selectedNodeData.classData.isTemplate"
+         @click="addTemplateTypeName()">
+      <font-awesome-icon icon="fa-plus fa-solid" color="white" />
+    </div>
+    <ul v-if="selectedNodeData.classData.isTemplate" class="text-white normal-case">
+      <div @click.prevent class="flex grow">
+        <p class="grow">Type Names</p>
+      </div>
+      <li v-for="(typename, typenameIdx) in selectedNodeData.classData.TemplateTypesData" :key="typename.id" class="mb-1">
+        <label class="normal-case text-left w-16">{{ typenameIdx }}:</label>
+        <input class="bg-gray-500 rounded ml-1 px-2 w-36
+                                    border border-gray-500
+                                    focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+               :value="typename.name"
+               @keyup.enter="changeTemplateTypename($event.target, typename)"
+               @focusout="onTemplateTypenameInputLostFocus($event.target, typename)"
+        />
+        <font-awesome-icon icon="fa-solid fa-xmark" color="red" class="my-auto cursor-pointer mx-2"
+                           @click.prevent="removeTypename(`${typenameIdx}`)"/>
+      </li>
+    </ul>
+  </details>
 </template>
 
 <script setup>
@@ -1082,4 +1117,45 @@ function friendClassStatusChanged(targetClass, isFriend) {
     }
   }
 }
+
+
+// Template class data editing
+function addTemplateTypeName() {
+  selectedNodeData.value.classData.TemplateTypesData.push({
+    id: uuidv4(),
+    name: "T",
+  });
+  flowStore.changesOccurred();
+}
+function removeTypename(typenameIdx) {
+  selectedNodeData.value.classData.TemplateTypesData.splice(typenameIdx, 1);
+  flowStore.changesOccurred();
+}
+function changeTemplateTypename(inputElement, typename) {
+  inputElement.value = inputElement.value.trim();
+  if(checkNameValidity(inputElement.value)) {
+    typename.name = inputElement.value;
+
+    // Remove the red border if there was any previous error
+    inputElement.classList.remove("focus:border-red-600");
+
+    flowStore.changesOccurred();
+  }
+  else {
+    // Color the border red to let the user know that the value is not valid
+    inputElement.classList.add("focus:border-red-600");
+  }
+}
+function onTemplateTypenameInputLostFocus(inputElement, typename) {
+  // Save changes
+  changeTemplateTypename(inputElement, typename);
+
+  // If the input at the time of focus lost is not valid, we need to
+  // give the input value the value of the actual method
+  inputElement.value = typename.name;
+
+  // Remove the red border if there was any previous error
+  inputElement.classList.remove("focus:border-red-600");
+}
+
 </script>

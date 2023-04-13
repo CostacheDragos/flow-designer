@@ -437,12 +437,14 @@ function createNewNode(nodeData, position, parentId) {
             methods: [],
             generateCopyConstructor: false,
             constructors: [],
-            generateDestructor: false,
             generateCopyAssignOperator: false,
+            generateDestructor: false,
             destructor: {
               deletedFieldsIds: [],
             },
             friendClassesIds: [],
+            isTemplate: false,
+            TemplateTypesData: [],
           },
         },
       };
