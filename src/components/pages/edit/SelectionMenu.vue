@@ -3,7 +3,8 @@
 
   <div class="bg-slate-600 w-72 select-none overflow-y-auto overflow-x-hidden max-w-lg min-w-fit" id="selection-menu-container">
     <!-- Information about the selected node. Different menus based on the type on node -->
-    <ClassNodeSelectionMenu v-if="selectedClassNodeData" :selected-node-data="selectedClassNodeData" @warning="onWarning"/>
+    <ClassNodeSelectionMenu v-if="selectedClassNodeData" :selected-node-data="selectedClassNodeData"
+                            @warning="onWarning" @associate-classes="onAssociateClasses" @remove-class-association="onRemoveClassAssociation"/>
     <PackageNodeSelectionMenu v-else-if="selectedPackageNodeData" :selected-node-data="selectedPackageNodeData" @removeNodeFromParentPackage="onSubmenuRemoveNodeFromParentPackage"/>
 
     <!-- Placeholder if no node is selected -->
@@ -25,7 +26,7 @@ import PackageNodeSelectionMenu from "@/components/pages/edit/PackageNodeSelecti
 
 const { getSelectedNodes } = useVueFlow();
 
-const emits = defineEmits(["removeNodeFromParentPackage", "warning"]);
+const emits = defineEmits(["removeNodeFromParentPackage", "warning", "associateClasses", "removeClassAssociation"]);
 
 // Listens for when the node selection changes and updates the selection menu accordingly
 const selectedClassNodeData = ref();
@@ -61,6 +62,13 @@ function onSubmenuRemoveNodeFromParentPackage(nodeId) {
 }
 function onWarning(warningMessage) {
   emits("warning", warningMessage);
+}
+
+function onAssociateClasses(sourceClassId, targetClassId) {
+  emits("associateClasses", sourceClassId, targetClassId);
+}
+function onRemoveClassAssociation(sourceClassId, targetClassId) {
+  emits("removeClassAssociation", sourceClassId, targetClassId);
 }
 
 // Resize bar functions

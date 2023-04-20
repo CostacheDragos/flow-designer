@@ -58,8 +58,10 @@
       </ul>
     </div>
 
-    <Handle :position="Position.Top" type="target"/>
+    <Handle :position="Position.Top" type="target" />
     <Handle :position="Position.Bottom" type="source"/>
+    <Handle :position="Position.Right" :connectable="false"/>
+    <Handle :position="Position.Left" :connectable="false"/>
   </div>
 </template>
 

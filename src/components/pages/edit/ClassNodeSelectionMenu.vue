@@ -185,6 +185,12 @@
                       <option v-for="dataType in generalDataTypes">
                         {{ dataType }}
                       </option>
+                      <option v-for="classNode in getClassNodes()">
+                        {{ classNode.label }}
+                      </option>
+                      <option>
+                        {{ selectedNodeData.classData.name }}
+                      </option>
                     </datalist>
                   </div>
                   <!-- Type const check -->
@@ -630,7 +636,7 @@ import {nodeTypes} from "@/components/nodes/NodeUtil.js";
 const { findNode, getSelectedNodes, removeNodes, getNodes } = useVueFlow();
 const flowStore = useFlowStore();
 const props = defineProps(["selectedNodeData"]);
-const emits = defineEmits(["warning"]);
+const emits = defineEmits(["warning", "associateClasses", "removeClassAssociation"]);
 const selectedNodeData =  toRef(props, "selectedNodeData");
 
 const generalDataTypes = ["int", "signed int", "unsigned int", "short int", "unsigned short int",
@@ -644,8 +650,12 @@ const generalDataTypes = ["int", "signed int", "unsigned int", "short int", "uns
 function changeClassName(inputElement) {
   inputElement.value = inputElement.value.trim();
   if(checkNameValidity(inputElement.value)) {
+    const oldName = selectedNodeData.value.classData.name;
+
     selectedNodeData.value.classData.name = inputElement.value;
     getSelectedNodes.value[0].label = inputElement.value;
+
+    updateAssociatedPropertiesOnClassRename(oldName);
 
     // Remove the red border if there was any previous error
     inputElement.classList.remove("focus:border-red-600");
@@ -670,6 +680,28 @@ function onClassNameInputLostFocus(inputElement) {
   inputElement.classList.remove("focus:border-red-600");
 }
 
+function updateAssociationOnPropertyChanged(property) {
+  // Check if the property type matches any class
+  const associatedClassNode = getClassNodes().find(classNode => classNode.label === property.type.name);
+  if(associatedClassNode !== undefined) {
+    // If it does, check if any of the other properties of the selected node match this same class
+    // if not, remove the association edge
+    if(selectedNodeData.value.classData.properties.find(currentProp =>
+        currentProp.id !== property.id && currentProp.type.name === associatedClassNode.label) === undefined) {
+      emits("removeClassAssociation", selectedNodeData.value.id, associatedClassNode.id);
+    }
+  }
+}
+// When the name of the class changes, we need to find any reference to it in other classes
+// properties and alter the type name
+function updateAssociatedPropertiesOnClassRename(oldName) {
+  getClassNodes().forEach(classNode => {
+    classNode.data.classData.properties.forEach(property => {
+      if(property.type.name === oldName)
+        property.type.name = selectedNodeData.value.classData.name;
+    });
+  });
+}
 
 // ****** Class constructors functions ******
 function addConstructor() {
@@ -850,7 +882,9 @@ function addProperty() {
 function removeProperty(propertyIndex) {
   updateConstructorsInitializationListsOnPropertyDelete(selectedNodeData.value.classData.properties[propertyIndex]);
   removeFieldFromDestructorDeletionList(selectedNodeData.value.classData.properties[propertyIndex]);
+  updateAssociationOnPropertyChanged(selectedNodeData.value.classData.properties[propertyIndex]);
   selectedNodeData.value.classData.properties.splice(propertyIndex, 1);
+
   flowStore.changesOccurred();
 }
 
@@ -887,8 +921,15 @@ function onPropertyNameInputLostFocus(inputElement, property) {
 }
 function changePropertyType(inputElement, property) {
   inputElement.value = inputElement.value.trim();
-  if(generalDataTypes.includes(inputElement.value) || checkNameValidity(inputElement.value)) {
+  if(inputElement.value !== property.type.name && (generalDataTypes.includes(inputElement.value) || checkNameValidity(inputElement.value))) {
+    updateAssociationOnPropertyChanged(property);
+
     property.type.name = inputElement.value;
+
+    // If the new type indicates another class, emit the association event in order for the association line to be drawn
+    const otherClassNode = getClassNodes().find(classNode => classNode.label === property.type.name);
+    if(otherClassNode !== undefined)
+      emits("associateClasses", selectedNodeData.value.id, otherClassNode.id);
 
     // Remove the red border if there was any previous error
     inputElement.classList.remove("focus:border-red-600");

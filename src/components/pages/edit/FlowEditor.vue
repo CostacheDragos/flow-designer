@@ -103,14 +103,19 @@
            <template v-slot:node-shape="props">
              <shape-node :label="props.label" :selected="props.selected" :data="props.data"/>
            </template>
+
            <template v-slot:edge-inheritance="props">
              <inheritance-edge v-bind="props"/>
+           </template>
+           <template v-slot:edge-association="props">
+             <association-edge v-bind="props"/>
            </template>
          </VueFlow>
       </div>
       <CodeEditorWithTabs v-if="showCodeEditor" :generated-classes="generatedClasses" @close_editor="toggleCodeEditorVisibility"/>
     </div>
-    <SelectionMenu @removeNodeFromParentPackage="removeNodeFromParentPackage" @warning="displayWarningModal"/>
+    <SelectionMenu @removeNodeFromParentPackage="removeNodeFromParentPackage"
+                   @warning="displayWarningModal" @associate-classes="createAssociationEdge" @remove-class-association="removeAssociationEdge"/>
   </div>
 
 
@@ -188,6 +193,7 @@ import PackageNode from "@/components/nodes/PackageNode.vue";
 import ImageNode from "@/components/nodes/ImageNode.vue";
 import ShapeNode from "@/components/nodes/ShapeNode.vue";
 import InheritanceEdge from "@/components/edges/InheritanceEdge.vue";
+import AssociationEdge from "@/components/edges/AssociationEdge.vue";
 import CodeEditorWithTabs from "@/components/pages/edit/CodeEditorWithTabs.vue";
 
 import {doc, getDoc, setDoc} from "firebase/firestore";
@@ -201,7 +207,7 @@ import html2canvas from "html2canvas";
 import { useFlowStore } from "@/stores/flow.js";
 import {onBeforeRouteLeave} from "vue-router";
 
-const { addNodes, addEdges, removeNodes, findNode, findEdge, getSelectedNodes, vueFlowRef, project, onConnect, toObject,
+const { addNodes, addEdges, removeEdges, removeNodes, findNode, findEdge, getEdges, getSelectedNodes, vueFlowRef, project, onConnect, toObject,
         getNodes, setNodes, setEdges, setTransform, onNodesChange, onNodeDrag, onNodeDragStop, onEdgesChange, onPaneReady } =
     useVueFlow();
 
@@ -220,7 +226,6 @@ const nodeTypes = {
 // Called when 2 nodes are connected
 // TODO: create more edge types and add them according to what handles the user tries to link
 onConnect((params) => {
-
   // Check if adding this edge will create an inheritance cycle
   if(checkInheritanceCycle(params.source, params.target)) {
     // Display warning to user
@@ -242,6 +247,24 @@ onConnect((params) => {
   const targetNode = findNode(params.target);
   targetNode.data.parentClassNodes.push({id: params.source, accessSpecifier: accessModifiers.public});
 });
+
+function createAssociationEdge(sourceNodeId, targetNodeId) {
+  addEdges([
+    {
+      source: sourceNodeId,
+      sourceHandle: `${sourceNodeId}__handle-right`,
+      target: targetNodeId,
+      targetHandle: `${targetNodeId}__handle-left`,
+      type: "association",
+      markerEnd: MarkerType.ArrowClosed,
+    },
+  ]);
+}
+function removeAssociationEdge(sourceNodeId, targetNodeId) {
+  const edgeToBeDeleted = getEdges.value.find(edge =>
+      edge.source === sourceNodeId && edge.target === targetNodeId && edge.type === "association");
+  removeEdges([edgeToBeDeleted.id]);
+}
 
 // Called when there was a change regarding nodes
 onNodesChange((events) => {
