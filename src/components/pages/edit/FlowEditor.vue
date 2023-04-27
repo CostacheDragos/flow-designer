@@ -187,7 +187,7 @@ import {Background} from "@vue-flow/background";
 import {MiniMap} from "@vue-flow/minimap";
 
 import Sidebar from "@/components/pages/edit/Sidebar.vue";
-import SelectionMenu from "@/components/pages/edit/SelectionMenu.vue"
+import SelectionMenu from "@/components/pages/edit/node-editors/SelectionMenu.vue"
 import ClassNode from "@/components/nodes/ClassNode.vue";
 import PackageNode from "@/components/nodes/PackageNode.vue";
 import ImageNode from "@/components/nodes/ImageNode.vue";

@@ -623,6 +623,7 @@
       </li>
     </ul>
   </details>
+
 </template>
 
 <script setup>
@@ -644,6 +645,10 @@ const generalDataTypes = ["int", "signed int", "unsigned int", "short int", "uns
   "float", "double", "long double", "bool",
   "char", "signed char", "unsigned char", "wchar_t",
   "std::string"];
+
+const submenusOpenStatus = {
+  constructorSubmenu: false,
+};
 
 
 // ****** General class functions ******

@@ -21,8 +21,8 @@
 import {ref, watch} from "vue";
 import { useVueFlow } from "@vue-flow/core";
 
-import ClassNodeSelectionMenu from "@/components/pages/edit/ClassNodeSelectionMenu.vue";
-import PackageNodeSelectionMenu from "@/components/pages/edit/PackageNodeSelectionMenu.vue";
+import ClassNodeSelectionMenu from "@/components/pages/edit/node-editors/ClassNodeSelectionMenu.vue";
+import PackageNodeSelectionMenu from "@/components/pages/edit/node-editors/PackageNodeSelectionMenu.vue";
 
 const { getSelectedNodes } = useVueFlow();
 
