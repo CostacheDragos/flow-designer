@@ -1,20 +1,23 @@
 <template>
   <!-- Name -->
-  <details class="duration-300 text-white border-b-4 p-4 border-gray-900">
+  <details class="duration-300 text-white p-4">
     <summary class="flex">
-      <font-awesome-icon icon="fa-solid fa-pen-to-square" color="white" class="my-auto cursor-pointer mx-2"/>
+      <font-awesome-icon icon="fa-solid fa-pen-to-square"
+                         class="my-auto cursor-pointer text-slate-400 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"/>
       <div class="flex grow" @click.prevent>
         <h1 class="grow my-auto normal-case">
           {{ selectedNodeData.classData.name }}
         </h1>
-        <font-awesome-icon icon="fa-solid fa-trash" color="red" class="cursor-pointer my-auto mx-2" @click="removeNodes([`${getSelectedNodes[0].id}`])"/>
+        <font-awesome-icon icon="fa-solid fa-trash"
+                           class="my-auto cursor-pointer text-red-600 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"
+                           @click="removeNodes([`${getSelectedNodes[0].id}`])"/>
       </div>
     </summary>
-    <div class="mx-2 hover:shadow-lg hover:shadow-gray-500 border border-slate-600 hover:border-gray-500">
+    <div class="mx-2">
       <ul class="p-2 space-y-2">
         <!-- Class name editing -->
         <li class="flex">
-          <label class="normal-case text-left">Name:</label>
+          <label class="normal-case text-left my-auto w-16">Name:</label>
           <input class="bg-gray-500 rounded ml-1 px-2 w-36
                                     border border-gray-500
                                     focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
@@ -28,49 +31,58 @@
   </details>
 
   <!-- Constructor controls -->
-  <details class="bg-inherit duration-300 border-b-4 border-gray-900">
-    <summary class="bg-inherit px-5 py-3 text-lg cursor-pointer text-white border-b border-gray-900">Constructors</summary>
-    <div class="hover:bg-gray-400 py-2 border-b border-gray-900 cursor-pointer" @click="addConstructor">
-      <font-awesome-icon icon="fa-plus fa-solid" color="white" />
+  <div class="ml-4 mr-4 flex text-white border-t border-slate-700">
+    <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"
+                       icon="fa-solid fa-angle-right" v-show="!submenusOpenStatus.constructorSubmenu"
+                       @click="submenusOpenStatus.constructorSubmenu = !submenusOpenStatus.constructorSubmenu"/>
+    <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"
+                       icon="fa-solid fa-angle-down" v-show="submenusOpenStatus.constructorSubmenu"
+                       @click="submenusOpenStatus.constructorSubmenu = !submenusOpenStatus.constructorSubmenu"/>
+    <h1 class="bg-inherit pl-2 py-3 text-lg normal-case">Constructors</h1>
+  </div>
+  <div class="ml-8 text-white normal-case" v-show="submenusOpenStatus.constructorSubmenu">
+    <div class="flex w-fit mt-1">
+      <label class="normal-case text-left w-48">Copy constructor: </label>
+      <input type="checkbox"
+             class="checkbox checkbox-sm my-auto border-white bg-white ml-1"
+             v-model="selectedNodeData.classData.generateCopyConstructor">
     </div>
-    <div class="py-2 text-white normal-case">
-      <ul>
-        <li>
-          <div class="flex w-fit mx-auto">
-            <label class="normal-case text-right w-fit">Generate copy constructor: </label>
-            <input type="checkbox"
-                   class="bg-gray-500 rounded ml-1 px-2 h-5 w-5
-                                        border border-gray-500
-                                        cursor-pointer
-                                        focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                   v-model="selectedNodeData.classData.generateCopyConstructor">
-          </div>
-          <div class="flex w-fit mx-auto">
-            <label class="normal-case text-right w-fit">Generate copy assign operator: </label>
-            <input type="checkbox"
-                   class="bg-gray-500 rounded ml-1 px-2 h-5 w-5
-                                        border border-gray-500
-                                        cursor-pointer
-                                        focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                   v-model="selectedNodeData.classData.generateCopyAssignOperator">
-          </div>
-        </li>
+    <div class="flex w-fit mt-1">
+      <label class="normal-case text-left w-48">Copy assign operator: </label>
+      <input type="checkbox"
+             class="checkbox checkbox-sm my-auto border-white bg-white ml-1"
+             v-model="selectedNodeData.classData.generateCopyAssignOperator">
+    </div>
+    <div class="flex w-fit mt-1">
+      <label class="normal-case text-left w-48">Add constructor: </label>
+      <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white border border-slate-700
+                          hover:bg-slate-700 hover:border-white rounded-2xl px-2 py-1 w-2.5"
+                         icon="fa-plus fa-solid" @click="addConstructor"/>
+    </div>
+    <div class="flex w-fit mt-1">
+      <label class="normal-case text-left w-48">Constructors: </label>
+    </div>
+    <div class="py-2">
+      <label v-show="selectedNodeData.classData.constructors.length === 0">No constructors created</label>
+      <ul class="ml-3">
         <li v-for="(constructor, constructorIndex) in selectedNodeData.classData.constructors" :key="constructor.id">
           <details class="duration-300 text-white" >
             <summary class="flex my-1">
-              <font-awesome-icon icon="fa-solid fa-pen-to-square" color="white" class="my-auto cursor-pointer mx-2"/>
-              <div @click.prevent class="flex grow">
-                <p class="grow text-white normal-case"> {{ constructor.name }} </p>
-                <font-awesome-icon icon="fa-solid fa-xmark" color="red" class="my-auto cursor-pointer mx-2"
+              <font-awesome-icon icon="fa-solid fa-pen-to-square"
+                                 class="my-auto cursor-pointer text-slate-400 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"/>
+              <div @click.prevent class="flex">
+                <p class="text-white normal-case my-auto mx-4"> {{ constructor.name }} </p>
+                <font-awesome-icon icon="fa-solid fa-xmark"
+                                   class="my-auto cursor-pointer text-red-600 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"
                                    @click.prevent="removeConstructor(`${constructorIndex}`)"/>
               </div>
             </summary>
-            <div class="mx-2 hover:shadow-lg hover:shadow-gray-500 border border-slate-600 hover:border-gray-500">
+            <div class="mx-2 rounded-2xl border border-slate-600 hover:border-gray-500">
               <ul class="p-2 space-y-2">
                 <!-- Constructor name editing -->
                 <li class="flex">
-                  <label class="normal-case text-left w-16">Name:</label>
-                  <input class="bg-gray-500 rounded ml-1 px-2 w-36
+                  <label class="normal-case text-left w-16">Label:</label>
+                  <input class="bg-gray-500 rounded ml-1 px-2 w-52 text-center
                                     border border-gray-500
                                     focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
                          :value="constructor.name"
@@ -80,15 +92,15 @@
                 </li>
                 <!-- Constructor initialized fields editing -->
                 <li>
-                  <div v-for="property in selectedNodeData.classData.properties" :key="property.id" class="flex">
+                  <div class="flex">
+                    <label>Fields to initialize:</label>
+                  </div>
+                  <div v-for="property in selectedNodeData.classData.properties" :key="property.id" class="flex ">
                     <input type="checkbox"
-                           class="bg-gray-500 rounded ml-1 my-auto px-2 h-5 w-5
-                                      border border-gray-500
-                                      cursor-pointer
-                                      focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                           class="checkbox checkbox-sm my-auto border-white bg-white mx-3"
                            :checked="constructor.initializedFieldsIDs.find(fieldID => fieldID === property.id) !== undefined"
                            @change="constructorFieldStatusChanged(constructor, property, $event.target.checked)">
-                    <label class="normal-case text-left w-16 ml-3">{{ property.name }}</label>
+                    <label class="normal-case text-left w-40">{{ property.name }}</label>
                   </div>
                 </li>
               </ul>
@@ -97,56 +109,71 @@
         </li>
       </ul>
     </div>
-  </details>
+  </div>
 
   <!-- Destructor controls -->
-  <details class="bg-inherit duration-300 border-b-4 border-gray-900 text-white">
-    <summary class="bg-inherit px-5 py-3 text-lg cursor-pointer border-b border-gray-900">Destructor</summary>
-    <div class="flex w-fit mx-auto">
-      <label class="normal-case text-right w-fit my-auto">Generate destructor: </label>
+  <div class="ml-4 mr-4 flex text-white border-t border-slate-700">
+    <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"
+                       icon="fa-solid fa-angle-right" v-show="!submenusOpenStatus.destructorSubmenu"
+                       @click="submenusOpenStatus.destructorSubmenu = !submenusOpenStatus.destructorSubmenu"/>
+    <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"
+                       icon="fa-solid fa-angle-down" v-show="submenusOpenStatus.destructorSubmenu"
+                       @click="submenusOpenStatus.destructorSubmenu = !submenusOpenStatus.destructorSubmenu"/>
+    <h1 class="bg-inherit pl-2 py-3 text-lg normal-case">Destructor</h1>
+  </div>
+  <div class="ml-8 text-white normal-case" v-show="submenusOpenStatus.destructorSubmenu">
+    <div class="flex w-fit py-2">
+      <label class="normal-case text-left w-48 my-auto">Generate destructor: </label>
       <input type="checkbox"
-             class="bg-gray-500 rounded ml-1 my-auto px-2 h-5 w-5
-                                        border border-gray-500
-                                        cursor-pointer
-                                        focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+             class="checkbox checkbox-sm my-auto border-white bg-white ml-1"
              v-model="selectedNodeData.classData.generateDestructor">
     </div>
-    <div v-if="selectedNodeData.classData.generateDestructor" class="mx-2 py-2 text-white normal-case">
-        <p class="flex">Fields to be deleted: </p>
-        <!-- Fields to be deleted by destructor -->
-        <div v-for="property in selectedNodeData.classData.properties" :key="property.id" v-show="property.type.pointerList.length > 0"
-             class="ml-5 flex">
-          <input type="checkbox"
-                 class="bg-gray-500 rounded ml-1 my-auto px-2 h-5 w-5
-                            border border-gray-500
-                            cursor-pointer
-                            focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                 :checked="selectedNodeData.classData.destructor.deletedFieldsIds.find(fieldID => fieldID === property.id) !== undefined"
-                 @change="destructorFieldStatusChanged(property, $event.target.checked)">
-          <label class="normal-case text-left w-16 ml-3">{{ property.name }}</label>
-        </div>
+    <div v-if="selectedNodeData.classData.generateDestructor" class="py-2 text-white normal-case">
+      <p class="flex">Fields to be deleted:</p>
+      <!-- Fields to be deleted by destructor -->
+      <div v-for="property in selectedNodeData.classData.properties" :key="property.id" v-show="property.type.pointerList.length > 0"
+           class="ml-5 flex">
+        <input type="checkbox"
+               class="checkbox checkbox-sm my-auto border-white bg-white mx-3"
+               :checked="selectedNodeData.classData.destructor.deletedFieldsIds.find(fieldID => fieldID === property.id) !== undefined"
+               @change="destructorFieldStatusChanged(property, $event.target.checked)">
+        <label class="normal-case text-left">{{ property.name }}</label>
+      </div>
     </div>
-  </details>
+  </div>
 
   <!-- Properties controls -->
-  <details class="bg-inherit duration-300 border-b-4 border-gray-900">
-    <summary class="bg-inherit px-5 py-3 text-lg cursor-pointer text-white border-b border-gray-900">Properties</summary>
-    <div class="hover:bg-gray-400 py-2 border-b border-gray-900 cursor-pointer" @click="addProperty">
-      <font-awesome-icon icon="fa-plus fa-solid" color="white" />
+  <div class="ml-4 mr-4 flex text-white border-t border-slate-700">
+    <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"
+                       icon="fa-solid fa-angle-right" v-show="!submenusOpenStatus.propertiesSubmenu"
+                       @click="submenusOpenStatus.propertiesSubmenu = !submenusOpenStatus.propertiesSubmenu"/>
+    <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"
+                       icon="fa-solid fa-angle-down" v-show="submenusOpenStatus.propertiesSubmenu"
+                       @click="submenusOpenStatus.propertiesSubmenu = !submenusOpenStatus.propertiesSubmenu"/>
+    <h1 class="bg-inherit pl-2 py-3 text-lg normal-case">Properties</h1>
+  </div>
+  <div class="ml-8 text-white normal-case" v-show="submenusOpenStatus.propertiesSubmenu">
+    <div class="flex w-fit mt-1">
+      <label class="normal-case text-left w-32">Add property: </label>
+      <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white border border-slate-700
+                          hover:bg-slate-700 hover:border-white rounded-2xl px-2 py-1 w-2.5"
+                         icon="fa-plus fa-solid" @click="addProperty"/>
     </div>
     <div class="py-2">
       <ul>
         <li v-for="(property, propertyIndex) in selectedNodeData.classData.properties" :key="property.id">
           <details class="duration-300 text-white" >
             <summary class="flex my-1">
-              <font-awesome-icon icon="fa-solid fa-pen-to-square" color="white" class="my-auto cursor-pointer mx-2"/>
-              <div @click.prevent class="flex grow">
-                <p class="grow text-white normal-case"> {{ property.name }} </p>
-                <font-awesome-icon icon="fa-solid fa-xmark" color="red" class="my-auto cursor-pointer mx-2"
+              <font-awesome-icon icon="fa-solid fa-pen-to-square"
+                                 class="my-auto cursor-pointer text-slate-400 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"/>
+              <div @click.prevent class="flex">
+                <p class="text-white normal-case my-auto mx-4"> {{ property.name }} </p>
+                <font-awesome-icon icon="fa-solid fa-xmark"
+                                   class="my-auto cursor-pointer text-red-600 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"
                                    @click.prevent="removeProperty(`${propertyIndex}`)"/>
               </div>
             </summary>
-            <div class="mx-2 hover:shadow-lg hover:shadow-gray-500 border border-slate-600 hover:border-gray-500">
+            <div class="mx-2 rounded-2xl border border-slate-600 hover:border-gray-500">
               <ul class="p-2 space-y-2">
                 <!-- Property name editing -->
                 <li class="flex">
@@ -169,9 +196,30 @@
                     <option v-for="modifier in accessModifiers" :value="modifier">{{ modifier }}</option>
                   </select>
                 </li>
+                <!-- Property setter editing -->
+                <li class="flex">
+                  <label class="normal-case text-left w-16">Setter:</label>
+                  <input type="checkbox"
+                         class="checkbox checkbox-sm my-auto border-white bg-white mx-3"
+                         v-model="property.generateSetter" @change="flowStore.changesOccurred()">
+                </li>
+                <!-- Property getter editing -->
+                <li class="flex">
+                  <label class="normal-case text-left w-16">Getter:</label>
+                  <input type="checkbox"
+                         class="checkbox checkbox-sm my-auto border-white bg-white mx-3"
+                         v-model="property.generateGetter" @change="flowStore.changesOccurred()">
+                </li>
+                <!-- Property static check -->
+                <li class="flex">
+                  <label class="normal-case text-left w-16">Static:</label>
+                  <input type="checkbox"
+                         class="checkbox checkbox-sm my-auto border-white bg-white mx-3"
+                         v-model="property.isStatic" @change="flowStore.changesOccurred()">
+                </li>
                 <!-- Property type editing -->
                 <li>
-                  <div class="flex">
+                  <div class="mt-5 flex">
                     <label class="normal-case text-left w-16">Type:</label>
                     <input type="text" list="property-data-types"
                            class="bg-gray-500 rounded ml-1 px-2 w-36
@@ -194,29 +242,29 @@
                     </datalist>
                   </div>
                   <!-- Type const check -->
-                  <div class="flex">
-                    <label class="normal-case text-left w-12">Const:</label>
+                  <div class="flex ml-5">
+                    <label class="normal-case text-left w-16">Const:</label>
                     <input type="checkbox"
-                           class="bg-gray-500 rounded ml-2 my-auto px-2 h-5 w-5
-                                      border border-gray-500
-                                      cursor-pointer
-                                      focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                           class="checkbox checkbox-sm my-auto border-white bg-white mx-3"
                            v-model="property.type.isConst" @change="flowStore.changesOccurred()">
                   </div>
                 </li>
                 <!-- Property array dimension list -->
-                <li class="flex">
-                  <div class="ml-1">
-                    <font-awesome-icon icon="fa-plus fa-solid" color="white" size="xs" class="cursor-pointer" @click="addArrayDimension(property.type)"/>
+                <li class="ml-5">
+                  <div class="flex">
+                    <label class="normal-case text-left w-40">Array dimensions:</label>
+                    <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white border border-slate-700
+                            hover:bg-slate-700 hover:border-white rounded-2xl px-2 py-1 w-2.5"
+                                       icon="fa-plus fa-solid" @click="addArrayDimension(property.type)"/>
                   </div>
-                  <label class="normal-case text-left w-20">Array dimensions:</label>
                   <ul class="ml-5">
-                    <li v-for="(dimension, dimensionIdx) in property.type.arrayDimensions" :key="dimension.id" class="flex">
+                    <li v-for="(dimension, dimensionIdx) in property.type.arrayDimensions" :key="dimension.id"
+                        class="flex rounded border border-slate-600 my-1">
                       <div class="my-2">
-                        <div class="w-fit">
-                          <label class="normal-case text-left w-16">dimension len store:</label>
+                        <div class="flex">
+                          <label class="ml-1 normal-case text-left w-44">Length field name:</label>
                           <input type="text"
-                                 class="bg-gray-500 rounded ml-3 my-auto px-2 h-5 w-20
+                                 class="bg-gray-500 rounded ml-3 my-auto px-2 h-5 w-28 text-center
                                               border border-gray-500
                                               cursor-pointer
                                               focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
@@ -224,51 +272,53 @@
                                  @focusout="onArrayLengthFieldNameFocusLost(dimension, $event.target)">
                         </div>
                         <div class="flex">
-                          <label class="normal-case text-left w-fit ml-2">Max len.:</label>
+                          <label class="ml-1 normal-case text-left w-44">Max length:</label>
                           <input type="number"
-                                 class="bg-gray-500 rounded ml-3 my-auto px-2 h-5 w-20
-                                      border border-gray-500
-                                      cursor-pointer
-                                      focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                                 class="bg-gray-500 rounded ml-3 my-auto px-2 h-5 w-28 text-center
+                                              border border-gray-500
+                                              cursor-pointer
+                                              focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
                                  :value="dimension.maxLength" @focusout="maxDimensionLengthChanged(dimension, $event.target)" @keyup.enter="loseFocus">
                         </div>
                       </div>
-                      <font-awesome-icon icon="fa-solid fa-xmark" color="red" class="my-auto cursor-pointer mx-2"
+                      <font-awesome-icon icon="fa-solid fa-xmark"
+                                         class="my-auto ml-auto mr-1
+                                          cursor-pointer text-red-600 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-3"
                                          @click="removeArrayDimension(property.type, dimensionIdx)"/>
                     </li>
                   </ul>
                 </li>
                 <!-- Property type pointer list -->
-                <li class="flex">
-                  <div class="ml-1">
-                    <font-awesome-icon icon="fa-plus fa-solid" color="white" size="xs" class="cursor-pointer" @click="addPointer(property.type)"/>
+                <li class="ml-5">
+                  <div class="flex">
+                    <label class="normal-case text-left w-24">Pointers:</label>
+                    <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white border border-slate-700
+                            hover:bg-slate-700 hover:border-white rounded-2xl px-2 py-1 w-2.5"
+                                       icon="fa-plus fa-solid" @click="addPointer(property.type)"/>
                   </div>
-                  <label class="normal-case text-left w-16">Pointers:</label>
                   <ul class="ml-5">
-                    <li v-for="(pointer, pointerIdx) in property.type.pointerList" :key="pointer.id" class="flex">
+                    <li v-for="(pointer, pointerIdx) in property.type.pointerList" :key="pointer.id"
+                        class="flex rounded border border-slate-600 my-1">
                       <div class="my-2">
-                        <div class="w-fit">
-                          <label class="normal-case text-left w-16">const {{ pointerIdx }}:</label>
+                        <div class="ml-1 w-fit">
+                          <label class="normal-case text-left w-16">Pointer No.: {{pointerIdx}}</label>
+                        </div>
+                        <div class="ml-1 w-fit">
+                          <label class="normal-case text-left w-16">Const:</label>
                           <input type="checkbox"
-                                 class="bg-gray-500 rounded ml-3 my-auto px-2 h-5 w-5
-                                            border border-gray-500
-                                            cursor-pointer
-                                            focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                                 class="checkbox checkbox-sm my-auto border-white bg-white mx-3"
                                  v-model="pointer.isConst" @change="flowStore.changesOccurred()">
                         </div>
-                        <div class="w-fit">
-                          <label class="normal-case text-left w-16">array {{ pointerIdx }}:</label>
+                        <div class="ml-1 w-fit">
+                          <label class="normal-case text-left w-16">Array:</label>
                           <input type="checkbox"
-                                 class="bg-gray-500 rounded ml-3 my-auto px-2 h-5 w-5
-                                            border border-gray-500
-                                            cursor-pointer
-                                            focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                                 class="checkbox checkbox-sm my-auto border-white bg-white mx-3"
                                  v-model="pointer.isArray" @change="flowStore.changesOccurred()">
                         </div>
                         <div v-show="pointer.isArray" class="w-fit">
-                          <label class="normal-case text-left w-16">array len store:</label>
+                          <label class="ml-1 normal-case text-left w-44">Length field name:</label>
                           <input type="text"
-                                 class="bg-gray-500 rounded ml-3 my-auto px-2 h-5 w-20
+                                 class="bg-gray-500 rounded ml-3 my-auto px-2 h-5 w-28 text-center
                                               border border-gray-500
                                               cursor-pointer
                                               focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
@@ -276,38 +326,11 @@
                                  @focusout="onArrayLengthFieldNameFocusLost(pointer, $event.target)">
                         </div>
                       </div>
-                      <font-awesome-icon icon="fa-solid fa-xmark" color="red" class="my-auto cursor-pointer mx-2"
+                      <font-awesome-icon icon="fa-solid fa-xmark" class="my-auto ml-auto mr-1
+                                          cursor-pointer text-red-600 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-3"
                                          @click="removePointer(property.type, pointerIdx), updateDestructorAfterPropertyPointerRemoval(property)"/>
                     </li>
                   </ul>
-                </li>
-                <!-- Property static check -->
-                <li class="flex">
-                  <label class="normal-case text-left w-16">Static:</label>
-                  <input type="checkbox"
-                         class="bg-gray-500 rounded ml-3 my-auto px-2 h-5 w-5
-                                    border border-gray-500
-                                    cursor-pointer
-                                    focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                         v-model="property.isStatic" @change="flowStore.changesOccurred()">
-                </li>
-                <!-- Property setter & getter editing -->
-                <li class="flex">
-                  <label class="normal-case text-left w-16">Setter:</label>
-                  <input type="checkbox"
-                         class="bg-gray-500 rounded ml-1 my-auto px-2 h-5 w-5
-                                    border border-gray-500
-                                    cursor-pointer
-                                    focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                         v-model="property.generateSetter" @change="flowStore.changesOccurred()">
-
-                  <label class="normal-case text-left w-16 ml-auto">Getter:</label>
-                  <input type="checkbox"
-                         class="bg-gray-500 rounded ml-1 my-auto px-2 h-5 w-5
-                                    border border-gray-500
-                                    cursor-pointer
-                                    focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                         v-model="property.generateGetter" @change="flowStore.changesOccurred()">
                 </li>
               </ul>
             </div>
@@ -315,27 +338,40 @@
         </li>
       </ul>
     </div>
-  </details>
+  </div>
 
   <!-- Methods controls -->
-  <details class="bg-inherit duration-300 border-b-4 border-gray-900">
-    <summary class="bg-inherit px-5 py-3 text-lg cursor-pointer text-white border-b border-gray-900">Methods</summary>
-    <div class="hover:bg-gray-400 py-2 border-b border-gray-900 cursor-pointer" @click="addMethod">
-      <font-awesome-icon icon="fa-plus fa-solid" color="white" />
+  <div class="ml-4 mr-4 flex text-white border-t border-slate-700">
+    <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"
+                       icon="fa-solid fa-angle-right" v-show="!submenusOpenStatus.methodsSubmenu"
+                       @click="submenusOpenStatus.methodsSubmenu = !submenusOpenStatus.methodsSubmenu"/>
+    <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"
+                       icon="fa-solid fa-angle-down" v-show="submenusOpenStatus.methodsSubmenu"
+                       @click="submenusOpenStatus.methodsSubmenu = !submenusOpenStatus.methodsSubmenu"/>
+    <h1 class="bg-inherit pl-2 py-3 text-lg normal-case">Methods</h1>
+  </div>
+  <div class="ml-8 text-white normal-case" v-show="submenusOpenStatus.methodsSubmenu">
+    <div class="flex w-fit mt-1">
+      <label class="normal-case text-left w-32">Add method: </label>
+      <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white border border-slate-700
+                          hover:bg-slate-700 hover:border-white rounded-2xl px-2 py-1 w-2.5"
+                         icon="fa-plus fa-solid" @click="addMethod"/>
     </div>
     <div class="py-2">
       <ul>
         <li v-for="(method, methodIndex) in selectedNodeData.classData.methods" :key="method.id">
           <details class="duration-300 text-white">
             <summary class="flex my-1">
-              <font-awesome-icon icon="fa-solid fa-pen-to-square" color="white" class="my-auto cursor-pointer px-2"/>
-              <div @click.prevent class="flex grow">
-                <p class="grow text-white normal-case"> {{ method.name }} </p>
-                <font-awesome-icon icon="fa-solid fa-xmark" color="red" class="my-auto cursor-pointer px-2"
+              <font-awesome-icon icon="fa-solid fa-pen-to-square"
+                                 class="my-auto cursor-pointer text-slate-400 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"/>
+              <div @click.prevent class="flex">
+                <p class="text-white normal-case my-auto mx-4"> {{ method.name }} </p>
+                <font-awesome-icon icon="fa-solid fa-xmark"
+                                   class="my-auto cursor-pointer text-red-600 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"
                                    @click.prevent="removeMethod(`${methodIndex}`)"/>
               </div>
             </summary>
-            <div class="mx-2 hover:shadow-lg hover:shadow-gray-500 border border-slate-600 hover:border-gray-500">
+            <div class="mx-2 rounded-2xl border border-slate-600 hover:border-gray-500">
               <ul class="p-2 space-y-2">
                 <!-- Method name editing -->
                 <li class="flex">
@@ -358,9 +394,23 @@
                     <option v-for="modifier in accessModifiers" :value="modifier">{{ modifier }}</option>
                   </select>
                 </li>
+                <!-- Method virtual check -->
+                <li class="flex">
+                  <label class="normal-case text-left w-16">Virtual:</label>
+                  <input type="checkbox"
+                         class="checkbox checkbox-sm my-auto border-white bg-white mx-3"
+                         v-model="method.isVirtual" @change="methodVirtualStatusChanged(method, $event.target.checked)">
+                </li>
+                <!-- Method static check -->
+                <li class="flex">
+                  <label class="normal-case text-left w-16">Static:</label>
+                  <input type="checkbox"
+                         class="checkbox checkbox-sm my-auto border-white bg-white mx-3"
+                         v-model="method.isStatic" @change="methodStaticStatusChanged(method, $event.target.checked)">
+                </li>
                 <!-- Method return type editing -->
                 <li>
-                  <div class="flex">
+                  <div class="flex mt-5">
                     <label class="normal-case w-16 text-left">Return:</label>
                     <input type="text" list="method-return-data-types"
                            class="bg-gray-500 rounded ml-1 px-2 w-36
@@ -378,75 +428,65 @@
                     </datalist>
                   </div>
                   <!-- Type const check -->
-                  <div class="flex">
-                    <label class="normal-case text-left w-12">Const:</label>
+                  <div class="flex ml-5">
+                    <label class="normal-case text-left w-16">Const:</label>
                     <input type="checkbox"
-                           class="bg-gray-500 rounded ml-2 my-auto px-2 h-5 w-5
-                                      border border-gray-500
-                                      cursor-pointer
-                                      focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                           class="checkbox checkbox-sm my-auto border-white bg-white mx-3"
                            v-model="method.returnType.isConst" @change="flowStore.changesOccurred()">
                   </div>
                 </li>
                 <!-- Method return type pointer list -->
-                <li class="flex">
-                  <div class="ml-1">
-                    <font-awesome-icon icon="fa-plus fa-solid" color="white" size="xs" class="cursor-pointer" @click="addPointer(method.returnType)"/>
+                <li class="ml-5">
+                  <div class="flex">
+                    <label class="normal-case text-left w-24">Pointers:</label>
+                    <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white border border-slate-700
+                            hover:bg-slate-700 hover:border-white rounded-2xl px-2 py-1 w-2.5"
+                                       icon="fa-plus fa-solid" @click="addPointer(method.returnType)"/>
                   </div>
-                  <label class="normal-case text-left w-16">Pointers:</label>
-                  <ul class="ml-10">
-                    <li v-for="(pointer, pointerIdx) in method.returnType.pointerList" :key="pointer.id">
-                      <label class="normal-case text-left w-16">const {{ pointerIdx }}:</label>
-                      <input type="checkbox"
-                             class="bg-gray-500 rounded ml-3 my-auto px-2 h-5 w-5
-                                        border border-gray-500
-                                        cursor-pointer
-                                        focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                             v-model="pointer.isConst" @change="flowStore.changesOccurred()">
-                      <font-awesome-icon icon="fa-solid fa-xmark" color="red" class="my-auto cursor-pointer mx-2"
+                  <ul class="ml-5">
+                    <li v-for="(pointer, pointerIdx) in method.returnType.pointerList" :key="pointer.id"
+                        class="flex rounded border border-slate-600 my-1">
+                      <div class="my-2">
+                        <div class="ml-1 w-fit">
+                          <label class="normal-case text-left w-16">Pointer No.: {{pointerIdx}}</label>
+                        </div>
+                        <div class="ml-1 w-fit">
+                          <label class="normal-case text-left w-16">Const:</label>
+                          <input type="checkbox"
+                                 class="checkbox checkbox-sm my-auto border-white bg-white mx-3"
+                                 v-model="pointer.isConst" @change="flowStore.changesOccurred()">
+                        </div>
+                      </div>
+                      <font-awesome-icon icon="fa-solid fa-xmark" class="my-auto ml-auto mr-1
+                                          cursor-pointer text-red-600 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-3"
                                          @click.prevent="removePointer(method.returnType, pointerIdx)"/>
                     </li>
                   </ul>
                 </li>
-                <!-- Method virtual check -->
-                <li class="flex">
-                  <label class="normal-case text-left w-16">Virtual:</label>
-                  <input type="checkbox"
-                         class="bg-gray-500 rounded ml-3 my-auto px-2 h-5 w-5
-                                    border border-gray-500
-                                    cursor-pointer
-                                    focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                         v-model="method.isVirtual" @change="methodVirtualStatusChanged(method, $event.target.checked)">
-                </li>
-                <!-- Method static check -->
-                <li class="flex">
-                  <label class="normal-case text-left w-16">Static:</label>
-                  <input type="checkbox"
-                         class="bg-gray-500 rounded ml-3 my-auto px-2 h-5 w-5
-                                    border border-gray-500
-                                    cursor-pointer
-                                    focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                         v-model="method.isStatic" @change="methodStaticStatusChanged(method, $event.target.checked)">
-                </li>
                 <!-- Method parameters editing -->
                 <li>
-                  <div class="flex">
-                    <label class="normal-case w-16 text-left">Param:</label>
-                    <select class="bg-gray-500 focus:bg-white focus:text-black rounded ml-1 px-2 w-36 border border-gray-500"
-                            v-model="method.selectedParameterID" :disabled="method.parameters.length === 0">
-                      <option v-for="parameter in method.parameters" :value="parameter.id">{{ parameter.type.name }} {{ parameter.name }}</option>
-                    </select>
-                    <div class="ml-1">
-                      <font-awesome-icon icon="fa-plus fa-solid" color="white" size="xs" class="cursor-pointer" @click="addParameter(method)"/>
-                    </div>
+                  <div class="flex mt-5">
+                    <label class="normal-case text-left w-36">Add Parameter:</label>
+                    <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white border border-slate-700
+                            hover:bg-slate-700 hover:border-white rounded-2xl px-2 py-1 w-2.5"
+                            icon="fa-plus fa-solid" @click="addParameter(method)"/>
                   </div>
-
+                  <div class="flex mt-1">
+                    <label class="normal-case text-left w-36 my-auto">Edit Parameter:</label>
+                    <select class="bg-gray-500 focus:bg-white focus:text-black rounded ml-1 px-2 w-48 text-center border border-gray-500"
+                            v-model="method.selectedParameterID" :disabled="method.parameters.length === 0">
+                      <option v-for="parameter in method.parameters" :value="parameter.id">{{ parameter.name }}</option>
+                    </select>
+                    <font-awesome-icon icon="fa-solid fa-xmark" class="my-auto ml-2
+                                          cursor-pointer text-red-600 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-3"
+                                       @click="removeSelectedParameter(method)"/>
+                  </div>
                   <div v-if="method.selectedParameterID" class="ml-5 flex">
                     <ul class="p-2 space-y-2 list-disc grow">
                       <!-- Parameter name editing -->
                       <li class="flex">
-                        <label class="normal-case text-left">Name:</label>
-                        <input class="bg-gray-500 rounded ml-1 px-2 w-28
+                        <label class="normal-case text-left w-16">Name:</label>
+                        <input class="bg-gray-500 rounded ml-1 px-2 w-44
                                     border border-gray-500
                                     focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
                                :value="getSelectedParameterFromMethod(method).name"
@@ -456,9 +496,9 @@
                       </li>
                       <!-- Parameter type editing -->
                       <li class="flex">
-                        <label class="normal-case text-left">Type:</label>
+                        <label class="normal-case text-left w-16">Type:</label>
                         <input type="text" list="parameter-data-types"
-                               class="bg-gray-500 rounded ml-1 px-2 w-28
+                               class="bg-gray-500 rounded ml-1 px-2 w-44
                                     border border-gray-500
                                     focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
                                :value="getSelectedParameterFromMethod(method).type.name"
@@ -471,19 +511,34 @@
                           </option>
                         </datalist>
                       </li>
+                      <!-- Parameter Type const check -->
+                      <li class="flex ml-5">
+                        <label class="normal-case text-left w-16">Const:</label>
+                        <input type="checkbox"
+                               class="checkbox checkbox-sm my-auto border-white bg-white mx-3"
+                               v-model="getSelectedParameterFromMethod(method).type.isConst" @change="flowStore.changesOccurred()">
+                      </li>
+                      <!-- Parameter Type ref check -->
+                      <li class="flex ml-5">
+                        <label class="normal-case text-left w-16">Ref:</label>
+                        <input type="checkbox"
+                               class="checkbox checkbox-sm my-auto border-white bg-white mx-3"
+                               v-model="getSelectedParameterFromMethod(method).type.isRef" @change="flowStore.changesOccurred()">
+                      </li>
                       <!-- Parameter array dimension list -->
-                      <li class="flex">
-                        <div class="ml-1">
-                          <font-awesome-icon icon="fa-plus fa-solid" color="white" size="xs" class="cursor-pointer"
-                                             @click="addArrayDimension(getSelectedParameterFromMethod(method).type)"/>
+                      <li class="list-none ml-5">
+                        <div class="flex">
+                          <label class="normal-case text-left w-40">Array dimensions:</label>
+                          <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white border border-slate-700
+                            hover:bg-slate-700 hover:border-white rounded-2xl px-2 py-1 w-2.5"
+                                             icon="fa-plus fa-solid" @click="addArrayDimension(getSelectedParameterFromMethod(method).type)"/>
                         </div>
-                        <label class="normal-case text-left w-20">Array dimensions:</label>
                         <ul class="ml-5">
                           <li v-for="(dimension, dimensionIdx) in getSelectedParameterFromMethod(method).type.arrayDimensions"
-                              :key="dimension.id" class="flex">
+                              :key="dimension.id" class="flex rounded border border-slate-600 my-1">
                             <div class="my-2">
                               <div class="flex">
-                                <label class="normal-case text-left w-fit ml-2">Max len.:</label>
+                                <label class="normal-case text-left w-fit ml-2">Max length:</label>
                                 <input type="number"
                                        class="bg-gray-500 rounded ml-3 my-auto px-2 h-5 w-20
                                       border border-gray-500
@@ -492,51 +547,41 @@
                                        :value="dimension.maxLength" @focusout="maxDimensionLengthChanged(dimension, $event.target)" @keyup.enter="loseFocus">
                               </div>
                             </div>
-                            <font-awesome-icon icon="fa-solid fa-xmark" color="red" class="my-auto cursor-pointer mx-2"
+                            <font-awesome-icon icon="fa-solid fa-xmark" class="my-auto ml-auto mr-1
+                                               cursor-pointer text-red-600 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-3"
                                                @click="removeArrayDimension(getSelectedParameterFromMethod(method).type, dimensionIdx)"/>
                           </li>
                         </ul>
                       </li>
                       <!-- Parameter type pointer list -->
-                      <li class="flex">
-                        <div class="ml-1">
-                          <font-awesome-icon icon="fa-plus fa-solid" color="white" size="xs" class="cursor-pointer" @click="addPointer(getSelectedParameterFromMethod(method).type)"/>
+                      <li class="list-none ml-5">
+                        <div class="flex">
+                          <label class="normal-case text-left w-24">Pointers:</label>
+                          <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white border border-slate-700
+                            hover:bg-slate-700 hover:border-white rounded-2xl px-2 py-1 w-2.5"
+                                             icon="fa-plus fa-solid" @click="addPointer(getSelectedParameterFromMethod(method).type)"/>
                         </div>
-                        <label class="normal-case text-left w-fit">Pointers:</label>
                         <ul class="ml-10">
-                          <li v-for="(pointer, pointerIdx) in getSelectedParameterFromMethod(method).type.pointerList" :key="pointer.id">
-                            <label class="normal-case text-left w-16">const {{ pointerIdx }}:</label>
-                            <input type="checkbox"
-                                   class="bg-gray-500 rounded ml-3 my-auto px-2 h-5 w-5
-                                        border border-gray-500
-                                        cursor-pointer
-                                        focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                                   v-model="pointer.isConst" @change="flowStore.changesOccurred()">
-                            <font-awesome-icon icon="fa-solid fa-xmark" color="red" class="my-auto cursor-pointer mx-2"
+                          <li v-for="(pointer, pointerIdx) in getSelectedParameterFromMethod(method).type.pointerList" :key="pointer.id"
+                              class="flex rounded border border-slate-600 my-1">
+                            <div class="my-2">
+                              <div class="ml-1 w-fit">
+                                <label class="normal-case text-left w-16">Pointer No.: {{pointerIdx}}</label>
+                              </div>
+                              <div class="ml-1 w-fit">
+                                <label class="normal-case text-left w-16">Const:</label>
+                                <input type="checkbox"
+                                       class="checkbox checkbox-sm my-auto border-white bg-white mx-3"
+                                       v-model="pointer.isConst" @change="flowStore.changesOccurred()">
+                              </div>
+                            </div>
+                            <font-awesome-icon icon="fa-solid fa-xmark" class="my-auto ml-auto mr-1
+                                          cursor-pointer text-red-600 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-3"
                                                @click.prevent="removePointer(getSelectedParameterFromMethod(method).type, pointerIdx)"/>
                           </li>
                         </ul>
                       </li>
-                      <!-- Parameter const & ref check -->
-                      <li class="flex">
-                        <label class="normal-case text-left w-12">Const:</label>
-                        <input type="checkbox"
-                               class="bg-gray-500 rounded ml-2 my-auto px-2 h-5 w-5
-                                    border border-gray-500
-                                    cursor-pointer
-                                    focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                               v-model="getSelectedParameterFromMethod(method).type.isConst" @change="flowStore.changesOccurred()">
-
-                        <label class="normal-case text-left w-8 ml-5">Ref:</label>
-                        <input type="checkbox"
-                               class="bg-gray-500 rounded ml-2 my-auto px-2 h-5 w-5
-                                    border border-gray-500
-                                    cursor-pointer
-                                    focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                               v-model="getSelectedParameterFromMethod(method).type.isRef" @change="flowStore.changesOccurred()">
-                      </li>
                     </ul>
-                    <font-awesome-icon icon="fa-solid fa-trash" color="red" class="cursor-pointer my-auto ml-2" @click="removeSelectedParameter(method)"/>
                   </div>
                 </li>
               </ul>
@@ -545,85 +590,104 @@
         </li>
       </ul>
     </div>
-  </details>
+  </div>
 
   <!-- Inheritance controls -->
-  <details class="bg-inherit duration-300 border-b-4 border-gray-900">
-    <summary class="bg-inherit px-5 py-3 text-lg cursor-pointer text-white border-b border-gray-900">Inherited</summary>
+  <div class="ml-4 mr-4 flex text-white border-t border-slate-700">
+    <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"
+                       icon="fa-solid fa-angle-right" v-show="!submenusOpenStatus.inheritanceSubmenu"
+                       @click="submenusOpenStatus.inheritanceSubmenu = !submenusOpenStatus.inheritanceSubmenu"/>
+    <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"
+                       icon="fa-solid fa-angle-down" v-show="submenusOpenStatus.inheritanceSubmenu"
+                       @click="submenusOpenStatus.inheritanceSubmenu = !submenusOpenStatus.inheritanceSubmenu"/>
+    <h1 class="bg-inherit pl-2 py-3 text-lg normal-case">Inherited</h1>
+  </div>
+  <div class="ml-8 text-white normal-case" v-show="submenusOpenStatus.inheritanceSubmenu">
     <div class="py-2 text-white normal-case">
       <ul>
-        <li v-for="parentClassNode in selectedNodeData.parentClassNodes" :key="parentClassNode.id">
-          <div @click.prevent class="flex grow">
-            <p class="grow">{{ findNode(parentClassNode.id).label }}</p>
+        <li v-for="parentClassNode in selectedNodeData.parentClassNodes" :key="parentClassNode.id"
+            class="rounded border border-slate-600 my-1 p-2">
+          <div class="flex">
+            <p>Inherited class name: {{ findNode(parentClassNode.id).label }}</p>
           </div>
-          <label class="normal-case text-left w-16">Access:</label>
-          <select class="bg-gray-500 rounded ml-1 px-2 w-36
-                                    border border-gray-500
-                                    focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                  v-model="parentClassNode.accessSpecifier" @change="flowStore.changesOccurred()">
-            <option v-for="modifier in accessModifiers" :value="modifier">{{ modifier }}</option>
-          </select>
-        </li>
-      </ul>
-    </div>
-  </details>
-
-  <!-- Inheritance controls -->
-  <details class="bg-inherit duration-300 border-b-4 border-gray-900">
-    <summary class="bg-inherit px-5 py-3 text-lg cursor-pointer text-white border-b border-gray-900">Friends</summary>
-    <div class="py-2 text-white normal-case">
-      <ul>
-        <li v-for="classNode in getClassNodes()" :key="classNode.id">
-          <div class="flex mr-auto w-fit">
-            <input type="checkbox"
-                   class="bg-gray-500 rounded mr-3 my-auto px-2 h-5 w-5
-                            border border-gray-500
-                            cursor-pointer
-                            focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                   :checked="selectedNodeData.classData.friendClassesIds.find(classId => classId === classNode.id) !== undefined"
-                   @change="friendClassStatusChanged(classNode, $event.target.checked)">
-            <label>{{ classNode.label }}</label>
+          <div class="flex">
+            <label class="normal-case text-left w-16">Access:</label>
+            <select class="bg-gray-500 rounded ml-1 px-2 w-36
+                                      border border-gray-500
+                                      focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                    v-model="parentClassNode.accessSpecifier" @change="flowStore.changesOccurred()">
+              <option v-for="modifier in accessModifiers" :value="modifier">{{ modifier }}</option>
+            </select>
           </div>
         </li>
       </ul>
     </div>
-  </details>
+  </div>
+
+  <!-- Friends controls -->
+  <div class="ml-4 mr-4 flex text-white border-t border-slate-700">
+    <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"
+                       icon="fa-solid fa-angle-right" v-show="!submenusOpenStatus.friendsSubmenu"
+                       @click="submenusOpenStatus.friendsSubmenu = !submenusOpenStatus.friendsSubmenu"/>
+    <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"
+                       icon="fa-solid fa-angle-down" v-show="submenusOpenStatus.friendsSubmenu"
+                       @click="submenusOpenStatus.friendsSubmenu = !submenusOpenStatus.friendsSubmenu"/>
+    <h1 class="bg-inherit pl-2 py-3 text-lg normal-case">Friends</h1>
+  </div>
+  <div class="ml-8 text-white normal-case" v-show="submenusOpenStatus.friendsSubmenu">
+    <ul>
+      <li v-for="classNode in getClassNodes()" :key="classNode.id">
+        <div class="flex mr-auto w-fit">
+          <input type="checkbox"
+                 class="checkbox checkbox-sm my-auto border-white bg-white mx-3"
+                 :checked="selectedNodeData.classData.friendClassesIds.find(classId => classId === classNode.id) !== undefined"
+                 @change="friendClassStatusChanged(classNode, $event.target.checked)">
+          <label>{{ classNode.label }}</label>
+        </div>
+      </li>
+    </ul>
+  </div>
 
   <!-- Template controls -->
-  <details class="bg-inherit duration-300 border-b-4 border-gray-900">
-    <summary class="bg-inherit px-5 py-3 text-lg cursor-pointer text-white border-b border-gray-900">Template</summary>
-    <div class="flex w-fit mx-auto text-white">
-      <label class="normal-case text-right w-fit">Is Template: </label>
+  <div class="ml-4 mr-4 flex text-white border-t border-slate-700">
+    <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"
+                       icon="fa-solid fa-angle-right" v-show="!submenusOpenStatus.templateSubmenu"
+                       @click="submenusOpenStatus.templateSubmenu = !submenusOpenStatus.templateSubmenu"/>
+    <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"
+                       icon="fa-solid fa-angle-down" v-show="submenusOpenStatus.templateSubmenu"
+                       @click="submenusOpenStatus.templateSubmenu = !submenusOpenStatus.templateSubmenu"/>
+    <h1 class="bg-inherit pl-2 py-3 text-lg normal-case">Template</h1>
+  </div>
+  <div class="ml-8 text-white normal-case" v-show="submenusOpenStatus.templateSubmenu">
+    <div class="flex text-white">
+      <label class="normal-case text-left w-32">Is Template: </label>
       <input type="checkbox"
-             class="bg-gray-500 rounded ml-1 px-2 h-5 w-5
-                                        border border-gray-500
-                                        cursor-pointer
-                                        focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+             class="checkbox checkbox-sm my-auto border-white bg-white mx-1"
              v-model="selectedNodeData.classData.isTemplate">
     </div>
-    <div class="hover:bg-gray-400 py-2 border-b border-t border-gray-900 cursor-pointer" v-if="selectedNodeData.classData.isTemplate"
-         @click="addTemplateTypeName()">
-      <font-awesome-icon icon="fa-plus fa-solid" color="white" />
+    <div class="flex w-fit mt-1">
+      <label class="normal-case text-left w-32">Add typename: </label>
+      <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white border border-slate-700
+                          hover:bg-slate-700 hover:border-white rounded-2xl px-2 py-1 w-2.5"
+                         icon="fa-plus fa-solid" @click="addTemplateTypeName"/>
     </div>
     <ul v-if="selectedNodeData.classData.isTemplate" class="text-white normal-case">
-      <div @click.prevent class="flex grow">
-        <p class="grow">Type Names</p>
-      </div>
-      <li v-for="(typename, typenameIdx) in selectedNodeData.classData.TemplateTypesData" :key="typename.id" class="mb-1">
-        <label class="normal-case text-left w-16">{{ typenameIdx }}:</label>
-        <input class="bg-gray-500 rounded ml-1 px-2 w-36
+      <li v-for="(typename, typenameIdx) in selectedNodeData.classData.TemplateTypesData" :key="typename.id"
+          class="flex rounded border border-slate-600 my-1 p-1">
+        <label class="normal-case text-left w-16 my-auto">Name:</label>
+        <input class="bg-gray-500 rounded px-2 w-36
                                     border border-gray-500
                                     focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
                :value="typename.name"
                @keyup.enter="changeTemplateTypename($event.target, typename)"
                @focusout="onTemplateTypenameInputLostFocus($event.target, typename)"
         />
-        <font-awesome-icon icon="fa-solid fa-xmark" color="red" class="my-auto cursor-pointer mx-2"
+        <font-awesome-icon icon="fa-solid fa-xmark" class="my-auto ml-auto mr-1
+                                          cursor-pointer text-red-600 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-3"
                            @click.prevent="removeTypename(`${typenameIdx}`)"/>
       </li>
     </ul>
-  </details>
-
+  </div>
 </template>
 
 <script setup>
@@ -631,7 +695,7 @@ import {v4 as uuidv4} from "uuid";
 import { useVueFlow } from "@vue-flow/core";
 import { useFlowStore } from "@/stores/flow.js";
 import { checkNameValidity, accessModifiers, loseFocus } from "@/Utility/Utility.js";
-import {toRef} from "vue";
+import {reactive, toRef} from "vue";
 import {nodeTypes} from "@/components/nodes/NodeUtil.js";
 
 const { findNode, getSelectedNodes, removeNodes, getNodes } = useVueFlow();
@@ -646,10 +710,15 @@ const generalDataTypes = ["int", "signed int", "unsigned int", "short int", "uns
   "char", "signed char", "unsigned char", "wchar_t",
   "std::string"];
 
-const submenusOpenStatus = {
+const submenusOpenStatus = reactive({
   constructorSubmenu: false,
-};
-
+  destructorSubmenu: false,
+  propertiesSubmenu: false,
+  methodsSubmenu: false,
+  inheritanceSubmenu: false,
+  friendsSubmenu: false,
+  templateSubmenu: false,
+});
 
 // ****** General class functions ******
 function changeClassName(inputElement) {

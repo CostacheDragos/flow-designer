@@ -2,19 +2,22 @@
   <!-- Name -->
   <details class="duration-300 text-white border-b-4 p-4 border-gray-900">
     <summary class="flex">
-      <font-awesome-icon icon="fa-solid fa-pen-to-square" color="white" class="my-auto cursor-pointer mx-2"/>
+      <font-awesome-icon icon="fa-solid fa-pen-to-square"
+                         class="my-auto cursor-pointer text-slate-400 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"/>
       <div class="flex grow" @click.prevent>
         <h1 class="grow my-auto normal-case">
           {{ selectedNodeData.packageData.name }}
         </h1>
-        <font-awesome-icon icon="fa-solid fa-trash" color="red" class="cursor-pointer my-auto mx-2" @click="removeNodes([`${getSelectedNodes[0].id}`])"/>
+        <font-awesome-icon icon="fa-solid fa-trash"
+                           class="my-auto cursor-pointer text-red-600 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"
+                           @click="removeNodes([`${getSelectedNodes[0].id}`])"/>
       </div>
     </summary>
-    <div class="mx-2 hover:shadow-lg hover:shadow-gray-500 border border-slate-600 hover:border-gray-500">
+    <div class="mx-2">
       <ul class="p-2 space-y-2">
         <!-- Package name editing -->
         <li class="flex">
-          <label class="normal-case text-left">Name:</label>
+          <label class="normal-case text-left my-auto w-16">Name:</label>
           <input class="bg-gray-500 rounded ml-1 px-2 w-36
                                     border border-gray-500
                                     focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
@@ -28,27 +31,36 @@
   </details>
 
   <!-- Child nodes controls -->
-  <details class="bg-inherit duration-300 border-b-4 border-gray-900">
-    <summary class="bg-inherit px-5 py-3 text-lg cursor-pointer text-white border-b border-gray-900">Contents</summary>
+  <div class="ml-4 mr-4 flex text-white border-t border-slate-700">
+    <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"
+                       icon="fa-solid fa-angle-right" v-show="!submenusOpenStatus.childNodesSubmenu"
+                       @click="submenusOpenStatus.childNodesSubmenu = !submenusOpenStatus.childNodesSubmenu"/>
+    <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"
+                       icon="fa-solid fa-angle-down" v-show="submenusOpenStatus.childNodesSubmenu"
+                       @click="submenusOpenStatus.childNodesSubmenu = !submenusOpenStatus.childNodesSubmenu"/>
+    <h1 class="bg-inherit pl-2 py-3 text-lg normal-case">Content</h1>
+  </div>
+  <div class="ml-8 text-white normal-case" v-show="submenusOpenStatus.childNodesSubmenu">
     <div class="py-2 text-white normal-case">
-      <ul>
+      <ul class="list-disc ml-5">
         <li v-for="childNodeId in selectedNodeData.packageData.childrenIds" :key="childNodeId">
-          <div @click.prevent class="flex grow">
-            <p class="grow">{{ findNode(childNodeId).label }}</p>
-            <font-awesome-icon icon="fa-solid fa-xmark" color="red" class="my-auto cursor-pointer mx-2"
+          <div @click.prevent class="flex">
+            <p class="text-white normal-case my-auto mx-4">{{ findNode(childNodeId).label }}</p>
+            <font-awesome-icon icon="fa-solid fa-xmark"
+                               class="my-auto cursor-pointer text-red-600 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"
                                @click="emits('removeNodeFromParentPackage', childNodeId)"/>
           </div>
         </li>
       </ul>
     </div>
-  </details>
+  </div>
 </template>
 
 <script setup>
 import {useVueFlow} from "@vue-flow/core";
 import {useFlowStore} from "@/stores/flow.js";
 import { checkNameValidity } from "@/Utility/Utility.js";
-import {toRef} from "vue";
+import {reactive, toRef} from "vue";
 
 
 const { findNode, getSelectedNodes, removeNodes } = useVueFlow();
@@ -57,6 +69,10 @@ const flowStore = useFlowStore();
 const emits = defineEmits(["removeNodeFromParentPackage"]);
 const props = defineProps(["selectedNodeData"]);
 const selectedNodeData =  toRef(props, "selectedNodeData");
+
+const submenusOpenStatus = reactive({
+  childNodesSubmenu: false,
+});
 
 // ****** General package functions ******
 function changePackageName(inputElement) {
