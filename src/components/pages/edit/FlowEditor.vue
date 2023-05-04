@@ -3,28 +3,28 @@
     <Sidebar/>
     <div class="flex-grow flex flex-col">
       <div class="flex-grow flex flex-col">
-         <nav class="bg-slate-600 h-6 flex select-none">
+         <nav class="bg-slate-800 h-6 flex select-none">
            <ul class="ml-3 flex">
              <!-- Flow dropdown menu -->
              <li>
                <div class="dropdown">
-                 <button class="text-white rounded hover:bg-gray-500 px-2 normal-case">Flow</button>
-                 <ul tabindex="0" class="dropdown-content rounded py-2 bg-gray-600 w-40 mt-2">
-                   <li class="rounded hover:bg-gray-500 bg-gray-600 cursor-pointer px-3 py-1 mx-1 flex" @click="saveFlow">
+                 <button class="text-white rounded hover:bg-slate-700 transition px-2 normal-case">Flow</button>
+                 <ul tabindex="0" class="dropdown-content rounded py-2 bg-slate-800 w-40 mt-2">
+                   <li class="rounded hover:bg-slate-700 bg-slate-800 cursor-pointer px-3 py-1 mx-1 flex" @click="saveFlow">
                      <font-awesome-icon icon="fa-solid fa-cloud-arrow-up" color="white"/>
                      <p class="text-white normal-case ml-3 mr-auto">Save</p>
                    </li>
                    <label for="detail-edit-modal">
-                     <li class="rounded hover:bg-gray-500 bg-gray-600 cursor-pointer px-3 py-1 mx-1 flex">
+                     <li class="rounded hover:bg-slate-700 bg-slate-800 cursor-pointer px-3 py-1 mx-1 flex">
                        <font-awesome-icon icon="fa-solid fa-file-pen" color="white"/>
                        <p class="text-white normal-case ml-3 mr-auto">Details</p>
                      </li>
                    </label>
-                   <li class="rounded hover:bg-gray-500 bg-gray-600 cursor-pointer px-3 py-1 mx-1 flex" @click="downloadSaveFile">
+                   <li class="rounded hover:bg-slate-700 bg-slate-800 cursor-pointer px-3 py-1 mx-1 flex" @click="downloadSaveFile">
                      <font-awesome-icon icon="fa-solid fa-download" color="white" />
                      <p class="text-white normal-case ml-3 mr-auto">Download</p>
                    </li>
-                   <li class="rounded hover:bg-gray-500 bg-gray-600 cursor-pointer px-3 py-1 mx-1 flex" @click="$refs.fileInput.click()">
+                   <li class="rounded hover:bg-slate-700 bg-slate-800 cursor-pointer px-3 py-1 mx-1 flex" @click="$refs.fileInput.click()">
                      <input type="file" ref="fileInput" @change="uploadSavedFlow" class="hidden">
                      <font-awesome-icon icon="fa-solid fa-upload" color="white" />
                      <p class="text-white normal-case ml-3 mr-auto">Upload</p>
@@ -35,10 +35,10 @@
              <!-- Tools dropdown menu -->
              <li>
                <div class="dropdown">
-                 <button class="text-white rounded hover:bg-gray-500 px-2 normal-case">Tools</button>
-                 <ul tabindex="0" class="dropdown-content rounded py-2 bg-gray-600 w-40 mt-2">
+                 <button class="text-white rounded hover:bg-slate-700 transition px-2 normal-case">Tools</button>
+                 <ul tabindex="0" class="dropdown-content rounded py-2 bg-slate-800 w-40 mt-2">
                    <label for="code-generation-options-modal">
-                     <li class="rounded hover:bg-gray-500 bg-gray-600 cursor-pointer px-3 py-1 mx-1 flex" @click="codeGenerationClicked">
+                     <li class="rounded hover:bg-slate-700 bg-slate-800 cursor-pointer px-3 py-1 mx-1 flex" @click="codeGenerationClicked">
                        <font-awesome-icon icon="fa-solid fa-code" class="my-auto" color="white" />
                        <p class="text-white normal-case ml-3 mr-auto">Code Gen.</p>
                      </li>
@@ -49,9 +49,9 @@
              <!-- View dropdown menu -->
              <li>
                <div class="dropdown">
-                 <button class="text-white rounded hover:bg-gray-500 px-2 normal-case">View</button>
-                 <ul tabindex="0" class="dropdown-content rounded py-2 bg-gray-600 w-48 mt-2">
-                   <li class="rounded hover:bg-gray-500 bg-gray-600 cursor-pointer px-3 py-1 mx-1 flex" @click="toggleCodeEditorVisibility">
+                 <button class="text-white rounded hover:bg-slate-700 px-2 normal-case">View</button>
+                 <ul tabindex="0" class="dropdown-content rounded py-2 bg-slate-800 w-48 mt-2">
+                   <li class="rounded hover:bg-slate-700 bg-slate-800 cursor-pointer px-3 py-1 mx-1 flex" @click="toggleCodeEditorVisibility">
                      <font-awesome-icon icon="fa-solid fa-file-code" class="my-auto" color="white"/>
                      <p class="text-white normal-case ml-3 mr-auto">Code editor</p>
                      <input type="checkbox" checked="checked" class="checkbox checkbox-sm ml-2 my-auto border-white bg-white" v-model="showCodeEditor"/>

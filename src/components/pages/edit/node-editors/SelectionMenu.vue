@@ -1,7 +1,7 @@
 <template>
   <div class="h-full w-1.5 bg-gray-700 cursor-col-resize flex-shrink-0 hover:bg-gray-600" @mousedown="resizeStart"/>
 
-  <div class="bg-slate-900 w-72 select-none overflow-y-auto overflow-x-hidden max-w-lg border-t border-slate-700" id="selection-menu-container">
+  <div class="bg-slate-800 w-72 select-none overflow-y-auto overflow-x-hidden max-w-lg border-t border-slate-700" id="selection-menu-container">
     <!-- Information about the selected node. Different menus based on the type on node -->
     <ClassNodeSelectionMenu v-if="selectedClassNodeData" :selected-node-data="selectedClassNodeData"
                             @warning="onWarning" @associate-classes="onAssociateClasses" @remove-class-association="onRemoveClassAssociation"/>

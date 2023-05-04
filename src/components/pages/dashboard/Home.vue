@@ -1,5 +1,5 @@
 <template>
-  <div class="w-screen h-full overflow-y-auto">
+  <div class="w-screen h-full overflow-y-auto bg-slate-800">
     <div class="w-10/12 h-fit mx-auto my-3 flex flex-wrap">
       <div class="card w-96 h-96 bg-gray-300 shadow-xl m-3 normal-case select-none cursor-pointer transition hover:shadow-2xl hover:bg-gray-200 hover:scale-105"
       @click="createNewFlow">

@@ -1,17 +1,18 @@
 <template>
 
-  <div class="w-full h-2 bg-gray-900 cursor-row-resize flex-shrink-0" @mousedown="resizeStart"/>
-  <div class="bg-gray-700 h-60 normal-case" id="code-editor-container">
+  <div class="w-full h-2 bg-gray-700 hover:bg-gray-600 cursor-row-resize flex-shrink-0" @mousedown="resizeStart"/>
+
+  <div class="bg-slate-800 h-60 normal-case" id="code-editor-container">
     <div class="flex float-right">
       <!-- Download files button -->
       <div class="mr-1 tooltip tooltip-bottom" data-tip="Download editor contents">
-        <button class="px-2 bg-gray-800 rounded-b transition hover:bg-gray-600" @click="downloadFiles">
+        <button class="px-2 bg-gray-900 rounded-b transition hover:bg-gray-600" @click="downloadFiles">
           <i class="bi bi-download text-white"></i>
         </button>
       </div>
       <!-- Close button -->
       <div class="ml-1 tooltip tooltip-bottom" data-tip="Close">
-        <button class="px-2 bg-gray-800 rounded-b transition hover:bg-gray-600" @click="emit('close_editor')">
+        <button class="px-2 bg-gray-900 rounded-b transition hover:bg-gray-600" @click="emit('close_editor')">
           <font-awesome-icon icon="fa-solid fa-angle-down" color="white" size="sm"/>
         </button>
       </div>

@@ -1,6 +1,6 @@
 <template>
-  <div class="bg-slate-900 w-60 max-w-lg select-none h-full overflow-y-auto border-t border-slate-700" id="sidebar-menu-container">
-    <p class="text-white normal-case text-xs border-b-2 border-gray-900 py-2">Drag & Drop to place</p>
+  <div class="bg-slate-800 w-60 max-w-lg select-none h-full overflow-y-auto border-t border-slate-700" id="sidebar-menu-container">
+    <p class="text-white normal-case text-xs py-2">Drag & Drop to place</p>
 
 
     <div class="ml-4 mr-4 flex text-white border-t border-slate-700">
@@ -58,7 +58,7 @@
     </div>
   </div>
 
-  <div class="h-full w-1.5 bg-gray-700 cursor-col-resize flex-shrink-0 hover:bg-gray-600" @mousedown="resizeStart"/>
+  <div class="h-full w-1.5 bg-gray-700 hover:bg-gray-600 cursor-col-resize flex-shrink-0" @mousedown="resizeStart"/>
 
 </template>
 
