@@ -1,7 +1,18 @@
 <template>
   <div class="w-screen h-full overflow-y-auto bg-slate-800">
+    <div class="w-10/12 text-white mx-auto my-5 flex border-white border-b pb-2">
+      <label class="normal-case text-left my-auto w-fit my-auto text-lg">Search by title:</label>
+      <input class="bg-gray-500 rounded ml-1 px-2 w-96
+                                      border border-gray-500
+                                      focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+             v-model="searchedTitle"
+             @input="searchedTitleChanged"
+      />
+    </div>
+
     <div class="w-10/12 h-fit mx-auto my-3 flex flex-wrap">
-      <div class="card w-96 h-96 bg-gray-300 shadow-xl m-3 normal-case select-none cursor-pointer transition hover:shadow-2xl hover:bg-gray-200 hover:scale-105"
+      <div class="card w-96 h-96 bg-slate-900 text-white m-3 normal-case select-none cursor-pointer transition
+      hover:shadow-2xl hover:shadow-slate-300 hover:bg-slate-300 hover:text-slate-900 hover:scale-105"
       @click="createNewFlow">
         <div class="card-body">
           <div class="my-auto">
@@ -12,14 +23,16 @@
       </div>
 
       <!-- Saved flows cards -->
-      <div v-for="(flow, flowIdx) in savedFlows" :key="flow.metadata.flowId" v-show="finishedLoading" class="relative w-96 h-96 m-3">
+      <div v-for="(flow, flowIdx) in savedFlows" :key="flow.metadata.flowId" v-show="finishedLoading && flow.matchesSearchedTitle"
+           class="relative w-96 h-96 m-3">
         <div v-if="flow.deleting" class="card bg-black bg-opacity-60 w-96 h-96 absolute z-10">
           <div class="mx-auto my-auto text-white">
             <h3 class="text-3xl font-bold normal-case mb-4">Deleting</h3>
             <font-awesome-icon class="animate-spin m-3" icon="fa-solid fa-spinner" size="5x" />
           </div>
         </div>
-        <div class="card w-96 h-96 bg-gray-300 shadow-xl normal-case transition hover:shadow-2xl hover:bg-gray-200 hover:scale-105 absolute">
+        <div class="card w-96 h-96 bg-slate-900 text-white normal-case transition
+        hover:shadow-2xl hover:shadow-slate-300 hover:bg-slate-300 hover:text-slate-900 hover:scale-105 absolute">
           <figure class="mt-2">
             <img :src="flow.metadata.imageURL" alt="Minimap" class="rounded-lg h-full" />
           </figure>
@@ -57,6 +70,8 @@ const flowStore = useFlowStore();
 
 const savedFlows = reactive([]);
 const finishedLoading = ref(false);
+const searchedTitle = ref("");
+
 
 onMounted(async () => {
   const q = query(collection(db, "flowsMetadata"), where("userId", "==", auth.currentUser.uid));
@@ -66,11 +81,21 @@ onMounted(async () => {
     savedFlows.push({
       metadata: doc.data(),
       deleting: false,
+      matchesSearchedTitle: true,
     });
   });
 
   finishedLoading.value = true
 });
+
+function searchedTitleChanged() {
+  const lowerCaseSearched = searchedTitle.value.toLowerCase();
+  savedFlows.forEach(flow => {
+    const lowerCaseTitle = flow.metadata.title.toLowerCase();
+    flow.matchesSearchedTitle = lowerCaseTitle.includes(lowerCaseSearched)
+  })
+}
+
 
 // Called when the open button is pressed on one of the cards
 async function openFlow(flow) {
