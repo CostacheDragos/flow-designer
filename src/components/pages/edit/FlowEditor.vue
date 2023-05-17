@@ -92,6 +92,7 @@
            <Background/>
            <template v-slot:node-class="props">
             <class-node :label="props.label" :data="props.data" :selected="props.selected" :id="props.id" :parent-node="props.parent"
+                        :is-valid-source-pos="props.isValidSourcePos"
                         @removeNodeFromParentPackage="removeNodeFromParentPackage"/>
            </template>
            <template v-slot:node-package="props">
@@ -238,7 +239,7 @@ onConnect((params) => {
     {
       ...params,
       type: "inheritance",
-      markerEnd: MarkerType.Arrow,
+      markerStart: MarkerType.Arrow,
     },
   ]);
 
@@ -443,11 +444,22 @@ function createNewNode(nodeData, position, parentId) {
 
   switch (nodeData.nodeType) {
     case nodeTypes.classNode:
+      const connectionValidation = (connection) => {
+        // Get the handles that are to be connected by cutting out the ids
+        const sourceHandleName = connection.sourceHandle.slice(connection.source.length, connection.sourceHandle.length);
+        const targetHandleName = connection.targetHandle.slice(connection.target.length, connection.targetHandle.length);
+
+        // The 2 possible handle names are __handle-top and __handle-bottom, for the connection to be valid
+        // it has to be between different names
+        return sourceHandleName !== targetHandleName;
+      };
+
       newNode = {
         id: uuidv4(),
         label: `Class`,
         type: nodeTypes.classNode,
         position,
+        isValidSourcePos: connectionValidation,
         parentNode: parentId,
         extent: parentId ? "parent" : undefined,
         data: {
@@ -685,12 +697,17 @@ function uploadSavedFlow(event) {
 
   // Called when the file reading ended
   reader.addEventListener('load', () => {
-    const flowData = JSON.parse(reader.result.toString());
+    try {
+      const flowData = JSON.parse(reader.result.toString());
 
-    setNodes(flowData.nodes);
-    setEdges(flowData.edges);
-    const [x = 0, y = 0] = flowData.position;
-    setTransform({x, y, zoom: flowData.zoom || 0});
+      setNodes(flowData.nodes);
+      setEdges(flowData.edges);
+      const [x = 0, y = 0] = flowData.position;
+      setTransform({x, y, zoom: flowData.zoom || 0});
+    } catch (error) {
+      console.log(error);
+      displayWarningModal("Failed to load the provided flow.")
+    }
   });
 
   reader.readAsText(file);

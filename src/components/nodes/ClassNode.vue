@@ -58,8 +58,8 @@
       </ul>
     </div>
 
-    <Handle :position="Position.Top" type="target" />
-    <Handle :position="Position.Bottom" type="source"/>
+    <Handle :position="Position.Top" type="target" :is-valid-connection="props.isValidSourcePos"/>
+    <Handle :position="Position.Bottom" type="source" :is-valid-connection="props.isValidSourcePos"/>
     <Handle :position="Position.Right" :connectable="false"/>
     <Handle :position="Position.Left" :connectable="false"/>
   </div>
@@ -72,7 +72,7 @@ import {NodeToolbar} from "@vue-flow/node-toolbar";
 import {ref} from "vue";
 
 // Accepting props
-const props = defineProps(["label", "id", "data", "selected", "parentNode"]);
+const props = defineProps(["label", "id", "data", "selected", "parentNode", "isValidSourcePos"]);
 const emits = defineEmits(["removeNodeFromParentPackage"]);
 
 // Called when adding properties & methods using the node toolbar

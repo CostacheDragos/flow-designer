@@ -11,7 +11,7 @@ const props = defineProps(["id", "sourceX", "sourceY", "targetX", "targetY",
   "sourcePosition", "targetPosition", "selected", "data", "markerEnd", "style"]);
 
 const animatedStyle = 'stroke-width: 1.5; stroke-dasharray: 5; animation: dashdraw 0.5s linear infinite';
-const basicStyle = 'stroke-width: 1.5; stroke: black';
+const basicStyle = 'stroke-width: 1.5';
 
 // Get the path for the edge
 const path = computed(() => getBezierPath({...props}));
