@@ -665,7 +665,7 @@
              class="checkbox checkbox-sm my-auto border-white bg-white mx-1"
              v-model="selectedNodeData.classData.isTemplate">
     </div>
-    <div class="flex w-fit mt-1">
+    <div v-if="selectedNodeData.classData.isTemplate" class="flex w-fit mt-1">
       <label class="normal-case text-left w-32">Add typename: </label>
       <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white border border-slate-700
                           hover:bg-slate-700 hover:border-white rounded-2xl px-2 py-1 w-2.5"

@@ -239,7 +239,7 @@ onConnect((params) => {
     {
       ...params,
       type: "inheritance",
-      markerStart: MarkerType.Arrow,
+      markerStart: MarkerType.ArrowClosed,
     },
   ]);
 
@@ -257,7 +257,7 @@ function createAssociationEdge(sourceNodeId, targetNodeId) {
       target: targetNodeId,
       targetHandle: `${targetNodeId}__handle-left`,
       type: "association",
-      markerEnd: MarkerType.ArrowClosed,
+      markerEnd: MarkerType.Arrow,
     },
   ]);
 }
