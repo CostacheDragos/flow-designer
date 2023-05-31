@@ -1,6 +1,6 @@
 <template>
   <!-- Name -->
-  <details class="duration-300 text-white border-b-4 p-4 border-gray-900">
+  <details class="duration-300 text-white p-4">
     <summary class="flex">
       <font-awesome-icon icon="fa-solid fa-pen-to-square"
                          class="my-auto cursor-pointer text-slate-400 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"/>

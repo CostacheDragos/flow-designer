@@ -30,17 +30,17 @@
     </div>
   </details>
 
-  <!-- Constructor controls -->
-  <div class="ml-4 mr-4 flex text-white border-t border-slate-700">
-    <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"
-                       icon="fa-solid fa-angle-right" v-show="!submenusOpenStatus.constructorSubmenu"
-                       @click="submenusOpenStatus.constructorSubmenu = !submenusOpenStatus.constructorSubmenu"/>
-    <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"
-                       icon="fa-solid fa-angle-down" v-show="submenusOpenStatus.constructorSubmenu"
-                       @click="submenusOpenStatus.constructorSubmenu = !submenusOpenStatus.constructorSubmenu"/>
-    <h1 class="bg-inherit pl-2 py-3 text-lg normal-case">Constructors</h1>
+  <div class="mx-4 flex-wrap mx-auto py-1 select-none border-t border-b border-slate-700">
+    <button v-for="(openStatus, submenu) in submenusOpenStatus" :key="submenu"
+            class="bg-gray-500 w-28 mx-0.5 mb-0.5 rounded text-gray-300 transition text-sm hover:text-black hover:bg-gray-200"
+            :class="openStatus ? 'bg-white text-black shadow-lg shadow-white' : ''"
+            @click="changeMenu(submenu)">
+      {{ submenu }}
+    </button>
   </div>
-  <div class="ml-8 text-white normal-case" v-show="submenusOpenStatus.constructorSubmenu">
+
+  <!-- Constructor controls -->
+  <div class="ml-8 mt-1 text-white normal-case" v-show="submenusOpenStatus.Constructor">
     <div class="flex w-fit mt-1">
       <label class="normal-case text-left w-48">Copy constructor: </label>
       <input type="checkbox"
@@ -112,16 +112,7 @@
   </div>
 
   <!-- Destructor controls -->
-  <div class="ml-4 mr-4 flex text-white border-t border-slate-700">
-    <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"
-                       icon="fa-solid fa-angle-right" v-show="!submenusOpenStatus.destructorSubmenu"
-                       @click="submenusOpenStatus.destructorSubmenu = !submenusOpenStatus.destructorSubmenu"/>
-    <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"
-                       icon="fa-solid fa-angle-down" v-show="submenusOpenStatus.destructorSubmenu"
-                       @click="submenusOpenStatus.destructorSubmenu = !submenusOpenStatus.destructorSubmenu"/>
-    <h1 class="bg-inherit pl-2 py-3 text-lg normal-case">Destructor</h1>
-  </div>
-  <div class="ml-8 text-white normal-case" v-show="submenusOpenStatus.destructorSubmenu">
+  <div class="ml-8 mt-1 text-white normal-case" v-show="submenusOpenStatus.Destructor">
     <div class="flex w-fit py-2">
       <label class="normal-case text-left w-48 my-auto">Generate destructor: </label>
       <input type="checkbox"
@@ -143,16 +134,7 @@
   </div>
 
   <!-- Properties controls -->
-  <div class="ml-4 mr-4 flex text-white border-t border-slate-700">
-    <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"
-                       icon="fa-solid fa-angle-right" v-show="!submenusOpenStatus.propertiesSubmenu"
-                       @click="submenusOpenStatus.propertiesSubmenu = !submenusOpenStatus.propertiesSubmenu"/>
-    <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"
-                       icon="fa-solid fa-angle-down" v-show="submenusOpenStatus.propertiesSubmenu"
-                       @click="submenusOpenStatus.propertiesSubmenu = !submenusOpenStatus.propertiesSubmenu"/>
-    <h1 class="bg-inherit pl-2 py-3 text-lg normal-case">Properties</h1>
-  </div>
-  <div class="ml-8 text-white normal-case" v-show="submenusOpenStatus.propertiesSubmenu">
+  <div class="ml-8 mt-1 text-white normal-case" v-show="submenusOpenStatus.Properties">
     <div class="flex w-fit mt-1">
       <label class="normal-case text-left w-32">Add property: </label>
       <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white border border-slate-700
@@ -341,16 +323,7 @@
   </div>
 
   <!-- Methods controls -->
-  <div class="ml-4 mr-4 flex text-white border-t border-slate-700">
-    <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"
-                       icon="fa-solid fa-angle-right" v-show="!submenusOpenStatus.methodsSubmenu"
-                       @click="submenusOpenStatus.methodsSubmenu = !submenusOpenStatus.methodsSubmenu"/>
-    <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"
-                       icon="fa-solid fa-angle-down" v-show="submenusOpenStatus.methodsSubmenu"
-                       @click="submenusOpenStatus.methodsSubmenu = !submenusOpenStatus.methodsSubmenu"/>
-    <h1 class="bg-inherit pl-2 py-3 text-lg normal-case">Methods</h1>
-  </div>
-  <div class="ml-8 text-white normal-case" v-show="submenusOpenStatus.methodsSubmenu">
+  <div class="ml-8 mt-1 text-white normal-case" v-show="submenusOpenStatus.Methods">
     <div class="flex w-fit mt-1">
       <label class="normal-case text-left w-32">Add method: </label>
       <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white border border-slate-700
@@ -424,7 +397,12 @@
                       <option v-for="dataType in generalDataTypes">
                         {{ dataType }}
                       </option>
-                      <option>void</option>
+                      <option v-for="classNode in getClassNodes()">
+                        {{ classNode.label }}
+                      </option>
+                      <option>
+                        {{ selectedNodeData.classData.name }}
+                      </option>
                     </datalist>
                   </div>
                   <!-- Type const check -->
@@ -593,16 +571,10 @@
   </div>
 
   <!-- Inheritance controls -->
-  <div class="ml-4 mr-4 flex text-white border-t border-slate-700">
-    <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"
-                       icon="fa-solid fa-angle-right" v-show="!submenusOpenStatus.inheritanceSubmenu"
-                       @click="submenusOpenStatus.inheritanceSubmenu = !submenusOpenStatus.inheritanceSubmenu"/>
-    <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"
-                       icon="fa-solid fa-angle-down" v-show="submenusOpenStatus.inheritanceSubmenu"
-                       @click="submenusOpenStatus.inheritanceSubmenu = !submenusOpenStatus.inheritanceSubmenu"/>
-    <h1 class="bg-inherit pl-2 py-3 text-lg normal-case">Inherited</h1>
-  </div>
-  <div class="ml-8 text-white normal-case" v-show="submenusOpenStatus.inheritanceSubmenu">
+  <div class="ml-8 mt-1 text-white normal-case" v-show="submenusOpenStatus.Inheritance">
+    <div class="text-left" v-if="selectedNodeData.parentClassNodes.length === 0">
+      The current class does not inherit any other class!
+    </div>
     <div class="py-2 text-white normal-case">
       <ul>
         <li v-for="parentClassNode in selectedNodeData.parentClassNodes" :key="parentClassNode.id"
@@ -625,16 +597,10 @@
   </div>
 
   <!-- Friends controls -->
-  <div class="ml-4 mr-4 flex text-white border-t border-slate-700">
-    <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"
-                       icon="fa-solid fa-angle-right" v-show="!submenusOpenStatus.friendsSubmenu"
-                       @click="submenusOpenStatus.friendsSubmenu = !submenusOpenStatus.friendsSubmenu"/>
-    <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"
-                       icon="fa-solid fa-angle-down" v-show="submenusOpenStatus.friendsSubmenu"
-                       @click="submenusOpenStatus.friendsSubmenu = !submenusOpenStatus.friendsSubmenu"/>
-    <h1 class="bg-inherit pl-2 py-3 text-lg normal-case">Friends</h1>
-  </div>
-  <div class="ml-8 text-white normal-case" v-show="submenusOpenStatus.friendsSubmenu">
+  <div class="ml-8 mt-1 text-white normal-case" v-show="submenusOpenStatus.Friends">
+    <div class="text-left" v-if="getClassNodes().length === 0">
+      No classes available!
+    </div>
     <ul>
       <li v-for="classNode in getClassNodes()" :key="classNode.id">
         <div class="flex mr-auto w-fit">
@@ -649,16 +615,7 @@
   </div>
 
   <!-- Template controls -->
-  <div class="ml-4 mr-4 flex text-white border-t border-slate-700">
-    <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"
-                       icon="fa-solid fa-angle-right" v-show="!submenusOpenStatus.templateSubmenu"
-                       @click="submenusOpenStatus.templateSubmenu = !submenusOpenStatus.templateSubmenu"/>
-    <font-awesome-icon class="my-auto cursor-pointer text-slate-400 transition hover:text-white hover:bg-slate-700 rounded-lg p-2 w-5"
-                       icon="fa-solid fa-angle-down" v-show="submenusOpenStatus.templateSubmenu"
-                       @click="submenusOpenStatus.templateSubmenu = !submenusOpenStatus.templateSubmenu"/>
-    <h1 class="bg-inherit pl-2 py-3 text-lg normal-case">Template</h1>
-  </div>
-  <div class="ml-8 text-white normal-case" v-show="submenusOpenStatus.templateSubmenu">
+  <div class="ml-8 mt-1 text-white normal-case" v-show="submenusOpenStatus.Template">
     <div class="flex text-white">
       <label class="normal-case text-left w-32">Is Template: </label>
       <input type="checkbox"
@@ -708,17 +665,35 @@ const generalDataTypes = ["int", "signed int", "unsigned int", "short int", "uns
   "long int", "unsigned long int", "long long int", "unsigned long long int", "long",
   "float", "double", "long double", "bool",
   "char", "signed char", "unsigned char", "wchar_t",
-  "std::string"];
+  "std::string", "void"];
 
 const submenusOpenStatus = reactive({
-  constructorSubmenu: false,
-  destructorSubmenu: false,
-  propertiesSubmenu: false,
-  methodsSubmenu: false,
-  inheritanceSubmenu: false,
-  friendsSubmenu: false,
-  templateSubmenu: false,
+  Constructor: false,
+  Destructor: false,
+  Properties: false,
+  Methods: false,
+  Inheritance: false,
+  Friends: false,
+  Template: false,
 });
+let currentMenu = null;
+
+// Close the old menu and open the new one
+function changeMenu(newMenu) {
+  // If the user clicks the open menu again, toggle it
+  if(currentMenu === newMenu) {
+    submenusOpenStatus[currentMenu] = false;
+    currentMenu = null;
+    return;
+  }
+
+  // If no menu was open before, nothing needs to be closed
+  if(currentMenu !== null)
+    submenusOpenStatus[currentMenu] = false;
+
+  submenusOpenStatus[newMenu] = true;
+  currentMenu = newMenu;
+}
 
 // ****** General class functions ******
 function changeClassName(inputElement) {
