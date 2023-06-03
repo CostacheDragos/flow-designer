@@ -20,14 +20,17 @@
 
     <!-- TODO change the way you handle many tabs, don't wrap them because it causes resize problems -->
     <div class="flex flex-wrap w-10/12 mx-auto pl-1 select-none">
-      <button v-for="(classData, idx) in props.generatedClasses" :key="classData.id"
-              class="bg-gray-500 px-3 mt-1 rounded-t text-gray-300 transition hover:text-black hover:bg-gray-200"
-              :class="classData.isTabOpen ? 'bg-white text-black mx-1 shadow-lg shadow-white' : ''"
-              @click="changeTab(idx)">
-        {{ classData.className }}
-      </button>
+      <div v-for="(classData, idx) in props.generatedClasses" :key="classData.id"
+           class="bg-gray-500 px-3 mt-1 rounded-t text-gray-300 transition hover:text-black hover:bg-gray-200"
+           :class="classData.isTabOpen ? 'bg-white text-black mx-1 shadow-lg shadow-white' : ''">
+        <button @click="changeTab(idx)" class="mr-2">
+          {{ classData.className }}
+        </button>
+        <font-awesome-icon icon="fa-solid fa-xmark" @click="removeTab(idx)" class="cursor-pointer"/>
+      </div>
+
       <button class="bg-gray-900 mx-1 mt-auto rounded-t px-2 h-fit w-fit hover:bg-gray-600 transition" @click="createNewTab">
-        <font-awesome-icon icon="fa-plus fa-solid" color="white"/>
+        <font-awesome-icon icon="fa-plus fa-solid" class="text-white"/>
       </button>
     </div>
 
@@ -77,6 +80,9 @@ function createNewTab() {
   changeTab(props.generatedClasses.length - 1);
 }
 
+function removeTab(tabIndex) {
+  props.generatedClasses.splice(tabIndex, 1);
+}
 
 // Downloads an archive containing all the files open if the editor
 function downloadFiles() {
