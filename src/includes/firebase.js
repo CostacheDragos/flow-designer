@@ -6,12 +6,12 @@ import { getStorage } from "firebase/storage";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyCRwMTSRBAarEcjFao4d9kfj-ZSxW-jLkk",
-    authDomain: "flow-editor-1c110.firebaseapp.com",
-    projectId: "flow-editor-1c110",
-    storageBucket: "flow-editor-1c110.appspot.com",
-    messagingSenderId: "290469999476",
-    appId: "1:290469999476:web:d03d94c70cd72540643221"
+    apiKey: "redacted",
+    authDomain: "redacted",
+    projectId: "redacted",
+    storageBucket: "redacted",
+    messagingSenderId: "redacted",
+    appId: "redacted"
 };
 
 // Initialize Firebase
